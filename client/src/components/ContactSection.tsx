@@ -1,0 +1,300 @@
+import { motion } from 'framer-motion';
+import { useInView } from 'framer-motion';
+import { useRef, useState } from 'react';
+import { MapPin, Phone, Mail, Clock, Send, MessageCircle, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface ContactSectionProps {
+  className?: string;
+}
+
+export default function ContactSection({ className = '' }: ContactSectionProps) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+
+  const contactInfo = [
+    {
+      icon: MapPin,
+      title: 'Visit Us',
+      details: ['123 Community Drive', 'Springfield, ST 12345'],
+      action: 'Get Directions'
+    },
+    {
+      icon: Phone,
+      title: 'Call Us',
+      details: ['Main: (555) 123-4567', 'Prayer: (555) 123-PRAY'],
+      action: 'Call Now'
+    },
+    {
+      icon: Mail,
+      title: 'Email Us',
+      details: ['info@gracecommunity.org', 'pastor@gracecommunity.org'],
+      action: 'Send Email'
+    },
+    {
+      icon: Clock,
+      title: 'Office Hours',
+      details: ['Mon-Fri: 9:00 AM - 5:00 PM', 'Sat-Sun: By Appointment'],
+      action: 'Schedule Visit'
+    }
+  ];
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Form submitted:', formData);
+    // TODO: Remove mock functionality - implement real form submission
+    alert('Thank you for your message! We\'ll get back to you soon.');
+    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+  };
+
+  return (
+    <section ref={ref} className={`py-20 bg-card ${className}`} id="contact">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-foreground mb-6">
+            Get in <span className="text-primary">Touch</span>
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            We'd love to hear from you! Whether you have questions, need prayer, or want to get involved, 
+            we're here to help and connect with you.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Contact Information */}
+          <div className="lg:col-span-1 space-y-6">
+            {contactInfo.map((info, index) => (
+              <motion.div
+                key={info.title}
+                initial={{ opacity: 0, x: -30 }}
+                animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Card className="hover-elevate transition-all duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-start">
+                      <div className="bg-primary/10 p-3 rounded-lg mr-4 flex-shrink-0">
+                        <info.icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground mb-2">{info.title}</h3>
+                        {info.details.map((detail, i) => (
+                          <p key={i} className="text-muted-foreground text-sm mb-1">
+                            {detail}
+                          </p>
+                        ))}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="mt-2 p-0 h-auto text-primary hover:text-primary/80"
+                          data-testid={`button-${info.title.toLowerCase().replace(' ', '-')}`}
+                          onClick={() => console.log(`${info.action} clicked`)}
+                        >
+                          {info.action} →
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+
+            {/* Map Placeholder */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <Card className="overflow-hidden hover-elevate transition-all duration-300">
+                <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                  <div className="text-center">
+                    <MapPin className="h-12 w-12 text-primary mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Interactive Map</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      data-testid="button-view-map"
+                      onClick={() => console.log('View map clicked')}
+                    >
+                      View Full Map
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Contact Form */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="lg:col-span-2"
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <MessageCircle className="h-5 w-5 mr-2 text-primary" />
+                  Send us a Message
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Name and Email Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name *</Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        placeholder="Your full name"
+                        required
+                        data-testid="input-name"
+                        className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email Address *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        placeholder="your.email@example.com"
+                        required
+                        data-testid="input-email"
+                        className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone and Subject Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone Number</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        placeholder="(555) 123-4567"
+                        data-testid="input-phone"
+                        className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="subject">Subject</Label>
+                      <Select 
+                        value={formData.subject} 
+                        onValueChange={(value) => handleInputChange('subject', value)}
+                      >
+                        <SelectTrigger data-testid="select-subject" className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
+                          <SelectValue placeholder="What's this about?" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="general">General Inquiry</SelectItem>
+                          <SelectItem value="prayer">Prayer Request</SelectItem>
+                          <SelectItem value="visit">Planning a Visit</SelectItem>
+                          <SelectItem value="volunteer">Volunteer Opportunities</SelectItem>
+                          <SelectItem value="pastoral">Pastoral Care</SelectItem>
+                          <SelectItem value="events">Events & Programs</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Message */}
+                  <div className="space-y-2">
+                    <Label htmlFor="message">Your Message *</Label>
+                    <Textarea
+                      id="message"
+                      value={formData.message}
+                      onChange={(e) => handleInputChange('message', e.target.value)}
+                      placeholder="Tell us how we can help you or what's on your heart..."
+                      className="min-h-[120px] transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                      required
+                      data-testid="textarea-message"
+                    />
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                    <p className="text-sm text-muted-foreground">
+                      We typically respond within 24 hours.
+                    </p>
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="bg-accent hover:bg-accent/90 w-full sm:w-auto"
+                      data-testid="button-send-message"
+                    >
+                      <Send className="h-4 w-4 mr-2" />
+                      Send Message
+                    </Button>
+                  </div>
+                </form>
+
+                {/* Quick Actions */}
+                <div className="mt-8 pt-6 border-t border-border">
+                  <h4 className="font-medium text-foreground mb-4">Need immediate help?</h4>
+                  <div className="flex flex-wrap gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      data-testid="button-emergency-prayer"
+                      onClick={() => console.log('Emergency prayer request')}
+                    >
+                      Emergency Prayer
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      data-testid="button-schedule-meeting"
+                      onClick={() => console.log('Schedule pastoral meeting')}
+                    >
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Schedule Meeting
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      data-testid="button-live-chat"
+                      onClick={() => console.log('Start live chat')}
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Live Chat
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
