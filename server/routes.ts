@@ -8,6 +8,15 @@ import { storage } from "./storage";
 import { insertEventSchema, insertLiveStreamSchema, insertGalleryImageSchema, insertMessageSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint for Railway
+  app.get('/health', (req: Request, res: Response) => {
+    res.status(200).json({ 
+      status: 'healthy', 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  });
+
   // Authentication middleware (simple check for admin routes)
   const requireAuth = (req: Request, res: Response, next: any) => {
     const authHeader = req.headers.authorization;

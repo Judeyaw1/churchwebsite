@@ -10,7 +10,8 @@
     "check": "tsc",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx scripts/seed-database.ts",
-    "db:reset": "drizzle-kit push && npm run db:seed"
+    "db:reset": "drizzle-kit push && npm run db:seed",
+    "db:setup": "tsx scripts/setup-production.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
