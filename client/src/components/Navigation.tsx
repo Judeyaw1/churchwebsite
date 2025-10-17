@@ -58,7 +58,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
               decoding="async"
             />
             <span className={`font-serif text-2xl font-bold transition-colors duration-300 ${
-              isScrolled ? 'text-black' : 'text-white'
+              isScrolled ? 'text-white' : 'text-white'
             }`}>
               United Bethel Presbyterian
             </span>
@@ -77,7 +77,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                   <a
                     className={`transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2 rounded-lg ${
                       isScrolled 
-                        ? 'text-black hover:text-black/80 hover:bg-white/20 hover:backdrop-blur-sm' 
+                        ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
                         : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
                     }`}
                     data-testid={`link-nav-${item.label.toLowerCase()}`}
@@ -112,7 +112,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               data-testid="button-mobile-menu"
               className={`transition-colors duration-300 ${
-                isScrolled ? 'text-black' : 'text-white'
+                isScrolled ? 'text-white' : 'text-white'
               }`}
             >
               <AnimatePresence mode="wait">
@@ -164,7 +164,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                       <a
                         className={`block transition-colors duration-300 font-medium py-2 flex items-center gap-2 ${
                           isScrolled 
-                            ? 'text-black hover:text-black/80' 
+                            ? 'text-white hover:text-white/80' 
                             : 'text-white hover:text-white/80'
                         }`}
                         data-testid={`link-mobile-${item.label.toLowerCase()}`}
