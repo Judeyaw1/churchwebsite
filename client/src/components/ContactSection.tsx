@@ -74,7 +74,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-6">
-            Get in <span className="text-primary">Touch</span>
+            Get in <span className="text-white">Touch</span>
           </h2>
           <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
             We'd love to hear from you! Whether you have questions, need prayer, or want to get involved, 
@@ -95,8 +95,8 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                 <Card className="hover-elevate transition-all duration-300 bg-white/5 border-white/20">
                   <CardContent className="p-6">
                     <div className="flex items-start">
-                      <div className="bg-primary/10 p-3 rounded-lg mr-4 flex-shrink-0">
-                        <info.icon className="h-6 w-6 text-primary" />
+                      <div className="bg-white/10 p-3 rounded-lg mr-4 flex-shrink-0">
+                        <info.icon className="h-6 w-6 text-white" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-white mb-2">{info.title}</h3>
@@ -108,7 +108,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="mt-2 p-0 h-auto text-primary hover:text-primary/80"
+                          className="mt-2 p-0 h-auto text-white hover:text-white/80"
                           data-testid={`button-${info.title.toLowerCase().replace(' ', '-')}`}
                           onClick={() => console.log(`${info.action} clicked`)}
                         >
@@ -249,7 +249,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                     <Button
                       type="submit"
                       size="lg"
-                      className="bg-accent hover:bg-accent/90 w-full sm:w-auto"
+                      className="bg-black hover:bg-black/90 w-full sm:w-auto"
                       data-testid="button-send-message"
                     >
                       <Send className="h-4 w-4 mr-2" />
@@ -265,6 +265,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                     <Button
                       variant="outline"
                       size="sm"
+                      className="border-white text-white hover:bg-white/10 hover:text-white"
                       data-testid="button-emergency-prayer"
                       onClick={() => console.log('Emergency prayer request')}
                     >
@@ -273,6 +274,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                     <Button
                       variant="outline"
                       size="sm"
+                      className="border-white text-white hover:bg-white/10 hover:text-white"
                       data-testid="button-schedule-meeting"
                       onClick={() => console.log('Schedule pastoral meeting')}
                     >
@@ -282,6 +284,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                     <Button
                       variant="outline"
                       size="sm"
+                      className="border-white text-white hover:bg-white/10 hover:text-white"
                       data-testid="button-live-chat"
                       onClick={() => console.log('Start live chat')}
                     >
