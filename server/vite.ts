@@ -24,6 +24,8 @@ export async function setupVite(app: Express, server: Server) {
     middlewareMode: true,
     hmr: { server },
     allowedHosts: true as const,
+    // Exclude API routes from Vite middleware
+    base: '/',
   };
 
   const vite = await createViteServer({
@@ -40,9 +42,26 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  app.use(vite.middlewares);
+  // Only apply Vite middleware to non-API routes
+  app.use((req, res, next) => {
+    const url = req.originalUrl;
+    
+    // Skip Vite middleware for health check and API routes
+    if (url === '/health' || url.startsWith('/api/') || url === '/api') {
+      return next();
+    }
+    
+    // Apply Vite middleware to all other routes
+    vite.middlewares(req, res, next);
+  });
+  
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
+    
+    // Skip Vite middleware for health check and API routes
+    if (url === '/health' || url.startsWith('/api/') || url === '/api') {
+      return next();
+    }
 
     try {
       const clientTemplate = path.resolve(

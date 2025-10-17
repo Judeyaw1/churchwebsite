@@ -13,7 +13,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(200).json({ 
       status: 'healthy', 
       timestamp: new Date().toISOString(),
-      uptime: process.uptime()
+      uptime: process.uptime(),
+      port: process.env.PORT || '3000'
+    });
+  });
+
+  app.get('/api/health', (req: Request, res: Response) => {
+    res.status(200).json({ 
+      status: 'healthy', 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      port: process.env.PORT || '3000'
     });
   });
 

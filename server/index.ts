@@ -7,6 +7,33 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Register health check routes immediately to avoid Vite middleware interference
+app.get('/api/health', (req: Request, res: Response) => {
+  res.status(200).json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    port: process.env.PORT || '3000'
+  });
+});
+
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    port: process.env.PORT || '3000'
+  });
+});
+
+app.get('/api', (req: Request, res: Response) => {
+  res.status(200).json({ 
+    message: 'United Bethel Presbyterian Church API',
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -38,15 +65,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Register API routes first, before any other middleware
   const server = await registerRoutes(app);
-
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
@@ -57,15 +77,30 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+
+    res.status(status).json({ message });
+    throw err;
+  });
+
   // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
+  // Railway will set PORT automatically. Default to 3000 for local development.
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-  }, () => {
-    log(`serving on port ${port}`);
+  const port = parseInt(process.env.PORT || '3000', 10);
+  
+  server.listen(port, '0.0.0.0', () => {
+    log(`[express] serving on port ${port}`);
+    log(`[express] Environment: ${process.env.NODE_ENV || 'development'}`);
+    log(`[express] Health check available at: http://0.0.0.0:${port}/health`);
+  });
+
+  server.on('error', (error: any) => {
+    log(`[express] Server error: ${error.message}`);
+    if (error.code === 'EADDRINUSE') {
+      log(`[express] Port ${port} is already in use`);
+    }
   });
 })();
