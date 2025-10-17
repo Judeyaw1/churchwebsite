@@ -64,7 +64,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
   };
 
   return (
-    <section ref={ref} className={`py-20 bg-card ${className}`} id="contact">
+    <section ref={ref} className={`py-20 bg-black/95 ${className}`} id="contact">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -73,10 +73,10 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-foreground mb-6">
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-6">
             Get in <span className="text-primary">Touch</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
             We'd love to hear from you! Whether you have questions, need prayer, or want to get involved, 
             we're here to help and connect with you.
           </p>
@@ -92,16 +92,16 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                 animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Card className="hover-elevate transition-all duration-300">
+                <Card className="hover-elevate transition-all duration-300 bg-white/5 border-white/20">
                   <CardContent className="p-6">
                     <div className="flex items-start">
                       <div className="bg-primary/10 p-3 rounded-lg mr-4 flex-shrink-0">
                         <info.icon className="h-6 w-6 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-foreground mb-2">{info.title}</h3>
+                        <h3 className="font-semibold text-white mb-2">{info.title}</h3>
                         {info.details.map((detail, i) => (
-                          <p key={i} className="text-muted-foreground text-sm mb-1">
+                          <p key={i} className="text-white/80 text-sm mb-1">
                             {detail}
                           </p>
                         ))}
@@ -127,11 +127,11 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
               animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              <Card className="overflow-hidden hover-elevate transition-all duration-300">
+              <Card className="overflow-hidden hover-elevate transition-all duration-300 bg-white/5 border-white/20">
                 <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
                   <div className="text-center">
                     <MapPin className="h-12 w-12 text-primary mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">Interactive Map</p>
+                    <p className="text-sm text-white/80">Interactive Map</p>
                     <Button
                       variant="outline"
                       size="sm"
@@ -154,9 +154,9 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
             transition={{ duration: 0.8, delay: 0.3 }}
             className="lg:col-span-2"
           >
-            <Card>
+            <Card className="bg-white/5 border-white/20">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-white">
                   <MessageCircle className="h-5 w-5 mr-2 text-primary" />
                   Send us a Message
                 </CardTitle>
@@ -166,7 +166,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                   {/* Name and Email Row */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Full Name *</Label>
+                      <Label htmlFor="name" className="text-white">Full Name *</Label>
                       <Input
                         id="name"
                         value={formData.name}
@@ -178,7 +178,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email Address *</Label>
+                      <Label htmlFor="email" className="text-white">Email Address *</Label>
                       <Input
                         id="email"
                         type="email"
@@ -195,7 +195,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                   {/* Phone and Subject Row */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label htmlFor="phone" className="text-white">Phone Number</Label>
                       <Input
                         id="phone"
                         type="tel"
@@ -207,7 +207,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="subject">Subject</Label>
+                      <Label htmlFor="subject" className="text-white">Subject</Label>
                       <Select 
                         value={formData.subject} 
                         onValueChange={(value) => handleInputChange('subject', value)}
@@ -229,7 +229,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
 
                   {/* Message */}
                   <div className="space-y-2">
-                    <Label htmlFor="message">Your Message *</Label>
+                    <Label htmlFor="message" className="text-white">Your Message *</Label>
                     <Textarea
                       id="message"
                       value={formData.message}
@@ -243,7 +243,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
 
                   {/* Submit Button */}
                   <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-white/80">
                       We typically respond within 24 hours.
                     </p>
                     <Button
@@ -260,7 +260,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
 
                 {/* Quick Actions */}
                 <div className="mt-8 pt-6 border-t border-border">
-                  <h4 className="font-medium text-foreground mb-4">Need immediate help?</h4>
+                  <h4 className="font-medium text-white mb-4">Need immediate help?</h4>
                   <div className="flex flex-wrap gap-3">
                     <Button
                       variant="outline"

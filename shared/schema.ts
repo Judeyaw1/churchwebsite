@@ -1,18 +1,145 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, boolean, integer, timestamp, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Enums
+export const eventCategoryEnum = pgEnum("event_category", [
+  "Special Event",
+  "Worship Service", 
+  "Special Service",
+  "Membership",
+  "Youth",
+  "Community Service",
+  "Adult Ministry",
+  "Children's Ministry"
+]);
+
+export const galleryCategoryEnum = pgEnum("gallery_category", [
+  "Worship",
+  "Fellowship", 
+  "Community",
+  "Youth",
+  "Children",
+  "Events"
+]);
+
+export const messagePriorityEnum = pgEnum("message_priority", [
+  "low",
+  "medium", 
+  "high"
+]);
+
+// Users table (for admin authentication)
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Events table
+export const events = pgTable("events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  date: text("date").notNull(), // Store as text for flexibility (e.g., "Dec 15, 2024")
+  time: text("time").notNull(),
+  location: text("location").notNull(),
+  description: text("description").notNull(),
+  category: eventCategoryEnum("category").notNull().default("Special Event"),
+  maxAttendees: integer("max_attendees"),
+  currentAttendees: integer("current_attendees").default(0),
+  registrationRequired: boolean("registration_required").notNull().default(false),
+  image: text("image"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Live streams table
+export const liveStreams = pgTable("live_streams", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  url: text("url").notNull(),
+  schedule: text("schedule").notNull(),
+  isLive: boolean("is_live").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Gallery images table
+export const galleryImages = pgTable("gallery_images", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  url: text("url").notNull(),
+  date: text("date").notNull(),
+  category: galleryCategoryEnum("category").notNull().default("Worship"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Messages table (for announcements)
+export const messages = pgTable("messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  date: text("date").notNull(),
+  priority: messagePriorityEnum("priority").notNull().default("medium"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
 });
 
+export const insertEventSchema = createInsertSchema(events).pick({
+  title: true,
+  date: true,
+  time: true,
+  location: true,
+  description: true,
+  category: true,
+  maxAttendees: true,
+  currentAttendees: true,
+  registrationRequired: true,
+  image: true,
+});
+
+export const insertLiveStreamSchema = createInsertSchema(liveStreams).pick({
+  title: true,
+  url: true,
+  schedule: true,
+  isLive: true,
+});
+
+export const insertGalleryImageSchema = createInsertSchema(galleryImages).pick({
+  title: true,
+  url: true,
+  date: true,
+  category: true,
+});
+
+export const insertMessageSchema = createInsertSchema(messages).pick({
+  title: true,
+  content: true,
+  date: true,
+  priority: true,
+});
+
+// Type exports
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+export type InsertEvent = z.infer<typeof insertEventSchema>;
+export type Event = typeof events.$inferSelect;
+
+export type InsertLiveStream = z.infer<typeof insertLiveStreamSchema>;
+export type LiveStream = typeof liveStreams.$inferSelect;
+
+export type InsertGalleryImage = z.infer<typeof insertGalleryImageSchema>;
+export type GalleryImage = typeof galleryImages.$inferSelect;
+
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Message = typeof messages.$inferSelect;

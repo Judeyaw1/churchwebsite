@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 
 interface NavigationProps {
@@ -20,12 +21,13 @@ export default function Navigation({ className = '' }: NavigationProps) {
   }, []);
 
   const navItems = [
-    { label: 'Home', href: '#home' },
-    { label: 'About', href: '#about' },
-    { label: 'Services', href: '#services' },
-    { label: 'Events', href: '#events' },
-    { label: 'Staff', href: '#staff' },
-    { label: 'Contact', href: '#contact' }
+    { label: 'Home', href: '/' },
+    { label: 'About', href: '/#about' },
+    { label: 'Services', href: '/#services' },
+    { label: 'Events', href: '/events' },
+    { label: 'Pastor', href: '/#pastor' },
+    { label: 'Contact', href: '/#contact' },
+    { label: 'Admin', href: '/admin/login', icon: LogIn } // Admin login link with icon
   ];
 
   return (
@@ -33,10 +35,10 @@ export default function Navigation({ className = '' }: NavigationProps) {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
         isScrolled 
-          ? 'bg-background/95 backdrop-blur-md shadow-lg border-b border-border' 
-          : 'bg-transparent'
+          ? 'bg-white/10 backdrop-blur-xl shadow-2xl border-b border-white/20' 
+          : 'bg-black/5 backdrop-blur-sm border-b border-white/10'
       } ${className}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -48,29 +50,43 @@ export default function Navigation({ className = '' }: NavigationProps) {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="flex items-center"
           >
-            <span className="font-serif text-2xl font-bold text-primary">
-              Grace Community
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRslI3U8-lsDRRpnOt-lxkEMYZvV6Wtdzv3TQ&s"
+              alt="United Bethel Presbyterian logo"
+              className="h-8 w-8 rounded-full object-contain bg-transparent mr-2"
+              loading="eager"
+              decoding="async"
+            />
+            <span className={`font-serif text-2xl font-bold transition-colors duration-300 ${
+              isScrolled ? 'text-black' : 'text-white'
+            }`}>
+              United Bethel Presbyterian
             </span>
           </motion.div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item, index) => (
-              <motion.a
+              <motion.div
                 key={item.label}
-                href={item.href}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-                className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
-                data-testid={`link-nav-${item.label.toLowerCase()}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log(`Navigate to ${item.label}`);
-                }}
               >
-                {item.label}
-              </motion.a>
+                <Link href={item.href}>
+                  <a
+                    className={`transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2 rounded-lg ${
+                      isScrolled 
+                        ? 'text-black hover:text-black/80 hover:bg-white/20 hover:backdrop-blur-sm' 
+                        : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
+                    }`}
+                    data-testid={`link-nav-${item.label.toLowerCase()}`}
+                    title={item.label} // Tooltip for icon-only admin link
+                  >
+                    {item.icon ? <item.icon className="h-5 w-5" /> : item.label}
+                  </a>
+                </Link>
+              </motion.div>
             ))}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
@@ -79,7 +95,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
             >
               <Button 
                 variant="default" 
-                className="bg-accent hover:bg-accent/90"
+                className="bg-white hover:bg-black/90 hover:text-white text-black"
                 data-testid="button-visit-us"
                 onClick={() => console.log('Visit Us clicked')}
               >
@@ -95,7 +111,9 @@ export default function Navigation({ className = '' }: NavigationProps) {
               size="icon"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               data-testid="button-mobile-menu"
-              className="text-foreground"
+              className={`transition-colors duration-300 ${
+                isScrolled ? 'text-black' : 'text-white'
+              }`}
             >
               <AnimatePresence mode="wait">
                 {isMenuOpen ? (
@@ -132,26 +150,31 @@ export default function Navigation({ className = '' }: NavigationProps) {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="md:hidden bg-card/95 backdrop-blur-md rounded-lg shadow-lg border border-border mt-2 mb-4"
+              className="md:hidden bg-white/10 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 mt-2 mb-4"
             >
               <div className="px-4 py-4 space-y-3">
                 {navItems.map((item, index) => (
-                  <motion.a
+                  <motion.div
                     key={item.label}
-                    href={item.href}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1, duration: 0.3 }}
-                    className="block text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
-                    data-testid={`link-mobile-${item.label.toLowerCase()}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsMenuOpen(false);
-                      console.log(`Navigate to ${item.label}`);
-                    }}
                   >
-                    {item.label}
-                  </motion.a>
+                    <Link href={item.href}>
+                      <a
+                        className={`block transition-colors duration-300 font-medium py-2 flex items-center gap-2 ${
+                          isScrolled 
+                            ? 'text-black hover:text-black/80' 
+                            : 'text-white hover:text-white/80'
+                        }`}
+                        data-testid={`link-mobile-${item.label.toLowerCase()}`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.icon && <item.icon className="h-5 w-5" />}
+                        {item.label}
+                      </a>
+                    </Link>
+                  </motion.div>
                 ))}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
