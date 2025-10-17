@@ -1,0 +1,14 @@
+# Ignore files that might cause deployment issues
+.nixpacks/
+node_modules/
+dist/
+.env
+.env.local
+.env.production
+.env.staging
+*.log
+logs/
+.DS_Store
+*.tar.gz
+uploads/
+test-image.html
