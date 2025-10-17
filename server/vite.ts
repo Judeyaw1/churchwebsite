@@ -18,8 +18,24 @@ export async function setupVite(app: Express, server: Server) {
   try {
     // Dynamically import Vite modules only when needed
     const { createServer: createViteServer, createLogger } = await import("vite");
-    const viteConfig = (await import("../vite.config")).default;
     const { nanoid } = await import("nanoid");
+    
+    // Create a minimal vite config inline to avoid importing vite.config.ts
+    const viteConfig = {
+      plugins: [],
+      resolve: {
+        alias: {
+          "@": path.resolve(import.meta.dirname, "..", "client", "src"),
+          "@shared": path.resolve(import.meta.dirname, "..", "shared"),
+          "@assets": path.resolve(import.meta.dirname, "..", "attached_assets"),
+        },
+      },
+      root: path.resolve(import.meta.dirname, "..", "client"),
+      build: {
+        outDir: path.resolve(import.meta.dirname, "..", "dist", "public"),
+        emptyOutDir: true,
+      },
+    };
   
   const viteLogger = createLogger();
   
@@ -94,7 +110,7 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
