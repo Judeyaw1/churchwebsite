@@ -25,7 +25,6 @@ export default function Navigation({ className = '' }: NavigationProps) {
     { label: 'About', href: '/#about' },
     { label: 'Services', href: '/#services' },
     { label: 'Events', href: '/events' },
-    { label: 'Pastor', href: '/#pastor' },
     { label: 'Contact', href: '/#contact' },
     { label: 'Admin', href: '/admin/login', icon: LogIn } // Admin login link with icon
   ];

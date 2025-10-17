@@ -94,7 +94,7 @@ app.use((req, res, next) => {
   server.listen(port, '0.0.0.0', () => {
     log(`[express] serving on port ${port}`);
     log(`[express] Environment: ${process.env.NODE_ENV || 'development'}`);
-    log(`[express] Health check available at: http://0.0.0.0:${port}/health`);
+    log(`[express] Health check available at: http://0.0.0.0:${port}/api/health`);
   });
 
   server.on('error', (error: any) => {
