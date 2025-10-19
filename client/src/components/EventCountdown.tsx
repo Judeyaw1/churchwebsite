@@ -95,12 +95,12 @@ export default function EventCountdown({
 
   if (!showCountdown) {
     return (
-      <div className={`bg-purple-800 rounded-lg p-6 sm:p-10 md:p-12 shadow-lg ${className}`}>
+      <div className={`bg-purple-800 rounded-lg p-4 sm:p-10 md:p-12 shadow-lg w-full sm:w-auto ${className}`}>
         <div className="text-center">
-          <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-3 sm:mb-4">
+          <div className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-2 sm:mb-4 break-words whitespace-normal leading-tight">
             Coming Soon
           </div>
-          <div className="text-base sm:text-lg md:text-xl text-purple-200 uppercase tracking-wide">
+          <div className="text-sm sm:text-lg md:text-xl text-purple-200 uppercase tracking-wide">
             Event Scheduled
           </div>
         </div>
