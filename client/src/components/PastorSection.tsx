@@ -6,7 +6,7 @@ import { Mail, Phone, Quote, GraduationCap, X, Calendar, MapPin, Users } from 'l
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import pastorImage from '@assets/generated_images/pastor_mark_final.svg';
+import pastorImage from '@assets/generated_images/pastor_mark_jpg.jpg';
 
 interface PastorSectionProps {
   className?: string;
