@@ -16,13 +16,37 @@ export default function PastorSection({ className = '' }: PastorSectionProps) {
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   const pastor = {
-    id: 'pastor-johnson',
-    name: 'Rev. Michael Johnson',
+    id: 'pastor-Mark',
+    name: 'Rev. Mark Asiedu Frimpong',
     title: 'Senior Pastor',
     image: pastorImage,
-    bio: 'Pastor Michael has been leading our congregation for over 15 years. He holds a Master of Divinity from Seminary and is passionate about biblical teaching and community outreach.',
-    email: 'mjohnson@unitedbethel.org',
-    phone: '(555) 123-4567',
+    bio: `"When Jesus says, 'Yes,' no one can say, 'No.'"
+
+The powerful truth in this well-known song resonates deeply with the heart of our pastor, Rev. Mark Asiedu Frimpong, a man who has continually witnessed the unfolding work of the Lord in ministering to His children. As he often proclaims, "The Lord takes the natural and adds His super to make it supernatural." Indeed, Rev. Asiedu Frimpong's life is a true reflection of this divine principle.
+
+Born and baptized in the Presbyterian Church, Pastor Frimpong began his personal walk with God during his third year in college—a transformative experience he describes as a "Pauline call" into ministry. He initially served in the Baptist Church for several years before feeling led back to his Presbyterian roots.
+
+In 1994, during the Nanumba–Konkomba conflict in the Northern Region of Ghana, his unwavering faith and bold spirit led him to serve courageously in the midst of danger. It was during this time that he planted his first non-denominational church in Zabzugu Tatale, demonstrating his deep commitment to God's mission even under perilous conditions.
+
+Pastor Frimpong is a proud graduate of Abuakwa State College, Akyem Kibi, and the Kwame Nkrumah University of Science and Technology (KNUST), where he earned a B.S. in Animal Production (1990–1994). He also holds a Postgraduate Diploma in Education (1998–1999) from the University of Cape Coast.
+
+As an educator, he taught science at Abuakwa State College, Praso Kuma Middle School, Mfantsiman Girls' Secondary School, and Langley High School in Virginia. From 1997 to 1999, he served as Head of the Agricultural Science Department at Mfantsiman Girls' Secondary School. In 1998, he also served as the District Subject Matter Specialist in Animal Production for the Ghana Ministry of Food and Agriculture.
+
+Answering his call to ministry, Rev. Frimpong served in numerous leadership roles within the Presbyterian Church of Ghana in the Central Region, including Local Preacher, Financial Committee Chairman, Christian Education Director, and Evangelism & Lay Training Committee Chairman. His dedication later earned him the roles of Assistant District Secretary for Bible Studies and Prayer Group, and District Church Planting and Evangelism Coordinator for the Cape Coast District.
+
+From 1997 to 1999, he also served as Patron for a combined group of nearly 1,000 members of the Ghana Methodist Students Union and National Union of Presbyterian Students.
+
+His zeal for evangelism inspired him and fellow teachers to form the Mfantsiman Staff Christian Fellowship and its Kitchen Ministry, an outreach program that brought the Word of God to teachers and staff who were unable to attend regular Sunday services due to work obligations.
+
+Although he was nominated by the Western Presbytery to begin seminary training in Ghana in 1999, Rev. Frimpong migrated to the United States, where he continued his dual journey as a teacher and servant of God. He worked as a Biology Instructor and Pharmacy Technician, while serving as an Ordained Elder for Evangelism and Mission in the Presbyterian Church (USA) in 2000, and later as Lay Leader of the Ghanaian Presbyterian Church in Maryland (2000–2004). He eventually pursued formal theological studies at the Louisville Presbyterian Theological Seminary, earning his Master of Divinity degree.
+
+On May 4, 2008, Rev. Frimpong was ordained by the National Capital Presbytery of PC(USA) as a Minister of Word and Sacrament. He served as Pastor of the Ghanaian Presbyterian Church in Maryland (later renamed Christ the King) until March 2014, when he received a divine call to plant a new church. This led to the founding of United Bethel Presbyterian Church, where he continues to serve faithfully as a humble, prayerful, and dynamic preacher—anointed with wisdom, humor, and a deep love for God's people.
+
+Rev. Frimpong is known for his principled and disciplined life, guided by firm convictions and an unshakable passion for ministry.
+
+He is blessed with a loving wife, Mrs. Juliana Asiedu Frimpong, and together they share the joy of parenting their son, Emmanuel Asiedu Frimpong.`,
+    email: 'pastor@unitedbethelpresbyterian.com',
+    phone: '(301) 339-3258',
     quote: 'My heart is to see every person discover God\'s love and purpose for their life.',
     specialties: ['Biblical Teaching', 'Pastoral Care', 'Leadership Development'],
     education: 'Master of Divinity, Seminary University',
