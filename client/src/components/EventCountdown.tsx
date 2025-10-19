@@ -95,12 +95,12 @@ export default function EventCountdown({
 
   if (!showCountdown) {
     return (
-      <div className={`bg-purple-800 rounded-lg p-12 shadow-lg ${className}`}>
+      <div className={`bg-purple-800 rounded-lg p-6 sm:p-10 md:p-12 shadow-lg ${className}`}>
         <div className="text-center">
-          <div className="text-6xl sm:text-7xl lg:text-8xl font-bold text-white mb-4">
+          <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-3 sm:mb-4">
             Coming Soon
           </div>
-          <div className="text-xl text-purple-200 uppercase tracking-wide">
+          <div className="text-base sm:text-lg md:text-xl text-purple-200 uppercase tracking-wide">
             Event Scheduled
           </div>
         </div>
@@ -109,49 +109,49 @@ export default function EventCountdown({
   }
 
   return (
-    <div className={`bg-gray-800 rounded-lg p-8 shadow-lg ${className}`}>
-      <div className="flex items-center justify-center space-x-12">
+    <div className={`bg-gray-800 rounded-lg p-4 sm:p-8 shadow-lg ${className}`}>
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-x-12">
         {timeLeft.days > 0 && (
           <>
             <div className="text-center">
-              <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-3">
+              <div className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-2 sm:mb-3">
                 {timeLeft.days.toString().padStart(2, '0')}
               </div>
-              <div className="text-base text-gray-400 uppercase tracking-wide">
+              <div className="text-sm sm:text-base text-gray-400 uppercase tracking-wide">
                 Days
               </div>
             </div>
-            <div className="w-px h-16 bg-gray-600"></div>
+            <div className="hidden sm:block w-px h-10 sm:h-16 bg-gray-600"></div>
           </>
         )}
         
         <div className="text-center">
-          <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-3">
+          <div className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-2 sm:mb-3">
             {timeLeft.hours.toString().padStart(2, '0')}
           </div>
-          <div className="text-base text-gray-400 uppercase tracking-wide">
+          <div className="text-sm sm:text-base text-gray-400 uppercase tracking-wide">
             Hours
           </div>
         </div>
         
-        <div className="w-px h-16 bg-gray-600"></div>
+        <div className="hidden sm:block w-px h-10 sm:h-16 bg-gray-600"></div>
         
         <div className="text-center">
-          <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-3">
+          <div className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-2 sm:mb-3">
             {timeLeft.minutes.toString().padStart(2, '0')}
           </div>
-          <div className="text-base text-gray-400 uppercase tracking-wide">
+          <div className="text-sm sm:text-base text-gray-400 uppercase tracking-wide">
             Minutes
           </div>
         </div>
         
-        <div className="w-px h-16 bg-gray-600"></div>
+        <div className="hidden sm:block w-px h-10 sm:h-16 bg-gray-600"></div>
         
         <div className="text-center">
-          <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-3">
+          <div className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-2 sm:mb-3">
             {timeLeft.seconds.toString().padStart(2, '0')}
           </div>
-          <div className="text-base text-gray-400 uppercase tracking-wide">
+          <div className="text-sm sm:text-base text-gray-400 uppercase tracking-wide">
             Seconds
           </div>
         </div>
