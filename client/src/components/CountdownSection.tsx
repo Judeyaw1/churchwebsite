@@ -74,7 +74,7 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
   }
 
   return (
-    <section ref={ref} className={`py-16 bg-gradient-to-b from-black/95 to-black/90 ${className}`}>
+    <section ref={ref} className={`py-12 sm:py-16 bg-gradient-to-b from-black/95 to-black/90 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -95,40 +95,42 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white/5 backdrop-blur-md rounded-lg p-6 hover-elevate transition-all duration-300 border border-white/20"
+          className="bg-white/5 backdrop-blur-md rounded-lg p-4 sm:p-6 hover-elevate transition-all duration-300 border border-white/20"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-8">
             {/* Event Info - Left Side */}
-            <div className="flex-1 pr-8">
-              <h3 className="text-2xl font-semibold text-white mb-3">{nextEvent.title}</h3>
+            <div className="flex-1 md:pr-8">
+              <h3 className="text-xl sm:text-2xl font-semibold text-white mb-2 sm:mb-3 break-words">
+                {nextEvent.title}
+              </h3>
               
-              <div className="space-y-2 mb-4">
+              <div className="space-y-2 mb-3 sm:mb-4">
                 <div className="flex items-center text-white/70">
                   <Calendar className="h-4 w-4 mr-2" />
-                  <span className="text-base">{nextEvent.date}</span>
+                  <span className="text-sm sm:text-base">{nextEvent.date}</span>
                 </div>
                 <div className="flex items-center text-white/70">
                   <Clock className="h-4 w-4 mr-2" />
-                  <span className="text-base">{nextEvent.time}</span>
+                  <span className="text-sm sm:text-base">{nextEvent.time}</span>
                 </div>
                 <div className="flex items-center text-white/70">
                   <MapPin className="h-4 w-4 mr-2" />
-                  <span className="text-base">{nextEvent.location}</span>
+                  <span className="text-sm sm:text-base break-words">{nextEvent.location}</span>
                 </div>
               </div>
 
-              <div className="inline-block bg-white/10 text-white px-3 py-1 rounded-full text-sm font-medium">
+              <div className="inline-block bg-white/10 text-white px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
                 {nextEvent.category}
               </div>
             </div>
 
             {/* Countdown Clock - Right Side */}
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 w-full md:w-auto">
               <EventCountdown
                 eventDate={nextEvent.date}
                 eventTime={nextEvent.time}
                 eventTitle={nextEvent.title}
-                className="w-full"
+                className="w-full max-w-full"
               />
             </div>
           </div>

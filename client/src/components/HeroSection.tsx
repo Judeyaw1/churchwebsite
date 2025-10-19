@@ -53,27 +53,27 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
       </div>
 
       {/* Video Controls - Bottom Center */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex items-center space-x-4">
+      <div className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex items-center space-x-3 sm:space-x-4">
         <button
           onClick={togglePlayPause}
-          className="bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 rounded-full p-3 border border-white/20"
+          className="bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 rounded-full p-2 sm:p-3 border border-white/20"
           aria-label={isPlaying ? "Pause video" : "Play video"}
         >
           {isPlaying ? (
-            <Pause className="h-6 w-6 text-white" />
+            <Pause className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
           ) : (
-            <Play className="h-6 w-6 text-white" />
+            <Play className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
           )}
         </button>
         <button
           onClick={toggleMute}
-          className="bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 rounded-full p-3 border border-white/20"
+          className="bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 rounded-full p-2 sm:p-3 border border-white/20"
           aria-label={isMuted ? "Unmute video" : "Mute video"}
         >
           {isMuted ? (
-            <VolumeX className="h-6 w-6 text-white" />
+            <VolumeX className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
           ) : (
-            <Volume2 className="h-6 w-6 text-white" />
+            <Volume2 className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
           )}
         </button>
       </div>
@@ -210,7 +210,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 0.5 }}
-        className="absolute bottom-24 left-1/2 transform -translate-x-1/2"
+        className="hidden sm:block absolute bottom-24 left-1/2 transform -translate-x-1/2"
       >
         <motion.div
           animate={{ y: [0, 10, 0] }}
