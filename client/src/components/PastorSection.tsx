@@ -6,7 +6,7 @@ import { Mail, Phone, Quote, GraduationCap, X, Calendar, MapPin, Users } from 'l
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import pastorImage from '@assets/generated_images/Church_pastor_professional_headshot_1618d5ab.png';
+import pastorImage from '@assets/generated_images/pastor_mark_asiedu_frimpong.svg';
 
 interface PastorSectionProps {
   className?: string;
