@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
@@ -98,7 +99,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-6">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white mb-4 sm:mb-6">
             Live Stream & <span className="text-white">Gallery</span>
           </h2>
           <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
@@ -107,7 +108,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Live Stream Section */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -185,6 +186,19 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                 )}
               </CardContent>
             </Card>
+            
+            {/* Visit Our Channel Button */}
+            <div className="text-left mt-6">
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-white/70 text-white hover:bg-white/10 hover:text-white px-8 py-3"
+                onClick={() => window.open('https://www.youtube.com/@unitedbethelpresbyterian', '_blank')}
+              >
+                <ExternalLink className="h-5 w-5 mr-2" />
+                Visit Our Channel
+              </Button>
+            </div>
           </motion.div>
 
           {/* Gallery Section */}

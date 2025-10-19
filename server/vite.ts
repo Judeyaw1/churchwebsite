@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import { type Server } from "http";
 
 export function log(message: string, source = "express") {
@@ -21,18 +22,21 @@ export async function setupVite(app: Express, server: Server) {
     const { nanoid } = await import("nanoid");
     
     // Create a minimal vite config inline to avoid importing vite.config.ts
+    // ESM-compatible __dirname replacement
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
     const viteConfig = {
       plugins: [],
       resolve: {
         alias: {
-          "@": path.resolve(import.meta.dirname, "..", "client", "src"),
-          "@shared": path.resolve(import.meta.dirname, "..", "shared"),
-          "@assets": path.resolve(import.meta.dirname, "..", "attached_assets"),
+          "@": path.resolve(__dirname, "..", "client", "src"),
+          "@shared": path.resolve(__dirname, "..", "shared"),
+          "@assets": path.resolve(__dirname, "..", "attached_assets"),
         },
       },
-      root: path.resolve(import.meta.dirname, "..", "client"),
+      root: path.resolve(__dirname, "..", "client"),
       build: {
-        outDir: path.resolve(import.meta.dirname, "..", "dist", "public"),
+        outDir: path.resolve(__dirname, "..", "dist", "public"),
         emptyOutDir: true,
       },
     };
@@ -84,7 +88,7 @@ export async function setupVite(app: Express, server: Server) {
 
     try {
       const clientTemplate = path.resolve(
-        import.meta.dirname,
+        __dirname,
         "..",
         "client",
         "index.html",
@@ -110,7 +114,8 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+  // Use process.cwd() to be robust in bundled/ESM and containerized environments
+  const distPath = path.resolve(process.cwd(), "dist", "public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(

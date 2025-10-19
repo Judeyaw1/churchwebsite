@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
@@ -41,7 +42,7 @@ export default function PastorSection({ className = '' }: PastorSectionProps) {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-6">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white mb-4 sm:mb-6">
             Meet Our <span className="text-white">Pastor</span>
           </h2>
           <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
@@ -70,10 +71,10 @@ export default function PastorSection({ className = '' }: PastorSectionProps) {
               </div>
 
               {/* Pastor Information */}
-              <div className="lg:w-1/2 p-8 lg:p-12">
+              <div className="lg:w-1/2 p-6 sm:p-8 lg:p-12">
                 <div className="h-full flex flex-col justify-center">
                   <div className="mb-6">
-                    <h3 className="text-2xl lg:text-3xl font-serif font-bold text-white mb-2">
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-white mb-2">
                       {pastor.name}
                     </h3>
                     <p className="text-lg text-white/70 mb-4">{pastor.title}</p>

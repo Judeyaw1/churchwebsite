@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
@@ -73,7 +74,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-6">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white mb-4 sm:mb-6">
             Get in <span className="text-white">Touch</span>
           </h2>
           <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
@@ -82,7 +83,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Contact Information */}
           <div className="lg:col-span-1 space-y-6">
             {contactInfo.map((info, index) => (

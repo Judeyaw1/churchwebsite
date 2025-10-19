@@ -302,6 +302,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Subscriber routes
+  app.post('/api/subscribe', async (req, res) => {
+    try {
+      const { email, name } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+
+      // Check if email already exists
+      const existingSubscriber = await storage.getSubscriberByEmail(email);
+      if (existingSubscriber) {
+        if (existingSubscriber.isActive) {
+          return res.status(400).json({ message: 'Email already subscribed' });
+        } else {
+          // Reactivate subscription
+          await storage.updateSubscriber(existingSubscriber.id, { isActive: true });
+          return res.json({ message: 'Subscription reactivated successfully' });
+        }
+      }
+
+      // Create new subscriber
+      const subscriber = await storage.createSubscriber({ email, name });
+      
+      // Send welcome email
+      try {
+        const { emailService } = await import('./emailService.js');
+        await emailService.sendWelcomeEmail(subscriber);
+      } catch (emailError) {
+        console.error('Failed to send welcome email:', emailError);
+        // Don't fail the subscription if email fails
+      }
+
+      res.json({ message: 'Subscribed successfully' });
+    } catch (error) {
+      console.error('Subscription error:', error);
+      res.status(500).json({ message: 'Failed to subscribe' });
+    }
+  });
+
+  app.post('/api/unsubscribe', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+
+      const success = await storage.unsubscribeSubscriber(email);
+      if (success) {
+        res.json({ message: 'Unsubscribed successfully' });
+      } else {
+        res.status(404).json({ message: 'Email not found' });
+      }
+    } catch (error) {
+      console.error('Unsubscribe error:', error);
+      res.status(500).json({ message: 'Failed to unsubscribe' });
+    }
+  });
+
+  // Send message to all subscribers (Admin only)
+  app.post('/api/admin/send-message', requireAuth, async (req, res) => {
+    try {
+      const { messageId } = req.body;
+      
+      if (!messageId) {
+        return res.status(400).json({ message: 'Message ID is required' });
+      }
+
+      // Get the message
+      const message = await storage.getMessage(messageId);
+      if (!message) {
+        return res.status(404).json({ message: 'Message not found' });
+      }
+
+      // Get active subscribers
+      const subscribers = await storage.getActiveSubscribers();
+      if (subscribers.length === 0) {
+        return res.status(400).json({ message: 'No active subscribers found' });
+      }
+
+      // Send emails
+      const { emailService } = await import('./emailService.js');
+      const result = await emailService.sendMessageToSubscribers(message, subscribers);
+
+      res.json({
+        message: 'Message sent successfully',
+        sent: result.success,
+        failed: result.failed,
+        totalSubscribers: subscribers.length
+      });
+    } catch (error) {
+      console.error('Send message error:', error);
+      res.status(500).json({ message: 'Failed to send message' });
+    }
+  });
+
+  // Get subscribers (Admin only)
+  app.get('/api/admin/subscribers', requireAuth, async (req, res) => {
+    try {
+      const subscribers = await storage.getSubscribers();
+      res.json(subscribers);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch subscribers' });
+    }
+  });
+
   // Admin authentication route
   app.post('/api/admin/login', async (req, res) => {
     try {

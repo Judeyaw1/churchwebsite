@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin, Users, Filter, Search, X, Mail, Phone, CheckCircle } from 'lucide-react';
@@ -8,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import CountdownClock from '@/components/CountdownClock';
+import CompactCountdown from '@/components/CompactCountdown';
 
 interface Event {
   id: string;
@@ -51,11 +54,19 @@ export default function Events() {
   const fetchEvents = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/events');
+      // Add cache-busting parameter to ensure fresh data
+      const response = await fetch(`/api/events?t=${Date.now()}`, {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (response.ok) {
         const eventsData = await response.json();
         setEvents(eventsData);
         console.log('Events fetched:', eventsData); // Debug log
+        console.log('Christmas event image:', eventsData.find(e => e.title.includes('Christmas'))?.image);
       }
     } catch (error) {
       console.error('Failed to fetch events:', error);
@@ -76,6 +87,17 @@ export default function Events() {
                          event.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
     return matchesSearch && matchesCategory;
+  });
+
+  // Get upcoming events (events that haven't happened yet)
+  const upcomingEvents = events.filter(event => {
+    const eventDateTime = new Date(`${event.date} ${event.time}`);
+    const now = new Date();
+    return eventDateTime > now;
+  }).sort((a, b) => {
+    const dateA = new Date(`${a.date} ${a.time}`);
+    const dateB = new Date(`${b.date} ${b.time}`);
+    return dateA.getTime() - dateB.getTime();
   });
 
   const getCategoryColor = (category: string) => {
@@ -108,7 +130,7 @@ export default function Events() {
               transition={{ duration: 0.8 }}
               className="text-center"
             >
-              <h1 className="text-4xl sm:text-5xl font-serif font-bold text-white mb-6">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-white mb-4 sm:mb-6">
                 Church <span className="text-white">Events</span>
               </h1>
               <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
@@ -129,9 +151,9 @@ export default function Events() {
               transition={{ duration: 0.6 }}
               className="mb-12"
             >
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+              <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between">
                 {/* Search */}
-                <div className="relative w-full md:w-96">
+                <div className="relative w-full sm:w-80 lg:w-96">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/70" />
                   <Input
                     placeholder="Search events..."
@@ -142,7 +164,7 @@ export default function Events() {
                 </div>
 
                 {/* Category Filter and Refresh */}
-                <div className="flex flex-wrap gap-2 items-center">
+                <div className="flex flex-wrap gap-2 items-center justify-center sm:justify-end">
                   {categories.map((category) => (
                     <Button
                       key={category}
@@ -164,11 +186,14 @@ export default function Events() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={fetchEvents}
+                    onClick={() => {
+                      // Force refresh with cache clearing
+                      window.location.reload();
+                    }}
                     className="border-white/30 text-white hover:bg-white/10"
                   >
                     <Calendar className="h-3 w-3 mr-1" />
-                    Refresh
+                    Force Refresh
                   </Button>
                 </div>
               </div>
@@ -182,9 +207,24 @@ export default function Events() {
               </div>
             )}
 
+            {/* Events Header */}
+            {!isLoading && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="mb-8"
+              >
+                <div className="text-center">
+                  <h2 className="text-3xl font-bold text-white mb-4">Church Events</h2>
+                  <p className="text-white/70">Join us for worship, fellowship, and community events</p>
+                </div>
+              </motion.div>
+            )}
+
             {/* Events Grid */}
             {!isLoading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {filteredEvents.map((event, index) => {
                 console.log('Rendering event:', event.title, 'with image:', event.image);
                 return (
@@ -198,13 +238,17 @@ export default function Events() {
                     {/* Event Image */}
                     <div className="aspect-video overflow-hidden relative">
                       {event.image ? (
-                        <img
-                          src={event.image}
-                          alt={event.title}
+                      <img
+                        src={`${event.image}?v=${Math.random()}`}
+                        alt={event.title}
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          onLoad={() => console.log('Image loaded successfully:', event.image)}
+                          onLoad={() => {
+                            console.log('Image loaded successfully:', event.image);
+                            console.log('Full image URL:', `${event.image}?v=${Math.random()}`);
+                          }}
                           onError={(e) => {
                             console.error('Image failed to load:', event.image);
+                            console.error('Failed URL:', e.currentTarget.src);
                             e.currentTarget.style.display = 'none';
                             const fallback = e.currentTarget.nextElementSibling as HTMLElement;
                             if (fallback) fallback.style.display = 'flex';
@@ -243,6 +287,25 @@ export default function Events() {
                       <Badge className={`mb-3 ${getCategoryColor(event.category)}`}>
                         {event.category}
                       </Badge>
+
+                      {/* Mini Countdown for upcoming events */}
+                      {(() => {
+                        const eventDateTime = new Date(`${event.date} ${event.time}`);
+                        const now = new Date();
+                        const isUpcoming = eventDateTime > now;
+                        
+                        if (isUpcoming) {
+                          return (
+                            <div className="mb-4 flex justify-center">
+                              <CompactCountdown
+                                eventDate={event.date}
+                                eventTime={event.time}
+                              />
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
 
                       <p className="text-white/80 text-sm mb-4 line-clamp-3">
                         {event.description}
@@ -321,26 +384,27 @@ export default function Events() {
       <Footer />
 
       {/* Event Details Modal */}
-      {selectedEvent && !showRegistrationForm && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedEvent(null)}
-        >
+      <AnimatePresence>
+        {selectedEvent && !showRegistrationForm && (
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setSelectedEvent(null)}
           >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
             <div className="relative">
               <div className="aspect-video overflow-hidden rounded-t-2xl relative">
                 {selectedEvent.image ? (
                   <img
-                    src={selectedEvent.image}
+                    src={`${selectedEvent.image}?v=${Math.random()}`}
                     alt={selectedEvent.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -448,29 +512,31 @@ export default function Events() {
                 </Button>
               </div>
             </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* Registration Form Modal */}
-      {showRegistrationForm && selectedEvent && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => {
-            setShowRegistrationForm(false);
-            setRegistrationSuccess(false);
-          }}
-        >
+      <AnimatePresence>
+        {showRegistrationForm && selectedEvent && (
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => {
+              setShowRegistrationForm(false);
+              setRegistrationSuccess(false);
+            }}
           >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
             {!registrationSuccess ? (
               <>
                 <div className="p-6 border-b border-gray-200">
@@ -619,9 +685,10 @@ export default function Events() {
                 </div>
               </div>
             )}
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }

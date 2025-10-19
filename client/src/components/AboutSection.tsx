@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
@@ -185,7 +186,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
   return (
     <section ref={ref} className={`py-20 bg-black/95 ${className}`} id="about">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           {/* Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -197,7 +198,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-6">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white mb-4 sm:mb-6">
                 Our <span className="text-white">Mission</span> & Values
               </h2>
               <p className="text-lg text-white/80 mb-6 leading-relaxed">

@@ -1,5 +1,7 @@
+import React from 'react';
 import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
+import CountdownSection from '@/components/CountdownSection';
 import AboutSection from '@/components/AboutSection';
 import ServicesSection from '@/components/ServicesSection';
 import LiveStreamGallerySection from '@/components/LiveStreamGallerySection';
@@ -17,6 +19,7 @@ export default function Home() {
       {/* Page Sections */}
       <main>
         <HeroSection />
+        <CountdownSection />
         <AboutSection />
         <ServicesSection />
         <LiveStreamGallerySection />

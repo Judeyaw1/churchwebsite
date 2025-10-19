@@ -12,11 +12,14 @@ import {
   type InsertGalleryImage,
   type Message,
   type InsertMessage,
+  type Subscriber,
+  type InsertSubscriber,
   users,
   events,
   liveStreams,
   galleryImages,
-  messages
+  messages,
+  subscribers
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -62,6 +65,16 @@ export interface IStorage {
   createMessage(message: InsertMessage): Promise<Message>;
   updateMessage(id: string, message: Partial<InsertMessage>): Promise<Message | undefined>;
   deleteMessage(id: string): Promise<boolean>;
+  
+  // Subscriber methods
+  getSubscribers(): Promise<Subscriber[]>;
+  getActiveSubscribers(): Promise<Subscriber[]>;
+  getSubscriber(id: string): Promise<Subscriber | undefined>;
+  getSubscriberByEmail(email: string): Promise<Subscriber | undefined>;
+  createSubscriber(subscriber: InsertSubscriber): Promise<Subscriber>;
+  updateSubscriber(id: string, subscriber: Partial<InsertSubscriber>): Promise<Subscriber | undefined>;
+  deleteSubscriber(id: string): Promise<boolean>;
+  unsubscribeSubscriber(email: string): Promise<boolean>;
 }
 
 export class PostgresStorage implements IStorage {
@@ -212,6 +225,60 @@ export class PostgresStorage implements IStorage {
   async deleteMessage(id: string): Promise<boolean> {
     const result = await db.delete(messages).where(eq(messages.id, id));
     return result.rowCount > 0;
+  }
+
+  // Subscriber methods
+  async getSubscribers(): Promise<Subscriber[]> {
+    return await db.select().from(subscribers).orderBy(desc(subscribers.subscribedAt));
+  }
+
+  async getActiveSubscribers(): Promise<Subscriber[]> {
+    return await db
+      .select()
+      .from(subscribers)
+      .where(eq(subscribers.isActive, true))
+      .orderBy(desc(subscribers.subscribedAt));
+  }
+
+  async getSubscriber(id: string): Promise<Subscriber | undefined> {
+    const result = await db.select().from(subscribers).where(eq(subscribers.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getSubscriberByEmail(email: string): Promise<Subscriber | undefined> {
+    const result = await db.select().from(subscribers).where(eq(subscribers.email, email)).limit(1);
+    return result[0];
+  }
+
+  async createSubscriber(subscriber: InsertSubscriber): Promise<Subscriber> {
+    const result = await db.insert(subscribers).values(subscriber).returning();
+    return result[0];
+  }
+
+  async updateSubscriber(id: string, subscriberUpdate: Partial<InsertSubscriber>): Promise<Subscriber | undefined> {
+    const result = await db
+      .update(subscribers)
+      .set(subscriberUpdate)
+      .where(eq(subscribers.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteSubscriber(id: string): Promise<boolean> {
+    const result = await db.delete(subscribers).where(eq(subscribers.id, id));
+    return result.rowCount > 0;
+  }
+
+  async unsubscribeSubscriber(email: string): Promise<boolean> {
+    const result = await db
+      .update(subscribers)
+      .set({ 
+        isActive: false, 
+        unsubscribedAt: new Date() 
+      })
+      .where(eq(subscribers.email, email))
+      .returning();
+    return result.length > 0;
   }
 }
 

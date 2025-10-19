@@ -1,5 +1,6 @@
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Youtube } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Youtube, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface FooterProps {
@@ -8,6 +9,47 @@ interface FooterProps {
 
 export default function Footer({ className = '' }: FooterProps) {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [subscriptionMessage, setSubscriptionMessage] = useState('');
+
+  const handleNewsletterSubscribe = async () => {
+    if (!email || !email.includes('@')) {
+      setSubscriptionStatus('error');
+      setSubscriptionMessage('Please enter a valid email address');
+      return;
+    }
+
+    setIsSubscribing(true);
+    setSubscriptionStatus('idle');
+
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubscriptionStatus('success');
+        setSubscriptionMessage('Thank you for subscribing! Check your email for a welcome message.');
+        setEmail('');
+      } else {
+        setSubscriptionStatus('error');
+        setSubscriptionMessage(data.message || 'Failed to subscribe. Please try again.');
+      }
+    } catch (error) {
+      setSubscriptionStatus('error');
+      setSubscriptionMessage('Network error. Please check your connection and try again.');
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   const footerSections = [
     {
@@ -129,21 +171,50 @@ export default function Footer({ className = '' }: FooterProps) {
             <p className="text-white/80 mb-4">
               Get weekly updates on events, sermons, and community news.
             </p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40"
-                data-testid="input-newsletter-email"
-              />
-              <Button
-                variant="secondary"
-                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-                data-testid="button-newsletter-subscribe"
-                onClick={() => console.log('Newsletter subscription')}
-              >
-                Subscribe
-              </Button>
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/40"
+                  data-testid="input-newsletter-email"
+                  disabled={isSubscribing}
+                />
+                <Button
+                  variant="secondary"
+                  className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                  data-testid="button-newsletter-subscribe"
+                  onClick={handleNewsletterSubscribe}
+                  disabled={isSubscribing || !email}
+                >
+                  {isSubscribing ? 'Subscribing...' : 'Subscribe'}
+                </Button>
+              </div>
+              
+              {/* Status Messages */}
+              {subscriptionStatus === 'success' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 text-green-300 text-sm"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  {subscriptionMessage}
+                </motion.div>
+              )}
+              
+              {subscriptionStatus === 'error' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 text-red-300 text-sm"
+                >
+                  <AlertCircle className="h-4 w-4" />
+                  {subscriptionMessage}
+                </motion.div>
+              )}
             </div>
           </div>
         </motion.div>

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'wouter';
@@ -18,7 +19,9 @@ import {
   Cloud,
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  Mail,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -65,10 +68,12 @@ interface Message {
 
 export default function Admin() {
   const [location, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<'events' | 'livestream' | 'gallery' | 'messages'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'livestream' | 'gallery' | 'messages' | 'subscribers'>('events');
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [editStatus, setEditStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
   // Check authentication on component mount
   useEffect(() => {
@@ -84,11 +89,12 @@ export default function Admin() {
       setIsLoading(true);
       
       // Fetch all data in parallel
-      const [eventsRes, streamsRes, galleryRes, messagesRes] = await Promise.all([
+      const [eventsRes, streamsRes, galleryRes, messagesRes, subscribersRes] = await Promise.all([
         fetch('/api/events'),
         fetch('/api/live-streams'),
         fetch('/api/gallery'),
-        fetch('/api/messages')
+        fetch('/api/messages'),
+        fetch('/api/admin/subscribers')
       ]);
 
       if (eventsRes.ok) {
@@ -109,6 +115,11 @@ export default function Admin() {
       if (messagesRes.ok) {
         const messagesData = await messagesRes.json();
         setMessages(messagesData);
+      }
+
+      if (subscribersRes.ok) {
+        const subscribersData = await subscribersRes.json();
+        setSubscribers(subscribersData);
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -307,12 +318,17 @@ export default function Admin() {
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [subscribers, setSubscribers] = useState<any[]>([]);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [emailMessage, setEmailMessage] = useState('');
 
   const tabs = [
     { id: 'events', label: 'Events', icon: Calendar },
     { id: 'livestream', label: 'Live Streams', icon: Video },
     { id: 'gallery', label: 'Gallery', icon: Camera },
-    { id: 'messages', label: 'Messages', icon: MessageSquare }
+    { id: 'messages', label: 'Messages', icon: MessageSquare },
+    { id: 'subscribers', label: 'Subscribers', icon: Users }
   ];
 
   const getPriorityColor = (priority: string) => {
@@ -371,6 +387,8 @@ export default function Admin() {
     setEditingItem(id);
     setShowForm(true);
     setIsAddingNew(false);
+    setHasUnsavedChanges(false);
+    setEditStatus('idle');
     
     // Populate form with existing data
     switch (type) {
@@ -393,8 +411,30 @@ export default function Admin() {
     }
   };
 
+  // Track form changes
+  const handleFormChange = (formType: string, field: string, value: any) => {
+    setHasUnsavedChanges(true);
+    setEditStatus('idle');
+    
+    switch (formType) {
+      case 'events':
+        setEventForm(prev => ({ ...prev, [field]: value }));
+        break;
+      case 'live-streams':
+        setStreamForm(prev => ({ ...prev, [field]: value }));
+        break;
+      case 'gallery':
+        setGalleryForm(prev => ({ ...prev, [field]: value }));
+        break;
+      case 'messages':
+        setMessageForm(prev => ({ ...prev, [field]: value }));
+        break;
+    }
+  };
+
   const handleSave = async () => {
     try {
+      setEditStatus('saving');
       const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
       const headers = {
         'Authorization': `Bearer ${token}`,
@@ -456,9 +496,16 @@ export default function Admin() {
         });
 
         if (response.ok) {
+          setEditStatus('success');
           // Refresh data from database
           await fetchData();
+          // Reset form after successful save
+          setShowForm(false);
+          setIsAddingNew(false);
+          setEditingItem(null);
+          setHasUnsavedChanges(false);
         } else {
+          setEditStatus('error');
           console.error('Failed to create item');
         }
       } else {
@@ -519,6 +566,43 @@ export default function Admin() {
       localStorage.removeItem('adminAuth');
       localStorage.removeItem('adminUser');
       setLocation('/admin/login');
+    }
+  };
+
+  const handleSendEmail = async (messageId: string) => {
+    if (!window.confirm('Are you sure you want to send this message to all subscribers?')) {
+      return;
+    }
+
+    setIsSendingEmail(true);
+    setEmailStatus('sending');
+    setEmailMessage('');
+
+    try {
+      const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
+      const response = await fetch('/api/admin/send-message', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ messageId })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setEmailStatus('success');
+        setEmailMessage(`Message sent successfully! Sent to ${data.sent} subscribers. ${data.failed > 0 ? `${data.failed} failed.` : ''}`);
+      } else {
+        setEmailStatus('error');
+        setEmailMessage(data.message || 'Failed to send message');
+      }
+    } catch (error) {
+      setEmailStatus('error');
+      setEmailMessage('Network error. Please try again.');
+    } finally {
+      setIsSendingEmail(false);
     }
   };
 
@@ -745,6 +829,33 @@ export default function Admin() {
               {/* Messages Management */}
               {activeTab === 'messages' && (
                 <div className="space-y-4">
+                  {/* Email Status Messages */}
+                  {emailStatus === 'success' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-green-500/20 border border-green-500/30 rounded-lg"
+                    >
+                      <div className="flex items-center gap-2 text-green-300">
+                        <CheckCircle className="h-4 w-4" />
+                        {emailMessage}
+                      </div>
+                    </motion.div>
+                  )}
+                  
+                  {emailStatus === 'error' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg"
+                    >
+                      <div className="flex items-center gap-2 text-red-300">
+                        <AlertCircle className="h-4 w-4" />
+                        {emailMessage}
+                      </div>
+                    </motion.div>
+                  )}
+
                   {messages.map((message) => (
                     <Card key={message.id} className="bg-white/5 border-white/20">
                       <CardContent className="p-6">
@@ -762,10 +873,24 @@ export default function Admin() {
                             <p className="text-white/80 text-sm line-clamp-3">{message.content}</p>
                           </div>
                           <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="border-blue-300 text-blue-300 hover:bg-blue-300/10"
+                              onClick={() => handleSendEmail(message.id)}
+                              disabled={isSendingEmail}
+                            >
+                              <Mail className="h-4 w-4" />
+                            </Button>
                             <Button size="sm" variant="outline" className="border-white/30 text-white">
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button size="sm" variant="outline" className="border-white/30 text-white">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="border-white/30 text-white"
+                              onClick={() => handleEdit('messages', message.id)}
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button 
@@ -773,6 +898,51 @@ export default function Admin() {
                               variant="outline" 
                               className="border-red-300 text-red-300 hover:bg-red-300/10"
                               onClick={() => handleDelete('messages', message.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {/* Subscribers Management */}
+              {activeTab === 'subscribers' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-white">Email Subscribers</h3>
+                    <Badge className="bg-blue-100 text-blue-800">
+                      {subscribers.filter(s => s.isActive).length} Active
+                    </Badge>
+                  </div>
+                  
+                  {subscribers.map((subscriber) => (
+                    <Card key={subscriber.id} className="bg-white/5 border-white/20">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-1">
+                              <h4 className="text-white font-medium">{subscriber.email}</h4>
+                              <Badge className={subscriber.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                                {subscriber.isActive ? 'Active' : 'Inactive'}
+                              </Badge>
+                            </div>
+                            {subscriber.name && (
+                              <p className="text-white/70 text-sm">{subscriber.name}</p>
+                            )}
+                            <p className="text-white/60 text-xs">
+                              Subscribed: {new Date(subscriber.subscribedAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="border-red-300 text-red-300 hover:bg-red-300/10"
+                              onClick={() => handleDelete('subscribers', subscriber.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

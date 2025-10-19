@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'wouter';
@@ -56,10 +56,11 @@ export default function Navigation({ className = '' }: NavigationProps) {
               loading="eager"
               decoding="async"
             />
-            <span className={`font-serif text-2xl font-bold transition-colors duration-300 ${
+            <span className={`font-serif text-lg sm:text-xl lg:text-2xl font-bold transition-colors duration-300 ${
               isScrolled ? 'text-white' : 'text-white'
             }`}>
-              United Bethel Presbyterian
+              <span className="hidden sm:inline">United Bethel Presbyterian</span>
+              <span className="sm:hidden">UBP</span>
             </span>
           </motion.div>
 
@@ -149,9 +150,9 @@ export default function Navigation({ className = '' }: NavigationProps) {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="md:hidden bg-white/10 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 mt-2 mb-4"
+              className="md:hidden bg-white/10 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 mt-2 mb-4 mx-2"
             >
-              <div className="px-4 py-4 space-y-3">
+              <div className="px-4 py-6 space-y-4">
                 {navItems.map((item, index) => (
                   <motion.div
                     key={item.label}
@@ -161,7 +162,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                   >
                     <Link href={item.href}>
                       <a
-                        className={`block transition-colors duration-300 font-medium py-2 flex items-center gap-2 ${
+                        className={`block transition-colors duration-300 font-medium py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
                           isScrolled 
                             ? 'text-white hover:text-white/80' 
                             : 'text-white hover:text-white/80'
@@ -169,8 +170,8 @@ export default function Navigation({ className = '' }: NavigationProps) {
                         data-testid={`link-mobile-${item.label.toLowerCase()}`}
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        {item.icon && <item.icon className="h-5 w-5" />}
-                        {item.label}
+                        {item.icon && <item.icon className="h-5 w-5 flex-shrink-0" />}
+                        <span className="text-base">{item.label}</span>
                       </a>
                     </Link>
                   </motion.div>
@@ -183,7 +184,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 >
                   <Button 
                     variant="default" 
-                    className="w-full bg-accent hover:bg-accent/90"
+                    className="w-full bg-accent hover:bg-accent/90 py-3 text-base font-semibold"
                     data-testid="button-mobile-visit-us"
                     onClick={() => {
                       setIsMenuOpen(false);
