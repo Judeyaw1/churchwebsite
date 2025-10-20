@@ -22,7 +22,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
 
   const navItems = [
     { label: 'Home', href: '/' },
-    { label: 'About', href: '/#about' },
+    { label: 'About', href: '/about' },
     { label: 'Services', href: '/#services' },
     { label: 'Events', href: '/events' },
     { label: 'Contact', href: '/#contact' },
