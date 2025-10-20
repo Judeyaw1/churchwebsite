@@ -73,11 +73,19 @@ export default function Footer({ className = '' }: FooterProps) {
     {
       title: 'Quick Links',
       items: [
-        { text: 'About Us', href: '/about' },
+        { text: 'Home', href: '/' },
+        { text: 'About', href: '/about' },
         { text: 'Services', href: '/#services' },
-        { text: 'Events', href: '/events' },
-        { text: 'Meet Our Pastor', href: '/#pastor' },
-        { text: 'Groups', href: '/groups' }
+        { text: 'Events', href: '/events' }
+      ]
+    },
+    {
+      title: 'Groups',
+      items: [
+        { text: 'Men\'s Fellowship', href: '/groups/mens-fellowship' },
+        { text: 'YAF', href: '/groups/yaf' },
+        { text: 'YPG', href: '/groups/ypg' },
+        { text: 'JY', href: '/groups/jy' }
       ]
     }
   ];
@@ -91,7 +99,7 @@ export default function Footer({ className = '' }: FooterProps) {
   return (
     <footer className={`bg-black/95 text-white border-t border-white/20 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Church Info */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
