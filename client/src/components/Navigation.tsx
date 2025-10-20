@@ -108,7 +108,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute top-full left-0 mt-2 w-48 bg-white/5 backdrop-blur-xl rounded-lg shadow-xl border border-white/10 py-2 z-50"
+                          className="absolute top-full left-0 mt-2 w-48 bg-black/80 backdrop-blur-xl rounded-lg shadow-xl border border-white/20 py-2 z-50"
                         >
                           {groupsItems.map((groupItem, groupIndex) => (
                             <Link key={groupItem.label} href={groupItem.href}>
@@ -235,12 +235,12 @@ export default function Navigation({ className = '' }: NavigationProps) {
                               animate={{ opacity: 1, height: 'auto' }}
                               exit={{ opacity: 0, height: 0 }}
                               transition={{ duration: 0.2 }}
-                              className="ml-4 mt-2 space-y-2"
+                              className="ml-4 mt-2 space-y-2 bg-black/60 backdrop-blur-sm rounded-lg p-2"
                             >
                               {groupsItems.map((groupItem, groupIndex) => (
                                 <Link key={groupItem.label} href={groupItem.href}>
                                   <a
-                                    className="block py-2 px-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200"
+                                    className="block py-2 px-3 text-white hover:text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
                                     onClick={() => {
                                       setIsMenuOpen(false);
                                       setIsGroupsOpen(false);
