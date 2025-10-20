@@ -193,7 +193,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                 variant="outline"
                 size="lg"
                 className="border-white/70 text-white hover:bg-white/10 hover:text-white px-8 py-3"
-                onClick={() => window.open('https://www.youtube.com/@unitedbethelpresbyterian', '_blank')}
+                onClick={() => window.open('http://www.youtube.com/@ubpcmedia6480', '_blank')}
               >
                 <ExternalLink className="h-5 w-5 mr-2" />
                 Visit Our Channel
