@@ -42,8 +42,8 @@ export default function EventCountdown({
         setTimeLeft({ days, hours, minutes, seconds });
         setIsExpired(false);
         
-        // Show countdown if 2 days or less remaining
-        setShowCountdown(days <= 2);
+        // Show countdown if 2 days or less remaining (temporarily always show for testing)
+        setShowCountdown(true);
       } else {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
         setIsExpired(true);
