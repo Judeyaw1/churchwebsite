@@ -11,6 +11,7 @@ interface NavigationProps {
 export default function Navigation({ className = '' }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isGroupsOpen, setIsGroupsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,8 +26,15 @@ export default function Navigation({ className = '' }: NavigationProps) {
     { label: 'About', href: '/about' },
     { label: 'Services', href: '/#services' },
     { label: 'Events', href: '/events' },
-    { label: 'Contact', href: '/#contact' },
+    { label: 'Groups', href: '#', hasDropdown: true },
     { label: 'Admin', href: '/admin/login', icon: LogIn } // Admin login link with icon
+  ];
+
+  const groupsItems = [
+    { label: 'Men\'s Fellowship', href: '/groups/mens-fellowship' },
+    { label: 'YAF', href: '/groups/yaf' },
+    { label: 'YPG', href: '/groups/ypg' },
+    { label: 'JY', href: '/groups/jy' }
   ];
 
   return (
@@ -72,20 +80,65 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+                className="relative"
               >
-                <Link href={item.href}>
-                  <a
-                    className={`transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2 rounded-lg ${
-                      isScrolled 
-                        ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
-                        : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
-                    }`}
-                    data-testid={`link-nav-${item.label.toLowerCase()}`}
-                    title={item.label} // Tooltip for icon-only admin link
+                {item.hasDropdown ? (
+                  <div
+                    className="relative"
+                    onMouseEnter={() => setIsGroupsOpen(true)}
+                    onMouseLeave={() => setIsGroupsOpen(false)}
                   >
-                    {item.icon ? <item.icon className="h-5 w-5" /> : item.label}
-                  </a>
-                </Link>
+                    <button
+                      className={`transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2 rounded-lg ${
+                        isScrolled 
+                          ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
+                          : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
+                      }`}
+                      data-testid={`link-nav-${item.label.toLowerCase()}`}
+                    >
+                      {item.label}
+                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isGroupsOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {/* Dropdown Menu */}
+                    <AnimatePresence>
+                      {isGroupsOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-full left-0 mt-2 w-48 bg-white/10 backdrop-blur-xl rounded-lg shadow-xl border border-white/20 py-2 z-50"
+                        >
+                          {groupsItems.map((groupItem, groupIndex) => (
+                            <Link key={groupItem.label} href={groupItem.href}>
+                              <a
+                                className="block px-4 py-2 text-white hover:bg-white/20 transition-colors duration-200"
+                                onClick={() => setIsGroupsOpen(false)}
+                              >
+                                {groupItem.label}
+                              </a>
+                            </Link>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <Link href={item.href}>
+                    <a
+                      className={`transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2 rounded-lg ${
+                        isScrolled 
+                          ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
+                          : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
+                      }`}
+                      data-testid={`link-nav-${item.label.toLowerCase()}`}
+                      title={item.label}
+                    >
+                      {item.icon ? <item.icon className="h-5 w-5" /> : item.label}
+                    </a>
+                  </Link>
+                )}
               </motion.div>
             ))}
             <motion.div
@@ -160,20 +213,63 @@ export default function Navigation({ className = '' }: NavigationProps) {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1, duration: 0.3 }}
                   >
-                    <Link href={item.href}>
-                      <a
-                        className={`block transition-colors duration-300 font-medium py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
-                          isScrolled 
-                            ? 'text-white hover:text-white/80' 
-                            : 'text-white hover:text-white/80'
-                        }`}
-                        data-testid={`link-mobile-${item.label.toLowerCase()}`}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        {item.icon && <item.icon className="h-5 w-5 flex-shrink-0" />}
-                        <span className="text-base">{item.label}</span>
-                      </a>
-                    </Link>
+                    {item.hasDropdown ? (
+                      <div>
+                        <button
+                          className={`w-full text-left transition-colors duration-300 font-medium py-3 px-3 rounded-lg flex items-center justify-between hover:bg-white/10 ${
+                            isScrolled 
+                              ? 'text-white hover:text-white/80' 
+                              : 'text-white hover:text-white/80'
+                          }`}
+                          onClick={() => setIsGroupsOpen(!isGroupsOpen)}
+                        >
+                          <span className="text-base">{item.label}</span>
+                          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isGroupsOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        
+                        {/* Mobile Dropdown */}
+                        <AnimatePresence>
+                          {isGroupsOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="ml-4 mt-2 space-y-2"
+                            >
+                              {groupsItems.map((groupItem, groupIndex) => (
+                                <Link key={groupItem.label} href={groupItem.href}>
+                                  <a
+                                    className="block py-2 px-3 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
+                                    onClick={() => {
+                                      setIsMenuOpen(false);
+                                      setIsGroupsOpen(false);
+                                    }}
+                                  >
+                                    {groupItem.label}
+                                  </a>
+                                </Link>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ) : (
+                      <Link href={item.href}>
+                        <a
+                          className={`block transition-colors duration-300 font-medium py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
+                            isScrolled 
+                              ? 'text-white hover:text-white/80' 
+                              : 'text-white hover:text-white/80'
+                          }`}
+                          data-testid={`link-mobile-${item.label.toLowerCase()}`}
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          {item.icon && <item.icon className="h-5 w-5 flex-shrink-0" />}
+                          <span className="text-base">{item.label}</span>
+                        </a>
+                      </Link>
+                    )}
                   </motion.div>
                 ))}
                 <motion.div
