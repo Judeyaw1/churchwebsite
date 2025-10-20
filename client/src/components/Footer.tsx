@@ -73,23 +73,23 @@ export default function Footer({ className = '' }: FooterProps) {
     {
       title: 'Quick Links',
       items: [
-        { text: 'About Us', href: '#about' },
-        { text: 'Services', href: '#services' },
-        { text: 'Events', href: '#events' },
-        { text: 'Meet Our Staff', href: '#staff' },
-        { text: 'Contact Us', href: '#contact' }
+        { text: 'About Us', href: '/about' },
+        { text: 'Services', href: '/#services' },
+        { text: 'Events', href: '/events' },
+        { text: 'Meet Our Pastor', href: '/#pastor' },
+        { text: 'Groups', href: '/groups' }
       ]
     }
   ];
 
   const socialLinks = [
-    { icon: Facebook, label: 'Facebook', href: '#' },
-    { icon: Instagram, label: 'Instagram', href: '#' },
-    { icon: Youtube, label: 'YouTube', href: '#' }
+    { icon: Facebook, label: 'Facebook', href: 'https://facebook.com/unitedbethelpresbyterian' },
+    { icon: Instagram, label: 'Instagram', href: 'https://instagram.com/unitedbethelpresbyterian' },
+    { icon: Youtube, label: 'YouTube', href: 'http://www.youtube.com/@ubpcmedia6480' }
   ];
 
   return (
-    <footer className={`bg-black text-white border-t border-white/20 ${className}`}>
+    <footer className={`bg-black/95 text-white border-t border-white/20 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Church Info */}
@@ -113,7 +113,7 @@ export default function Footer({ className = '' }: FooterProps) {
                   size="icon"
                   className="text-white/80 hover:text-white hover:bg-white/10"
                   data-testid={`link-social-${social.label.toLowerCase()}`}
-                  onClick={() => console.log(`Visit ${social.label}`)}
+                  onClick={() => window.open(social.href, '_blank')}
                   aria-label={social.label}
                 >
                   <social.icon className="h-5 w-5" />
@@ -141,10 +141,6 @@ export default function Footer({ className = '' }: FooterProps) {
                         href={item.href}
                         className="hover:text-white transition-colors duration-200"
                         data-testid={`link-footer-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          console.log(`Navigate to ${item.text}`);
-                        }}
                       >
                         {item.text}
                       </a>
@@ -230,12 +226,8 @@ export default function Footer({ className = '' }: FooterProps) {
           <p>
             © {currentYear} United Bethel Presbyterian Church. All rights reserved. | 
             <a 
-              href="#" 
+              href="/privacy" 
               className="hover:text-white transition-colors duration-200 ml-1"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log('Privacy policy clicked');
-              }}
               data-testid="link-privacy-policy"
             >
               Privacy Policy
