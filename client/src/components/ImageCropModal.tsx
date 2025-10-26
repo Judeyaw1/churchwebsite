@@ -3,7 +3,7 @@ import Cropper from 'react-easy-crop';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { AspectRatio, RotateCw } from 'lucide-react';
+import { RotateCw, Maximize2 } from 'lucide-react';
 
 interface ImageCropModalProps {
   isOpen: boolean;
@@ -121,7 +121,7 @@ export default function ImageCropModal({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium flex items-center">
-                <AspectRatio className="h-4 w-4 mr-2" />
+                <Maximize2 className="h-4 w-4 mr-2" />
                 Zoom
               </label>
               <span className="text-sm text-gray-500">{Math.round(zoom * 100)}%</span>
