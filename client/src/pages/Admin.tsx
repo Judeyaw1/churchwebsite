@@ -85,6 +85,11 @@ export default function Admin() {
     }
   }, [setLocation]);
 
+  // Debug showForm changes
+  useEffect(() => {
+    console.log('showForm changed to:', showForm, 'activeTab:', activeTab, 'editingItem:', editingItem);
+  }, [showForm, activeTab, editingItem]);
+
   // Fetch data from database APIs
   const fetchData = async () => {
     try {
@@ -906,7 +911,12 @@ export default function Admin() {
                             size="sm" 
                             variant="outline" 
                             className="border-white/30 text-white flex-1"
-                            onClick={() => handleEdit('gallery', image.id)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              alert('Edit button clicked for: ' + image.id);
+                              handleEdit('gallery', image.id);
+                            }}
                           >
                             <Edit className="h-4 w-4 mr-1" />
                             Edit
