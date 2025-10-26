@@ -21,13 +21,15 @@ import {
   AlertCircle,
   Loader2,
   Mail,
-  Users
+  Users,
+  Crop
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import Navigation from '@/components/Navigation';
+import ImageCropModal from '@/components/ImageCropModal';
 import Footer from '@/components/Footer';
 
 interface Event {
@@ -163,6 +165,11 @@ export default function Admin() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   
+  // Image crop modal states
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropImageUrl, setCropImageUrl] = useState<string>('');
+  const [cropFileIndex, setCropFileIndex] = useState<number>(-1);
+  
   // Event thumbnail upload states
   const [eventThumbnailFile, setEventThumbnailFile] = useState<File | null>(null);
   const [eventUploadProgress, setEventUploadProgress] = useState(0);
@@ -209,6 +216,34 @@ export default function Admin() {
     } else {
       console.log('No files selected');
     }
+  };
+
+  // Handle crop modal
+  const handleCropImage = (file: File, index: number) => {
+    const objectUrl = URL.createObjectURL(file);
+    setCropImageUrl(objectUrl);
+    setCropFileIndex(index);
+    setShowCropModal(true);
+  };
+
+  const handleCropComplete = (croppedImageUrl: string) => {
+    // Convert the cropped image URL to a File object
+    fetch(croppedImageUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const file = new File([blob], selectedFiles[cropFileIndex].name, { type: 'image/jpeg' });
+        const newFiles = [...selectedFiles];
+        newFiles[cropFileIndex] = file;
+        setSelectedFiles(newFiles);
+        
+        // Clean up the object URL
+        URL.revokeObjectURL(croppedImageUrl);
+      })
+      .catch(error => {
+        console.error('Error converting cropped image:', error);
+      });
+    
+    setShowCropModal(false);
   };
 
   const handleEventThumbnailSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1325,15 +1360,25 @@ export default function Admin() {
                                   <span className="text-sm text-gray-700 truncate">{file.name}</span>
                                   <span className="text-xs text-gray-500 ml-2">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
-                                  }}
-                                  className="ml-2 text-red-500 hover:text-red-700"
-                                >
-                                  ×
-                                </button>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCropImage(file, index)}
+                                    className="text-blue-600 hover:text-blue-700 p-1"
+                                    title="Adjust crop & focus"
+                                  >
+                                    <Crop className="h-4 w-4" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
+                                    }}
+                                    className="text-red-500 hover:text-red-700 p-1"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -1445,6 +1490,20 @@ export default function Admin() {
           </motion.div>
         </motion.div>
       )}
+
+      {/* Image Crop Modal */}
+      <ImageCropModal
+        isOpen={showCropModal}
+        onClose={() => {
+          setShowCropModal(false);
+          if (cropImageUrl) {
+            URL.revokeObjectURL(cropImageUrl);
+            setCropImageUrl('');
+          }
+        }}
+        imageUrl={cropImageUrl}
+        onCropComplete={handleCropComplete}
+      />
     </div>
   );
 }
