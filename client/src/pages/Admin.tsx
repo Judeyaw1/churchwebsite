@@ -443,6 +443,7 @@ export default function Admin() {
   };
 
   const handleEdit = (type: string, id: string) => {
+    console.log('handleEdit called:', { type, id, activeTab, galleryImagesCount: galleryImages.length });
     setEditingItem(id);
     setShowForm(true);
     setIsAddingNew(false);
@@ -453,21 +454,27 @@ export default function Admin() {
     switch (type) {
       case 'events':
         const event = events.find(e => e.id === id);
+        console.log('Found event:', event);
         if (event) setEventForm(event);
         break;
       case 'live-streams':
+      case 'livestream':
         const stream = liveStreams.find(s => s.id === id);
+        console.log('Found stream:', stream);
         if (stream) setStreamForm(stream);
         break;
       case 'gallery':
         const image = galleryImages.find(i => i.id === id);
+        console.log('Found gallery image:', image);
         if (image) setGalleryForm(image);
         break;
       case 'messages':
         const message = messages.find(m => m.id === id);
+        console.log('Found message:', message);
         if (message) setMessageForm(message);
         break;
     }
+    console.log('After handleEdit, showForm:', true);
   };
 
   // Track form changes
@@ -480,6 +487,7 @@ export default function Admin() {
         setEventForm(prev => ({ ...prev, [field]: value }));
         break;
       case 'live-streams':
+      case 'livestream':
         setStreamForm(prev => ({ ...prev, [field]: value }));
         break;
       case 'gallery':
