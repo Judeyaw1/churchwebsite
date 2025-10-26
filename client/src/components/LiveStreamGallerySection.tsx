@@ -62,20 +62,60 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
     fetchData();
   }, []);
 
+  // Convert YouTube URL to embed format
+  const convertYouTubeUrl = (url: string) => {
+    try {
+      // If already in embed format, return as is
+      if (url.includes('youtube.com/embed/')) {
+        return url;
+      }
+      
+      // Handle youtu.be short URLs
+      if (url.includes('youtu.be/')) {
+        const videoId = url.split('youtu.be/')[1].split('?')[0];
+        return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+      }
+      
+      // Handle youtube.com/watch?v= format
+      if (url.includes('youtube.com/watch?v=') || url.includes('youtube.com/')) {
+        let videoId = '';
+        if (url.includes('v=')) {
+          videoId = url.split('v=')[1].split('&')[0];
+        } else if (url.includes('/')) {
+          videoId = url.split('/').pop()?.split('?')[0] || '';
+        }
+        return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+      }
+      
+      // If URL doesn't match any pattern, try to extract video ID from the end
+      const possibleVideoId = url.split('/').pop()?.split('?')[0];
+      if (possibleVideoId && possibleVideoId.length > 8) {
+        return `https://www.youtube.com/embed/${possibleVideoId}?autoplay=1`;
+      }
+      
+      return url;
+    } catch (error) {
+      console.error('Error converting YouTube URL:', error);
+      return url;
+    }
+  };
+
   // Get current live stream
   const currentLiveStream = liveStreams.find(stream => stream.isLive) || liveStreams[0];
 
-  // Convert YouTube URL to embed format
-  const convertYouTubeUrl = (url: string) => {
-    if (url.includes('youtu.be/')) {
-      const videoId = url.split('youtu.be/')[1].split('?')[0];
-      return `https://www.youtube.com/embed/${videoId}`;
-    } else if (url.includes('youtube.com/watch?v=')) {
-      const videoId = url.split('v=')[1].split('&')[0];
-      return `https://www.youtube.com/embed/${videoId}`;
+  // Debug logging
+  useEffect(() => {
+    if (currentLiveStream) {
+      console.log('Current Live Stream:', {
+        title: currentLiveStream.title,
+        url: currentLiveStream.url,
+        isLive: currentLiveStream.isLive,
+        convertedUrl: currentLiveStream.url ? convertYouTubeUrl(currentLiveStream.url) : 'No URL'
+      });
+    } else {
+      console.log('No live stream found');
     }
-    return url;
-  };
+  }, [currentLiveStream]);
 
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => 
@@ -125,14 +165,16 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                     </div>
                   </div>
                 ) : currentLiveStream ? (
-                  <div className="relative aspect-video">
+                  <div className="relative aspect-video bg-black">
                     {currentLiveStream.url ? (
                       <iframe
+                        key={currentLiveStream.id}
                         src={convertYouTubeUrl(currentLiveStream.url)}
                         title={currentLiveStream.title}
-                        className="w-full h-full"
+                        className="w-full h-full border-0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
+                        frameBorder="0"
                       />
                     ) : (
                       <div className="relative aspect-video bg-gradient-to-br from-primary/30 to-primary/50">
