@@ -894,7 +894,12 @@ export default function Admin() {
                           <Badge className="bg-blue-100 text-blue-800">{image.category}</Badge>
                         </div>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="border-white/30 text-white flex-1">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-white/30 text-white flex-1"
+                            onClick={() => handleEdit('gallery', image.id)}
+                          >
                             <Edit className="h-4 w-4 mr-1" />
                             Edit
                           </Button>
