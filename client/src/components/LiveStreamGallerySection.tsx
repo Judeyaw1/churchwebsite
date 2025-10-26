@@ -281,13 +281,13 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                     </div>
                   ) : galleryImages.length > 0 ? (
                     <>
-                      <div className="aspect-video overflow-hidden">
+                      <div className="aspect-video overflow-hidden bg-black/30 flex items-center justify-center relative">
                         <img
                           src={galleryImages[currentImageIndex].url}
                           alt={galleryImages[currentImageIndex].title}
-                          className="w-full h-full object-cover"
+                          className="max-w-full max-h-full object-contain"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
                         
                         {/* Image Info Overlay */}
                         <div className="absolute bottom-4 left-4 text-white">
@@ -317,7 +317,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                             <button
                               key={image.id}
                               onClick={() => setCurrentImageIndex(index)}
-                              className={`aspect-video overflow-hidden rounded-lg transition-all duration-300 ${
+                              className={`aspect-video overflow-hidden rounded-lg bg-black/30 transition-all duration-300 ${
                                 index === currentImageIndex 
                                   ? 'ring-2 ring-white/50 scale-105' 
                                   : 'hover:scale-105 opacity-70 hover:opacity-100'
@@ -326,7 +326,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                               <img
                                 src={image.url}
                                 alt={image.title}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain"
                               />
                             </button>
                           ))}

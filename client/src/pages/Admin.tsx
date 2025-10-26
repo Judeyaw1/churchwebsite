@@ -893,11 +893,11 @@ export default function Admin() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {galleryImages.map((image) => (
                     <Card key={image.id} className="bg-white/5 border-white/20 overflow-hidden">
-                      <div className="aspect-video overflow-hidden">
+                      <div className="aspect-video overflow-hidden bg-black/30 flex items-center justify-center">
                         <img 
                           src={image.url} 
                           alt={image.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       </div>
                       <CardContent className="p-4">
