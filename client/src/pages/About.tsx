@@ -7,7 +7,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import communityImage from '@assets/generated_images/Church_community_fellowship_gathering_6de85642.png';
 import pastorImage from '@assets/generated_images/Church_pastor_professional_headshot_1618d5ab.png';
-import churchBuildingImage from '@assets/generated_images/Modern_church_exterior_building_046c51f8.png';
+import pastorImageJpg from '@assets/generated_images/pastor_mark_jpg.jpg';
 
 export default function About() {
   const heroRef = useRef(null);
@@ -65,7 +65,7 @@ export default function About() {
     {
       name: 'Deacon Michael Chen',
       position: 'Deacon Board Chair',
-      image: churchBuildingImage,
+      image: pastorImageJpg,
       bio: 'Michael leads our Deacon Board in caring for the practical needs of our congregation and community, ensuring that no one in our church family goes without support.',
       education: 'Master of Social Work',
       experience: '10+ years in community service'
@@ -150,7 +150,7 @@ export default function About() {
               className="relative"
             >
               <img
-                src={churchBuildingImage}
+                src={pastorImageJpg}
                 alt="United Bethel Presbyterian Church"
                 className="w-full h-96 object-cover rounded-2xl shadow-lg"
               />
