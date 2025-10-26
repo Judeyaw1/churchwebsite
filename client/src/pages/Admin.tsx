@@ -116,6 +116,8 @@ export default function Admin() {
 
       if (galleryRes.ok) {
         const galleryData = await galleryRes.json();
+        console.log('Gallery images loaded:', galleryData);
+        console.log('First image URL:', galleryData[0]?.url);
         setGalleryImages(galleryData);
       }
 
@@ -893,12 +895,26 @@ export default function Admin() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {galleryImages.map((image) => (
                     <Card key={image.id} className="bg-white/5 border-white/20 overflow-hidden">
-                      <div className="aspect-video bg-black/30 flex items-center justify-center p-2">
+                      <div className="aspect-video bg-black/30 flex items-center justify-center p-2 relative">
                         <img 
                           src={image.url} 
                           alt={image.title}
                           className="max-w-full max-h-full object-contain rounded"
+                          onLoad={() => {
+                            console.log('Image loaded successfully:', image.url);
+                          }}
+                          onError={(e) => {
+                            console.error('Failed to load image:', image.url);
+                            console.error('Image title:', image.title);
+                            e.currentTarget.style.display = 'none';
+                          }}
+                          loading="lazy"
                         />
+                        {/* Fallback placeholder */}
+                        <div className="absolute inset-0 flex items-center justify-center text-white/50 text-xs pointer-events-none opacity-50">
+                          <FileImage className="h-6 w-6" />
+                          <span className="ml-2 text-xs">{image.title}</span>
+                        </div>
                       </div>
                       <CardContent className="p-4">
                         <h3 className="text-white font-semibold mb-2">{image.title}</h3>
