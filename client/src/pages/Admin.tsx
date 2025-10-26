@@ -171,20 +171,25 @@ export default function Admin() {
   // File upload functions
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
+    console.log('Files selected:', files);
+    
     if (files && files.length > 0) {
       const validFiles: File[] = [];
       
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+        console.log(`Processing file ${i}:`, file.name, file.type, file.size);
         
         // Validate file type
         if (!file.type.startsWith('image/')) {
+          console.warn(`${file.name} is not an image file. Skipping.`);
           alert(`${file.name} is not an image file. Skipping.`);
           continue;
         }
         
         // Validate file size (max 10MB)
         if (file.size > 10 * 1024 * 1024) {
+          console.warn(`${file.name} is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Skipping.`);
           alert(`${file.name} is too large (max 10MB). Skipping.`);
           continue;
         }
@@ -192,10 +197,17 @@ export default function Admin() {
         validFiles.push(file);
       }
       
+      console.log('Valid files:', validFiles);
+      
       if (validFiles.length > 0) {
         setSelectedFiles(validFiles);
         setUploadStatus('idle');
+      } else {
+        console.log('No valid files to upload');
+        alert('No valid image files were selected. Please select image files under 10MB each.');
       }
+    } else {
+      console.log('No files selected');
     }
   };
 
@@ -481,6 +493,12 @@ export default function Admin() {
             break;
           case 'gallery':
             endpoint = '/api/admin/gallery';
+            // Validation: Must have either files or URL
+            if (selectedFiles.length === 0 && !galleryForm.url) {
+              alert('Please either upload image(s) or provide an image URL');
+              return;
+            }
+            
             // If multiple files are selected, upload them all
             if (selectedFiles.length > 0) {
               try {
