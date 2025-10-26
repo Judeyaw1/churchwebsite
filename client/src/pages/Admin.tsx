@@ -159,7 +159,7 @@ export default function Admin() {
     category: 'Worship'
   });
   
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   
@@ -170,20 +170,32 @@ export default function Admin() {
 
   // File upload functions
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
-        return;
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const validFiles: File[] = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert(`${file.name} is not an image file. Skipping.`);
+          continue;
+        }
+        
+        // Validate file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`${file.name} is too large (max 10MB). Skipping.`);
+          continue;
+        }
+        
+        validFiles.push(file);
       }
-      // Validate file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        alert('File size must be less than 10MB');
-        return;
+      
+      if (validFiles.length > 0) {
+        setSelectedFiles(validFiles);
+        setUploadStatus('idle');
       }
-      setSelectedFile(file);
-      setUploadStatus('idle');
     }
   };
 
@@ -469,14 +481,36 @@ export default function Admin() {
             break;
           case 'gallery':
             endpoint = '/api/admin/gallery';
-            // If a file is selected, upload it first
-            if (selectedFile) {
+            // If multiple files are selected, upload them all
+            if (selectedFiles.length > 0) {
               try {
-                const uploadedUrl = await uploadFile(selectedFile);
-                data = { ...galleryForm, url: uploadedUrl };
+                // Upload all files and create gallery items for each
+                const uploadPromises = selectedFiles.map(file => uploadFile(file));
+                const uploadedUrls = await Promise.all(uploadPromises);
+                
+                // Create multiple gallery items (one for each uploaded image)
+                const createPromises = uploadedUrls.map(async (url) => {
+                  const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ ...galleryForm, url })
+                  });
+                  return response.json();
+                });
+                
+                await Promise.all(createPromises);
+                
+                setEditStatus('success');
+                await fetchData();
+                setShowForm(false);
+                setIsAddingNew(false);
+                setEditingItem(null);
+                setHasUnsavedChanges(false);
+                setSelectedFiles([]);
+                return;
               } catch (error) {
                 console.error('File upload failed:', error);
-                alert('Failed to upload image. Please try again.');
+                alert('Failed to upload images. Please try again.');
                 return;
               }
             } else {
@@ -1220,6 +1254,7 @@ export default function Admin() {
                         <input
                           type="file"
                           accept="image/*"
+                          multiple
                           onChange={handleFileSelect}
                           className="hidden"
                           id="file-upload"
@@ -1227,7 +1262,7 @@ export default function Admin() {
                         <label htmlFor="file-upload" className="cursor-pointer">
                           <FileImage className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                           <p className="text-sm text-gray-600 mb-1">Upload from Device</p>
-                          <p className="text-xs text-gray-500">Click to select image (max 10MB)</p>
+                          <p className="text-xs text-gray-500">Click to select images (max 10MB each, multiple files allowed)</p>
                         </label>
                       </div>
                       
@@ -1259,34 +1294,31 @@ export default function Admin() {
                       </div>
                       
                       {/* Upload Status */}
-                      {selectedFile && (
-                        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              <FileImage className="h-4 w-4 text-gray-500 mr-2" />
-                              <span className="text-sm text-gray-700">{selectedFile.name}</span>
+                      {selectedFiles.length > 0 && (
+                        <div className="mt-3 space-y-2">
+                          <p className="text-xs text-gray-600 font-medium mb-2">
+                            {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} selected
+                          </p>
+                          {selectedFiles.map((file, index) => (
+                            <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center flex-1 min-w-0">
+                                  <FileImage className="h-4 w-4 text-gray-500 mr-2 flex-shrink-0" />
+                                  <span className="text-sm text-gray-700 truncate">{file.name}</span>
+                                  <span className="text-xs text-gray-500 ml-2">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
+                                  }}
+                                  className="ml-2 text-red-500 hover:text-red-700"
+                                >
+                                  ×
+                                </button>
+                              </div>
                             </div>
-                            <div className="flex items-center">
-                              {uploadStatus === 'uploading' && (
-                                <>
-                                  <Loader2 className="h-4 w-4 animate-spin text-blue-500 mr-2" />
-                                  <span className="text-xs text-blue-600">Uploading...</span>
-                                </>
-                              )}
-                              {uploadStatus === 'success' && (
-                                <>
-                                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                                  <span className="text-xs text-green-600">Uploaded</span>
-                                </>
-                              )}
-                              {uploadStatus === 'error' && (
-                                <>
-                                  <AlertCircle className="h-4 w-4 text-red-500 mr-2" />
-                                  <span className="text-xs text-red-600">Failed</span>
-                                </>
-                              )}
-                            </div>
-                          </div>
+                          ))}
                           {uploadStatus === 'uploading' && (
                             <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
                               <div 
