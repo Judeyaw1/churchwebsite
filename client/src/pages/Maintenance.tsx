@@ -73,32 +73,24 @@ export default function Maintenance() {
     <div className="min-h-screen w-full overflow-hidden relative flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Floating circles */}
-        {[...Array(6)].map((_, i) => (
+        {/* Floating circles - fixed positions for consistent rendering */}
+        {[200, 150, 180, 120, 160, 140].map((size, i) => (
           <motion.div
             key={i}
             className="absolute rounded-full bg-white/10 blur-xl"
             style={{
-              width: Math.random() * 400 + 100,
-              height: Math.random() * 400 + 100,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              width: size,
+              height: size,
+              left: `${20 + i * 15}%`,
+              top: `${10 + i * 15}%`,
             }}
             animate={{
-              x: [
-                Math.random() * 50 - 25,
-                Math.random() * 50 - 25,
-                Math.random() * 50 - 25
-              ],
-              y: [
-                Math.random() * 50 - 25,
-                Math.random() * 50 - 25,
-                Math.random() * 50 - 25
-              ],
-              scale: [1, 1.2, 1],
+              x: [-15, 15, -15],
+              y: [-10, 15, -10],
+              scale: [1, 1.1, 1],
             }}
             transition={{
-              duration: 5 + Math.random() * 5,
+              duration: 5 + i,
               repeat: Infinity,
               ease: "easeInOut",
               delay: i * 0.5
@@ -127,14 +119,15 @@ export default function Maintenance() {
               <div className="relative inline-block">
                 {/* Outer rotating ring */}
                 <motion.div
-                  className="absolute inset-0 border-4 border-purple-400 rounded-full"
+                  className="absolute inset-0 border-purple-400 rounded-full md:border-4"
                   style={{
-                    width: 100,
-                    height: 100,
+                    width: "100px",
+                    height: "100px",
+                    borderWidth: "2px",
                     top: "50%",
                     left: "50%",
-                    marginTop: -50,
-                    marginLeft: -50,
+                    marginTop: "-50px",
+                    marginLeft: "-50px",
                     borderStyle: "dashed"
                   }}
                   animate={rotateAnimation}
@@ -142,18 +135,18 @@ export default function Maintenance() {
                 
                 {/* Inner icon */}
                 <motion.div
-                  className="relative bg-gradient-to-br from-blue-500 to-purple-600 rounded-full p-5 w-20 h-20 flex items-center justify-center shadow-lg"
+                  className="relative bg-gradient-to-br from-blue-500 to-purple-600 rounded-full p-4 md:p-5 w-16 h-16 md:w-20 md:h-20 flex items-center justify-center shadow-lg"
                   whileHover={{ scale: 1.1, rotate: 15 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Wrench className="h-10 w-10 text-white" />
+                  <Wrench className="h-8 w-8 md:h-10 md:w-10 text-white" />
                 </motion.div>
 
                 {/* Glowing orbs around icon */}
                 {[...Array(4)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="absolute rounded-full bg-blue-400 blur-md"
+                    className="absolute rounded-full bg-blue-400 blur-md hidden md:block"
                     style={{
                       width: 20,
                       height: 20,
@@ -161,7 +154,7 @@ export default function Maintenance() {
                       left: "50%",
                       marginTop: -10,
                       marginLeft: -10,
-                      transform: `rotate(${i * 90}deg) translateX(60px)`,
+                      transform: `rotate(${i * 90}deg) translateX(40px)`,
                       transformOrigin: "10px 10px"
                     }}
                     animate={pulseAnimation}
@@ -215,7 +208,7 @@ export default function Maintenance() {
 
             {/* Description */}
             <motion.p
-              className="text-lg text-gray-600 mb-6 max-w-xl mx-auto"
+              className="text-base md:text-lg text-gray-600 mb-6 max-w-xl mx-auto px-2"
               variants={itemVariants}
             >
               We're currently performing scheduled maintenance to improve your experience. 
@@ -298,7 +291,7 @@ export default function Maintenance() {
             >
               <Button
                 onClick={() => window.location.href = 'mailto:unitedbethelpresbyterian@gmail.com'}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 text-sm font-semibold rounded-lg shadow-lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 md:px-6 py-2.5 md:py-3 text-sm md:text-base font-semibold rounded-lg shadow-lg w-full md:w-auto"
               >
                 <Mail className="h-4 w-4 mr-2" />
                 Contact Us
