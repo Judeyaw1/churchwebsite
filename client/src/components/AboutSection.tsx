@@ -5,7 +5,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Heart, Users, Book, Globe, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import communityImage from '@assets/generated_images/Church_community_fellowship_gathering_6de85642.png';
 import pastorImage from '@assets/generated_images/Church_pastor_professional_headshot_1618d5ab.png';
-import churchBuildingImage from '@assets/generated_images/Modern_church_exterior_building_046c51f8.png';
+import pastorImageJpg from '@assets/generated_images/pastor_mark_jpg.jpg';
 
 interface AboutSectionProps {
   className?: string;
@@ -34,7 +34,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
       description: "Guiding with wisdom and grace"
     },
     {
-      src: churchBuildingImage,
+      src: pastorImageJpg,
       alt: "Modern church exterior building",
       title: "Our Church Home",
       description: "A place of worship and community"
@@ -55,7 +55,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
       description: "Building lasting relationships"
     },
     {
-      src: churchBuildingImage,
+      src: pastorImageJpg,
       alt: "Church sanctuary",
       title: "Worship Space",
       description: "A sacred place of prayer"
@@ -64,7 +64,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
 
   const rightCardImages = [
     {
-      src: churchBuildingImage,
+      src: pastorImageJpg,
       alt: "Church exterior",
       title: "Our Home",
       description: "Welcome to our church"
