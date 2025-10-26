@@ -92,14 +92,20 @@ async function seedDatabase() {
     console.log("📺 Creating sample live streams...");
     await db.insert(liveStreams).values([
       {
-        title: 'Sunday Worship Service',
-        url: 'https://youtube.com/watch?v=example',
+        title: 'Sunday Morning Worship',
+        url: 'https://youtu.be/dQw4w9WgXcQ', // Replace with your actual YouTube video ID
         schedule: 'Sundays 9:00 AM & 11:00 AM',
+        isLive: true
+      },
+      {
+        title: 'Sunday Evening Service',
+        url: 'https://youtu.be/example2', // Replace with your actual YouTube video ID
+        schedule: 'Sundays 5:00 PM',
         isLive: false
       },
       {
         title: 'Midweek Bible Study',
-        url: 'https://youtube.com/watch?v=bible',
+        url: 'https://youtu.be/example3', // Replace with your actual YouTube video ID
         schedule: 'Wednesdays 7:00 PM',
         isLive: false
       }
