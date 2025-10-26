@@ -16,10 +16,6 @@ export default defineConfig({
         ]
       : []),
   ],
-  define: {
-    // Expose environment variables to the client
-    __MAINTENANCE_MODE__: JSON.stringify(process.env.MAINTENANCE_MODE === "true"),
-  },
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),

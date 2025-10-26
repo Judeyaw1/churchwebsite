@@ -11,9 +11,21 @@ import Admin from "@/pages/Admin";
 import AdminLogin from "@/pages/AdminLogin";
 import Unsubscribe from "@/pages/Unsubscribe";
 import NotFound from "@/pages/not-found";
-import MaintenancePage from "@/pages/Maintenance";
+import Maintenance from "@/pages/Maintenance";
+
+// Set to false when maintenance is complete
+const MAINTENANCE_MODE = true;
 
 function Router() {
+  // If maintenance mode is enabled, show maintenance page for all routes
+  if (MAINTENANCE_MODE) {
+    return (
+      <Switch>
+        <Route component={Maintenance} />
+      </Switch>
+    );
+  }
+
   return (
     <Switch>
       <Route path="/" component={Home} />
@@ -29,17 +41,6 @@ function Router() {
 }
 
 function App() {
-  // Check if maintenance mode is enabled via environment variable
-  const isMaintenanceModeEnabled = __MAINTENANCE_MODE__;
-  
-  // Check if maintenance approval is granted
-  const isMaintenanceApproved = sessionStorage.getItem("maintenanceApproved") === "true";
-
-  // If maintenance mode is enabled and not approved, show maintenance page
-  if (isMaintenanceModeEnabled && !isMaintenanceApproved) {
-    return <MaintenancePage />;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
