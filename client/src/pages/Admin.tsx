@@ -76,6 +76,9 @@ export default function Admin() {
   const [showForm, setShowForm] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [editStatus, setEditStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+  
+  // Bulk selection state
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   // Check authentication on component mount
   useEffect(() => {
@@ -430,6 +433,74 @@ export default function Admin() {
     }
   };
 
+  // Bulk delete handler
+  const handleBulkDelete = async (type: string) => {
+    if (selectedItems.size === 0) {
+      alert('No items selected');
+      return;
+    }
+
+    const count = selectedItems.size;
+    if (window.confirm(`Are you sure you want to delete ${count} item(s)?`)) {
+      try {
+        const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
+        const deletePromises = Array.from(selectedItems).map(id => 
+          fetch(`/api/admin/${type}/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          })
+        );
+
+        await Promise.all(deletePromises);
+        await fetchData();
+        setSelectedItems(new Set());
+        alert(`Successfully deleted ${count} item(s)`);
+      } catch (error) {
+        console.error('Error deleting items:', error);
+        alert('Failed to delete some items');
+      }
+    }
+  };
+
+  // Toggle item selection
+  const toggleItemSelection = (id: string) => {
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedItems(newSelected);
+  };
+
+  // Select all items
+  const selectAll = () => {
+    let allIds: string[] = [];
+    switch (activeTab) {
+      case 'events':
+        allIds = events.map(e => e.id);
+        break;
+      case 'livestream':
+        allIds = liveStreams.map(s => s.id);
+        break;
+      case 'gallery':
+        allIds = galleryImages.map(i => i.id);
+        break;
+      case 'messages':
+        allIds = messages.map(m => m.id);
+        break;
+    }
+    setSelectedItems(new Set(allIds));
+  };
+
+  // Clear selection
+  const clearSelection = () => {
+    setSelectedItems(new Set());
+  };
+
   const handleAddNew = () => {
     setIsAddingNew(true);
     setShowForm(true);
@@ -440,7 +511,7 @@ export default function Admin() {
     setGalleryForm({ title: '', url: '', date: '', category: 'Worship' });
     setMessageForm({ title: '', content: '', date: '', priority: 'medium' });
     // Reset file upload states
-    setSelectedFile(null);
+    setSelectedFiles([]);
     setUploadProgress(0);
     setUploadStatus('idle');
     // Reset event thumbnail upload states
@@ -892,9 +963,69 @@ export default function Admin() {
 
               {/* Gallery Management */}
               {activeTab === 'gallery' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {galleryImages.map((image) => (
-                    <Card key={image.id} className="bg-white/5 border-white/20 overflow-hidden">
+                <>
+                  {/* Bulk Actions Bar */}
+                  {selectedItems.size > 0 && (
+                    <div className="mb-6 p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <span className="text-white font-medium">
+                          {selectedItems.size} item{selectedItems.size > 1 ? 's' : ''} selected
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-blue-300 text-blue-300 hover:bg-blue-300/10"
+                          onClick={() => handleBulkDelete('gallery')}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Selected
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-white/30 text-white hover:bg-white/10"
+                          onClick={clearSelection}
+                        >
+                          Clear Selection
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Select All / Deselect All */}
+                  <div className="mb-4 flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-white/30 text-white hover:bg-white/10"
+                      onClick={selectAll}
+                    >
+                      Select All
+                    </Button>
+                    {selectedItems.size > 0 && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-white/30 text-white hover:bg-white/10"
+                        onClick={clearSelection}
+                      >
+                        Deselect All
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {galleryImages.map((image) => (
+                    <Card key={image.id} className="bg-white/5 border-white/20 overflow-hidden relative">
+                      {/* Checkbox */}
+                      <div className="absolute top-2 left-2 z-10">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.has(image.id)}
+                          onChange={() => toggleItemSelection(image.id)}
+                          className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                      </div>
                       <div className="aspect-video bg-black/30 flex items-center justify-center p-2 relative">
                         <img 
                           src={image.url} 
@@ -947,8 +1078,9 @@ export default function Admin() {
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
 
               {/* Messages Management */}
