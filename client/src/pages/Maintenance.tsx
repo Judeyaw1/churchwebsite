@@ -109,19 +109,19 @@ export default function Maintenance() {
 
       {/* Main Content */}
       <motion.div
-        className="relative z-10 w-full max-w-4xl mx-4"
+        className="relative z-10 w-full max-w-2xl mx-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 md:p-12">
+        <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-6 md:p-8">
           {/* Header with rotating icon */}
           <motion.div
-            className="text-center mb-12"
+            className="text-center mb-6"
             variants={itemVariants}
           >
             <motion.div
-              className="inline-block mb-8"
+              className="inline-block mb-4"
               animate={floatAnimation}
             >
               <div className="relative inline-block">
@@ -129,12 +129,12 @@ export default function Maintenance() {
                 <motion.div
                   className="absolute inset-0 border-4 border-purple-400 rounded-full"
                   style={{
-                    width: 120,
-                    height: 120,
+                    width: 100,
+                    height: 100,
                     top: "50%",
                     left: "50%",
-                    marginTop: -60,
-                    marginLeft: -60,
+                    marginTop: -50,
+                    marginLeft: -50,
                     borderStyle: "dashed"
                   }}
                   animate={rotateAnimation}
@@ -142,11 +142,11 @@ export default function Maintenance() {
                 
                 {/* Inner icon */}
                 <motion.div
-                  className="relative bg-gradient-to-br from-blue-500 to-purple-600 rounded-full p-6 w-24 h-24 flex items-center justify-center shadow-lg"
+                  className="relative bg-gradient-to-br from-blue-500 to-purple-600 rounded-full p-5 w-20 h-20 flex items-center justify-center shadow-lg"
                   whileHover={{ scale: 1.1, rotate: 15 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Wrench className="h-12 w-12 text-white" />
+                  <Wrench className="h-10 w-10 text-white" />
                 </motion.div>
 
                 {/* Glowing orbs around icon */}
@@ -172,12 +172,12 @@ export default function Maintenance() {
 
             {/* Status Code */}
             <motion.div
-              className="mb-6"
+              className="mb-4"
               variants={itemVariants}
             >
               <div className="relative inline-block">
                 <motion.span
-                  className="text-8xl md:text-9xl font-black bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent"
+                  className="text-6xl md:text-7xl font-black bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{
@@ -207,7 +207,7 @@ export default function Maintenance() {
 
             {/* Title */}
             <motion.h1
-              className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
+              className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
               variants={itemVariants}
             >
               Under Maintenance
@@ -215,20 +215,20 @@ export default function Maintenance() {
 
             {/* Description */}
             <motion.p
-              className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed"
+              className="text-lg text-gray-600 mb-6 max-w-xl mx-auto"
               variants={itemVariants}
             >
               We're currently performing scheduled maintenance to improve your experience. 
-              We'll be back soon with exciting updates!
+              We'll be back soon!
             </motion.p>
           </motion.div>
 
           {/* Animated progress bar */}
           <motion.div
-            className="mb-12"
+            className="mb-6"
             variants={itemVariants}
           >
-            <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden">
+            <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
               <motion.div
                 className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
                 initial={{ width: 0 }}
@@ -242,15 +242,12 @@ export default function Maintenance() {
                   repeatType: "reverse"
                 }}
               />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-xs font-semibold text-gray-700">75%</span>
-              </div>
             </div>
           </motion.div>
 
           {/* Features Grid */}
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
             variants={itemVariants}
           >
             {[
@@ -272,7 +269,7 @@ export default function Maintenance() {
             ].map((feature, index) => (
               <motion.div
                 key={feature.title}
-                className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border-2 border-purple-200"
+                className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border-2 border-purple-200"
                 whileHover={{ 
                   scale: 1.05,
                   rotate: [0, -2, 2, 0],
@@ -282,9 +279,9 @@ export default function Maintenance() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.2 + index * 0.2 }}
               >
-                <feature.icon className="h-10 w-10 text-purple-600 mb-4" />
-                <h3 className="font-bold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-sm text-gray-600">{feature.description}</p>
+                <feature.icon className="h-8 w-8 text-purple-600 mb-2" />
+                <h3 className="font-bold text-gray-900 mb-1 text-sm">{feature.title}</h3>
+                <p className="text-xs text-gray-600">{feature.description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -301,11 +298,10 @@ export default function Maintenance() {
             >
               <Button
                 onClick={() => window.location.href = 'mailto:unitedbethelpresbyterian@gmail.com'}
-                size="lg"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-6 text-lg font-semibold rounded-xl shadow-lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 text-sm font-semibold rounded-lg shadow-lg"
               >
-                <Mail className="h-5 w-5 mr-2" />
-                Contact Us for Updates
+                <Mail className="h-4 w-4 mr-2" />
+                Contact Us
               </Button>
             </motion.div>
           </motion.div>
