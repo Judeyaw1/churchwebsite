@@ -119,7 +119,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
               <span className="font-semibold">Location</span>
             </div>
             <p className="text-white/90">
-              123 Community Drive<br />Springfield, ST 12345
+              <a href="https://maps.google.com/?q=9045+Maier+Road,+Laurel,+MD+20723">9045 Maier Rd<br />Laurel, MD 20723</a>
             </p>
           </div>
           

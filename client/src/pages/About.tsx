@@ -368,7 +368,7 @@ export default function About() {
             <div className="bg-white/5 rounded-lg p-8 text-center border border-white/10">
               <MapPin className="h-8 w-8 text-white mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-white mb-2">Location</h3>
-              <p className="text-white/80">123 Community Drive<br />Springfield, ST 12345</p>
+              <p className="text-white/80">9045 Maier Rd<br />Laurel, MD 20723</p>
             </div>
           </div>
         </div>

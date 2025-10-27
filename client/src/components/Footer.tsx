@@ -55,10 +55,11 @@ export default function Footer({ className = '' }: FooterProps) {
     {
       title: 'Visit Us',
       items: [
-        { icon: MapPin, text: '123 Community Drive' },
-        { text: 'Springfield, ST 12345' },
+        { icon: MapPin, text: '9045 Maier Road' },
+        { text: 'Laurel, MD 20723' },
         { icon: Phone, text: '(555) 123-4567' },
-        { icon: Mail, text: 'info@unitedbethel.org' }
+        { icon: Mail, text: <a href="mailto:unitedbethelpresbyterian@gmail.com">unitedbethelpresbyterian</a> },
+        { text: '@gmail.com' }
       ]
     },
     {
@@ -73,9 +74,9 @@ export default function Footer({ className = '' }: FooterProps) {
     {
       title: 'Quick Links',
       items: [
-        { text: 'Home', href: '/' },
+        { text: 'Home', href: '/home' },
         { text: 'About', href: '/about' },
-        { text: 'Services', href: '/#services' },
+        { text: 'Services', href: '/services' },
         { text: 'Events', href: '/events' }
       ]
     },
