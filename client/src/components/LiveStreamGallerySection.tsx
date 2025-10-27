@@ -50,7 +50,11 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
 
         if (galleryRes.ok) {
           const galleryData = await galleryRes.json();
+          console.log('Gallery data fetched:', galleryData.length, 'images');
+          console.log('First gallery image URL:', galleryData[0]?.url);
           setGalleryImages(galleryData);
+        } else {
+          console.error('Gallery fetch failed:', galleryRes.status, galleryRes.statusText);
         }
       } catch (error) {
         console.error('Failed to fetch live streams and gallery data:', error);
@@ -286,6 +290,14 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                           src={galleryImages[currentImageIndex].url}
                           alt={galleryImages[currentImageIndex].title}
                           className="max-w-full max-h-full object-contain rounded-lg"
+                          onLoad={() => {
+                            console.log('Gallery image loaded:', galleryImages[currentImageIndex].url);
+                          }}
+                          onError={(e) => {
+                            console.error('Gallery image failed to load:', galleryImages[currentImageIndex].url);
+                            console.error('Attempted URL:', e.currentTarget.src);
+                          }}
+                          loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
                         
@@ -327,6 +339,14 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                                 src={image.url}
                                 alt={image.title}
                                 className="max-w-full max-h-full object-contain rounded"
+                                onLoad={() => {
+                                  console.log('Gallery thumbnail loaded:', image.url);
+                                }}
+                                onError={(e) => {
+                                  console.error('Gallery thumbnail failed to load:', image.url);
+                                  console.error('Attempted URL:', e.currentTarget.src);
+                                }}
+                                loading="lazy"
                               />
                             </button>
                           ))}
