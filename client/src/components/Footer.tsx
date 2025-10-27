@@ -58,8 +58,7 @@ export default function Footer({ className = '' }: FooterProps) {
         { icon: MapPin, text: '9045 Maier Road' },
         { text: 'Laurel, MD 20723' },
         { icon: Phone, text: '(555) 123-4567' },
-        { icon: Mail, text: <a href="mailto:unitedbethelpresbyterian@gmail.com">unitedbethelpresbyterian</a> },
-        { text: '@gmail.com' }
+        { icon: Mail, text: 'unitedbethelpresbyterian@gmail.com', href: 'mailto:unitedbethelpresbyterian@gmail.com' }
       ]
     },
     {
