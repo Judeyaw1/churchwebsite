@@ -84,8 +84,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve uploaded files
-  app.use('/uploads', express.static(uploadsDir));
+  // Serve uploaded files with caching headers
+  app.use('/uploads', (req, res, next) => {
+    // Set cache headers for images
+    res.set({
+      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year cache
+      'Expires': new Date(Date.now() + 31536000000).toUTCString()
+    });
+    express.static(uploadsDir, {
+      maxAge: '1y', // 1 year cache
+      etag: true
+    })(req, res, next);
+  });
 
   // ===== PUBLIC API ROUTES (for website components) =====
 
