@@ -79,6 +79,10 @@ export default function Admin() {
   
   // Bulk selection state
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  
+  // Delete progress state
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteProgress, setDeleteProgress] = useState(0);
 
   // Check authentication on component mount
   useEffect(() => {
@@ -412,7 +416,12 @@ export default function Admin() {
   const handleDelete = async (type: string, id: string) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
+        setIsDeleting(true);
+        setDeleteProgress(0);
+        
         const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
+        setDeleteProgress(50);
+        
         const response = await fetch(`/api/admin/${type}/${id}`, {
           method: 'DELETE',
           headers: {
@@ -421,14 +430,22 @@ export default function Admin() {
           }
         });
 
+        setDeleteProgress(75);
+
         if (response.ok) {
           // Refresh data from database
           await fetchData();
+          setDeleteProgress(100);
         } else {
           console.error('Failed to delete item');
+          alert('Failed to delete item. Please try again.');
         }
       } catch (error) {
         console.error('Error deleting item:', error);
+        alert('Failed to delete item. Please try again.');
+      } finally {
+        setIsDeleting(false);
+        setDeleteProgress(0);
       }
     }
   };
@@ -443,24 +460,41 @@ export default function Admin() {
     const count = selectedItems.size;
     if (window.confirm(`Are you sure you want to delete ${count} item(s)?`)) {
       try {
+        setIsDeleting(true);
+        setDeleteProgress(0);
+        
         const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
-        const deletePromises = Array.from(selectedItems).map(id => 
-          fetch(`/api/admin/${type}/${id}`, {
+        const items = Array.from(selectedItems);
+        
+        // Delete items one by one with progress
+        for (let i = 0; i < items.length; i++) {
+          const id = items[i];
+          const progress = Math.round(((i + 1) / items.length) * 90);
+          setDeleteProgress(progress);
+          
+          await fetch(`/api/admin/${type}/${id}`, {
             method: 'DELETE',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
             }
-          })
-        );
+          });
+        }
 
-        await Promise.all(deletePromises);
+        setDeleteProgress(95);
         await fetchData();
         setSelectedItems(new Set());
-        alert(`Successfully deleted ${count} item(s)`);
+        setDeleteProgress(100);
+        
+        setTimeout(() => {
+          alert(`Successfully deleted ${count} item(s)`);
+        }, 300);
       } catch (error) {
         console.error('Error deleting items:', error);
         alert('Failed to delete some items');
+      } finally {
+        setIsDeleting(false);
+        setTimeout(() => setDeleteProgress(0), 500);
       }
     }
   };
@@ -820,6 +854,53 @@ export default function Admin() {
             </div>
           </div>
         </section>
+
+        {/* Global Progress Bars */}
+        <div className="sticky top-16 z-40">
+          {/* Upload Progress */}
+          {uploadStatus === 'uploading' && (
+            <div className="bg-blue-500/20 border-b border-blue-500/30 px-4 py-2">
+              <div className="max-w-7xl mx-auto">
+                <div className="flex items-center gap-3 text-white">
+                  <div className="flex-shrink-0">
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">Uploading images...</p>
+                    <div className="mt-1 w-full bg-blue-900/30 rounded-full h-2">
+                      <div 
+                        className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Delete Progress */}
+          {isDeleting && (
+            <div className="bg-red-500/20 border-b border-red-500/30 px-4 py-2">
+              <div className="max-w-7xl mx-auto">
+                <div className="flex items-center gap-3 text-white">
+                  <div className="flex-shrink-0">
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">Deleting items...</p>
+                    <div className="mt-1 w-full bg-red-900/30 rounded-full h-2">
+                      <div 
+                        className="bg-red-500 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${deleteProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Admin Panel */}
         <section className="py-20 bg-black/95">
