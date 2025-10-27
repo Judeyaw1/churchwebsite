@@ -29,7 +29,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
     {
       icon: MapPin,
       title: 'Visit Us',
-      details: ['123 Community Drive', 'Springfield, ST 12345'],
+      details: ['9045 Maier Road', 'Laurel, MD 20723'],
       action: 'Get Directions'
     },
     {
@@ -41,7 +41,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
     {
       icon: Mail,
       title: 'Email Us',
-      details: ['info@gracecommunity.org', 'pastor@gracecommunity.org'],
+      details: ['unitedbethelpresbyterian', '@gmail.com'],
       action: 'Send Email'
     },
     {
@@ -111,7 +111,17 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                           size="sm"
                           className="mt-2 p-0 h-auto text-white hover:text-white/80"
                           data-testid={`button-${info.title.toLowerCase().replace(' ', '-')}`}
-                          onClick={() => console.log(`${info.action} clicked`)}
+                          onClick={() => {
+                            if (info.title === 'Visit Us') {
+                              window.open('https://maps.google.com/?q=9045+Maier+Road,+Laurel,+MD+20723', '_blank');
+                            } else if (info.title === 'Call Us') {
+                              window.location.href = 'tel:+15551234567';
+                            } else if (info.title === 'Email Us') {
+                              window.location.href = 'mailto:unitedbethelpresbyterian@gmail.com';
+                            } else {
+                              console.log(`${info.action} clicked`);
+                            }
+                          }}
                         >
                           {info.action} →
                         </Button>
@@ -122,28 +132,42 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
               </motion.div>
             ))}
 
-            {/* Map Placeholder */}
+            {/* Interactive Google Map */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
               <Card className="overflow-hidden hover-elevate transition-all duration-300 bg-white/5 border-white/20">
-                <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="h-12 w-12 text-primary mx-auto mb-2" />
-                    <p className="text-sm text-white/80">Interactive Map</p>
+                <div className="h-64">
+                  <iframe
+                    src="https://www.google.com/maps?q=9045+Maier+Road,+Laurel,+MD+20723&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="w-full h-full"
+                    title="United Bethel Presbyterian Church Location"
+                  />
+                </div>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-white/80">9045 Maier Road, Laurel, MD</p>
+                    </div>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="mt-2"
+                      className="border-white/30 text-white hover:bg-white/10"
                       data-testid="button-view-map"
-                      onClick={() => console.log('View map clicked')}
+                      onClick={() => window.open('https://maps.google.com/?q=9045+Maier+Road,+Laurel,+MD+20723', '_blank')}
                     >
-                      View Full Map
+                      Open in Maps
                     </Button>
                   </div>
-                </div>
+                </CardContent>
               </Card>
             </motion.div>
           </div>
