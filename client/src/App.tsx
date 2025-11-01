@@ -14,7 +14,7 @@ import NotFound from "@/pages/not-found";
 import Maintenance from "@/pages/Maintenance";
 
 // Set to false when maintenance is complete
-const MAINTENANCE_MODE = false;
+const MAINTENANCE_MODE = true;
 
 function Router() {
   // If maintenance mode is enabled, show maintenance page for all routes
