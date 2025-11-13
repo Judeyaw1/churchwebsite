@@ -3,7 +3,7 @@ import Cropper from 'react-easy-crop';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { RotateCw, Maximize2 } from 'lucide-react';
+import { RotateCw, Maximize2 } from 'lucide-react'; // Fixed: replaced AspectRatio with Maximize2
 
 interface ImageCropModalProps {
   isOpen: boolean;
