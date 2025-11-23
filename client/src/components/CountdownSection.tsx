@@ -33,10 +33,13 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
         const response = await fetch('/api/events');
         if (response.ok) {
           const eventsData = await response.json();
+          console.log('CountdownSection: Fetched events:', eventsData);
           setEvents(eventsData);
+        } else {
+          console.error('CountdownSection: Failed to fetch events, status:', response.status);
         }
       } catch (error) {
-        console.error('Failed to fetch events:', error);
+        console.error('CountdownSection: Failed to fetch events:', error);
       } finally {
         setIsLoading(false);
       }
@@ -47,14 +50,56 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
 
   // Get the next upcoming event (the one happening soonest)
   const nextEvent = events.filter(event => {
-    const eventDateTime = new Date(`${event.date} ${event.time}`);
-    const now = new Date();
-    return eventDateTime > now;
+    try {
+      // Parse date and time - handle different date formats
+      let eventDateTime: Date;
+      if (event.date && event.time) {
+        // Try parsing as "YYYY-MM-DD HH:MM" format first
+        const dateTimeString = `${event.date} ${event.time}`;
+        eventDateTime = new Date(dateTimeString);
+        
+        // If invalid, try alternative parsing
+        if (isNaN(eventDateTime.getTime())) {
+          // Try parsing date separately
+          const dateParts = event.date.split('-');
+          const timeParts = event.time.split(':');
+          if (dateParts.length === 3 && timeParts.length >= 2) {
+            eventDateTime = new Date(
+              parseInt(dateParts[0]),
+              parseInt(dateParts[1]) - 1,
+              parseInt(dateParts[2]),
+              parseInt(timeParts[0]),
+              parseInt(timeParts[1]) || 0
+            );
+          }
+        }
+      } else {
+        return false;
+      }
+      
+      const now = new Date();
+      const isUpcoming = eventDateTime.getTime() > now.getTime();
+      
+      if (isUpcoming) {
+        console.log('CountdownSection: Found upcoming event:', event.title, 'Date:', eventDateTime);
+      }
+      
+      return isUpcoming;
+    } catch (error) {
+      console.error('CountdownSection: Error parsing event date:', event, error);
+      return false;
+    }
   }).sort((a, b) => {
-    const dateA = new Date(`${a.date} ${a.time}`);
-    const dateB = new Date(`${b.date} ${b.time}`);
-    return dateA.getTime() - dateB.getTime();
+    try {
+      const dateA = new Date(`${a.date} ${a.time}`);
+      const dateB = new Date(`${b.date} ${b.time}`);
+      return dateA.getTime() - dateB.getTime();
+    } catch (error) {
+      return 0;
+    }
   })[0]; // Get only the next upcoming event
+
+  console.log('CountdownSection: Total events:', events.length, 'Next event:', nextEvent?.title || 'None');
 
   if (isLoading) {
     return (
@@ -70,7 +115,35 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
   }
 
   if (!nextEvent) {
-    return null; // Don't show the section if there are no upcoming events
+    // Show a message when there are no upcoming events
+    return (
+      <section ref={ref} className={`py-12 sm:py-16 bg-gradient-to-b from-black/95 to-black/90 ${className}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8 }}
+            className="text-center"
+          >
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-4">
+              Upcoming <span className="text-white">Events</span>
+            </h2>
+            <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed mb-6">
+              Check back soon for our upcoming events and activities.
+            </p>
+            <motion.a
+              href="/events"
+              className="inline-flex items-center px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-white/90 transition-all duration-300 hover:scale-105"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Calendar className="h-5 w-5 mr-2" />
+              View All Events
+            </motion.a>
+          </motion.div>
+        </div>
+      </section>
+    );
   }
 
   return (

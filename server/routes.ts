@@ -102,6 +102,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Events - Public routes
   app.get('/api/events', async (req, res) => {
     try {
+      // Automatically delete past events before fetching
+      await storage.deletePastEvents();
       const events = await storage.getEvents();
       res.json(events);
     } catch (error) {
@@ -111,6 +113,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/events/upcoming', async (req, res) => {
     try {
+      // Automatically delete past events before fetching
+      await storage.deletePastEvents();
       const limit = parseInt(req.query.limit as string) || 3;
       const events = await storage.getUpcomingEvents(limit);
       res.json(events);
@@ -195,6 +199,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'Event deleted successfully' });
     } catch (error) {
       res.status(500).json({ message: 'Failed to delete event' });
+    }
+  });
+
+  // Cleanup past events (Admin only)
+  app.post('/api/admin/events/cleanup', requireAuth, async (req, res) => {
+    try {
+      const deletedCount = await storage.deletePastEvents();
+      res.json({ 
+        message: 'Cleanup completed successfully',
+        deletedCount 
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to cleanup past events' });
     }
   });
 

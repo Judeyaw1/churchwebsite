@@ -43,6 +43,7 @@ export interface IStorage {
   updateEvent(id: string, event: Partial<InsertEvent>): Promise<Event | undefined>;
   deleteEvent(id: string): Promise<boolean>;
   getUpcomingEvents(limit?: number): Promise<Event[]>;
+  deletePastEvents(): Promise<number>; // Returns count of deleted events
   
   // Live Stream methods
   getLiveStreams(): Promise<LiveStream[]>;
@@ -129,6 +130,60 @@ export class PostgresStorage implements IStorage {
       .from(events)
       .orderBy(desc(events.createdAt))
       .limit(limit);
+  }
+
+  async deletePastEvents(): Promise<number> {
+    try {
+      // Get all events
+      const allEvents = await db.select().from(events);
+      const now = new Date();
+      const pastEventIds: string[] = [];
+
+      // Check each event to see if it's in the past
+      for (const event of allEvents) {
+        try {
+          // Parse the event date and time
+          const eventDateTime = new Date(`${event.date} ${event.time}`);
+          
+          // If parsing fails, try alternative format
+          if (isNaN(eventDateTime.getTime())) {
+            // Try parsing date separately (assuming YYYY-MM-DD format)
+            const dateParts = event.date.split('-');
+            const timeParts = event.time.split(':');
+            if (dateParts.length === 3 && timeParts.length >= 2) {
+              const parsedDate = new Date(
+                parseInt(dateParts[0]),
+                parseInt(dateParts[1]) - 1,
+                parseInt(dateParts[2]),
+                parseInt(timeParts[0]),
+                parseInt(timeParts[1]) || 0
+              );
+              if (!isNaN(parsedDate.getTime()) && parsedDate < now) {
+                pastEventIds.push(event.id);
+              }
+            }
+          } else if (eventDateTime < now) {
+            pastEventIds.push(event.id);
+          }
+        } catch (error) {
+          console.error(`Error parsing event date for event ${event.id}:`, error);
+          // Skip events with unparseable dates
+        }
+      }
+
+      // Delete all past events
+      if (pastEventIds.length > 0) {
+        for (const id of pastEventIds) {
+          await db.delete(events).where(eq(events.id, id));
+        }
+        console.log(`Deleted ${pastEventIds.length} past event(s)`);
+      }
+
+      return pastEventIds.length;
+    } catch (error) {
+      console.error('Error deleting past events:', error);
+      return 0;
+    }
   }
 
   // Live Stream methods
