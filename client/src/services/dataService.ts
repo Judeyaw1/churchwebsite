@@ -52,7 +52,7 @@ const defaultEvents: Event[] = [
     maxAttendees: 300,
     currentAttendees: 245,
     registrationRequired: false,
-    image: '/api/placeholder/400/200'
+    image: undefined
   },
   {
     id: '2',
@@ -63,7 +63,7 @@ const defaultEvents: Event[] = [
     description: 'A special service designed for families with children of all ages. Interactive worship, storytelling, and activities that engage both parents and children.',
     category: 'Worship Service',
     registrationRequired: false,
-    image: '/api/placeholder/400/200'
+    image: undefined
   },
   {
     id: '3',
@@ -74,7 +74,7 @@ const defaultEvents: Event[] = [
     description: 'Join us for our traditional Christmas Eve candlelight service celebrating the birth of Christ. Music, scripture, and the lighting of candles.',
     category: 'Worship Service',
     registrationRequired: false,
-    image: '/api/placeholder/400/200'
+    image: undefined
   },
   {
     id: '4',
@@ -85,7 +85,7 @@ const defaultEvents: Event[] = [
     description: 'Start the new year with prayer, reflection, and fellowship. Join us as we seek God\'s guidance for the year ahead.',
     category: 'Worship Service',
     registrationRequired: false,
-    image: '/api/placeholder/400/200'
+    image: undefined
   },
   {
     id: '5',
@@ -98,7 +98,7 @@ const defaultEvents: Event[] = [
     maxAttendees: 50,
     currentAttendees: 32,
     registrationRequired: true,
-    image: '/api/placeholder/400/200'
+    image: undefined
   },
   {
     id: '6',
@@ -109,7 +109,7 @@ const defaultEvents: Event[] = [
     description: 'Help us collect food donations for local families in need. Drop off non-perishable items and join us in serving our community.',
     category: 'Community Service',
     registrationRequired: false,
-    image: '/api/placeholder/400/200'
+    image: undefined
   },
   {
     id: '7',
@@ -122,7 +122,7 @@ const defaultEvents: Event[] = [
     maxAttendees: 20,
     currentAttendees: 15,
     registrationRequired: true,
-    image: '/api/placeholder/400/200'
+    image: undefined
   },
   {
     id: '8',
@@ -133,7 +133,7 @@ const defaultEvents: Event[] = [
     description: 'Our children will present the Easter story through music, drama, and scripture. A wonderful celebration of Christ\'s resurrection.',
     category: 'Children\'s Ministry',
     registrationRequired: false,
-    image: '/api/placeholder/400/200'
+    image: undefined
   }
 ];
 
@@ -154,50 +154,8 @@ const defaultLiveStreams: LiveStream[] = [
   }
 ];
 
-const defaultGalleryImages: GalleryImage[] = [
-  {
-    id: '1',
-    title: 'Community Gathering',
-    url: 'https://images.unsplash.com/photo-1517486804500-e215cd059c6b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    date: '2024-10-26',
-    category: 'Fellowship'
-  },
-  {
-    id: '2',
-    title: 'Worship Service',
-    url: 'https://images.unsplash.com/photo-1523050854805-d91864464e0a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    date: '2024-10-20',
-    category: 'Worship'
-  },
-  {
-    id: '3',
-    title: 'Youth Night',
-    url: 'https://images.unsplash.com/photo-1501504905252-473c47e072aa?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    date: '2024-10-18',
-    category: 'Youth'
-  },
-  {
-    id: '4',
-    title: 'Bible Study',
-    url: 'https://images.unsplash.com/photo-1523050854805-d91864464e0a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    date: '2024-10-16',
-    category: 'Community'
-  },
-  {
-    id: '5',
-    title: 'Outreach Program',
-    url: 'https://images.unsplash.com/photo-1517486804500-e215cd059c6b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    date: '2024-10-12',
-    category: 'Events'
-  },
-  {
-    id: '6',
-    title: 'Kids\' Sunday',
-    url: 'https://images.unsplash.com/photo-1501504905252-473c47e072aa?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    date: '2024-10-06',
-    category: 'Children'
-  }
-];
+// Use an empty default gallery to avoid AI/placeholder images; real images come from API
+const defaultGalleryImages: GalleryImage[] = [];
 
 const defaultMessages: Message[] = [
   {
