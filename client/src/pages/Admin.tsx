@@ -1665,7 +1665,7 @@ export default function Admin() {
                       {/* OneDrive Upload */}
                       <div className="border-2 border-dashed border-blue-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors space-y-2">
                         <Cloud className="h-6 w-6 text-blue-400 mx-auto mb-2" />
-                        <p className="text-sm text-blue-600 mb-1">OneDrive</p>
+                        <p className="text-sm text-blue-600 mb-1">OneDrive (Connect · Upload · Choose)</p>
                         <div className="flex flex-col gap-2">
                           <Button
                             type="button"
