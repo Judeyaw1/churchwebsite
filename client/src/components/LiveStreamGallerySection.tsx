@@ -33,6 +33,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Fetch live streams and gallery data
   useEffect(() => {
@@ -132,6 +133,14 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
       prevIndex === 0 ? galleryImages.length - 1 : prevIndex - 1
     );
   };
+
+  // Keep selected thumbnail in view (works for arrows and clicks)
+  useEffect(() => {
+    const el = thumbRefs.current[currentImageIndex];
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [currentImageIndex]);
 
   return (
     <section ref={ref} className={`py-20 bg-black/95 ${className}`} id="gallery">
@@ -326,11 +335,8 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                           {galleryImages.map((image, index) => (
                             <button
                               key={image.id}
-                              onClick={(e) => {
-                                setCurrentImageIndex(index);
-                                // Ensure the selected thumb scrolls into view
-                                e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-                              }}
+                              onClick={() => setCurrentImageIndex(index)}
+                              ref={(el) => (thumbRefs.current[index] = el)}
                               className={`min-w-[110px] max-w-[140px] aspect-[4/3] overflow-hidden rounded-lg bg-black/30 flex items-center justify-center p-1 transition-all duration-300 ${
                                 index === currentImageIndex 
                                   ? 'ring-2 ring-white/50 scale-105' 
