@@ -134,7 +134,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
   };
 
   return (
-    <section ref={ref} className={`py-20 bg-black/95 ${className}`} id="live-gallery">
+    <section ref={ref} className={`py-20 bg-black/95 ${className}`} id="gallery">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -262,22 +262,20 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                       <Camera className="h-5 w-5 text-white mr-2" />
                       <h3 className="text-xl font-semibold text-white">Photo Gallery</h3>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-white/30 text-white hover:bg-white/10"
-                      onClick={() => console.log('View full gallery')}
+                    <a
+                      href="/#gallery"
+                      className="inline-flex items-center px-3 py-2 border border-white/30 text-white rounded-md hover:bg-white/10 text-sm"
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
                       View All
-                    </Button>
+                    </a>
                   </div>
                 </div>
 
                 {/* Gallery Carousel */}
                 <div className="relative">
                   {isLoading ? (
-                    <div className="aspect-video bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
+                    <div className="aspect-[4/3] bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
                       <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
                         <p className="text-white/70">Loading gallery...</p>
@@ -285,7 +283,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                     </div>
                   ) : galleryImages.length > 0 ? (
                     <>
-                      <div className="aspect-video bg-black/30 flex items-center justify-center p-4 relative">
+                      <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-3 relative">
                         <img
                           src={galleryImages[currentImageIndex].url}
                           alt={galleryImages[currentImageIndex].title}
@@ -324,12 +322,12 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
 
                       {/* Gallery Thumbnails */}
                       <div className="p-4">
-                        <div className="grid grid-cols-3 gap-2">
-                          {galleryImages.slice(0, 6).map((image, index) => (
+                        <div className="flex gap-2 overflow-x-auto pb-2">
+                          {galleryImages.map((image, index) => (
                             <button
                               key={image.id}
                               onClick={() => setCurrentImageIndex(index)}
-                              className={`aspect-video overflow-hidden rounded-lg bg-black/30 flex items-center justify-center p-1 transition-all duration-300 ${
+                              className={`min-w-[110px] max-w-[140px] aspect-[4/3] overflow-hidden rounded-lg bg-black/30 flex items-center justify-center p-1 transition-all duration-300 ${
                                 index === currentImageIndex 
                                   ? 'ring-2 ring-white/50 scale-105' 
                                   : 'hover:scale-105 opacity-70 hover:opacity-100'
@@ -354,7 +352,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                       </div>
                     </>
                   ) : (
-                    <div className="aspect-video bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
+                    <div className="aspect-[4/3] bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
                       <div className="text-center">
                         <Camera className="h-16 w-16 text-white/80 mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-white mb-2">No Gallery Images</h3>
