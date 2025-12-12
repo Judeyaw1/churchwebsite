@@ -343,6 +343,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // List OneDrive files (images) in a folder (default root)
+  app.get('/api/admin/onedrive/list', requireAuth, async (req, res) => {
+    try {
+      const accessToken = await ensureAccessToken();
+      const path = (req.query.path as string) || '';
+      const listUrl = path
+        ? `https://graph.microsoft.com/v1.0/me/drive/root:/${encodeURIComponent(path)}:/children`
+        : 'https://graph.microsoft.com/v1.0/me/drive/root/children';
+
+      const listRes = await fetch(listUrl, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      if (!listRes.ok) {
+        const errTxt = await listRes.text();
+        console.error('OneDrive list failed:', errTxt);
+        return res.status(500).json({ message: 'Failed to list OneDrive files' });
+      }
+
+      const json: any = await listRes.json();
+      const items = (json.value || []).filter((item: any) => {
+        const mime = item.file?.mimeType || '';
+        const name = (item.name || '').toLowerCase();
+        return mime.startsWith('image/') || name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') || name.endsWith('.gif') || name.endsWith('.webp');
+      });
+
+      res.json({
+        items: items.map((i: any) => ({
+          id: i.id,
+          name: i.name,
+          size: i.size,
+          mimeType: i.file?.mimeType,
+          webUrl: i.webUrl
+        }))
+      });
+    } catch (error) {
+      console.error('OneDrive list error:', error);
+      res.status(500).json({ message: 'Failed to list OneDrive files' });
+    }
+  });
+
+  // Create a shareable link for a OneDrive item
+  app.post('/api/admin/onedrive/share', requireAuth, async (req, res) => {
+    try {
+      const { itemId } = req.body;
+      if (!itemId) return res.status(400).json({ message: 'itemId is required' });
+
+      const accessToken = await ensureAccessToken();
+      const shareUrl = `https://graph.microsoft.com/v1.0/me/drive/items/${itemId}/createLink`;
+      const shareRes = await fetch(shareUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ type: 'view', scope: 'anonymous' })
+      });
+
+      if (!shareRes.ok) {
+        const errTxt = await shareRes.text();
+        console.error('OneDrive share failed:', errTxt);
+        return res.status(500).json({ message: 'Failed to create share link' });
+      }
+
+      const shareJson: any = await shareRes.json();
+      const link = shareJson?.link?.webUrl;
+      if (!link) {
+        return res.status(500).json({ message: 'No share link returned' });
+      }
+
+      res.json({ url: link });
+    } catch (error) {
+      console.error('OneDrive share error:', error);
+      res.status(500).json({ message: 'Failed to create share link' });
+    }
+  });
+
   // Live Streams - Admin routes
   app.post('/api/admin/live-streams', requireAuth, async (req, res) => {
     try {

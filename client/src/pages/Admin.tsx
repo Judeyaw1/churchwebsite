@@ -358,6 +358,65 @@ export default function Admin() {
     }
   };
 
+  const handleOneDriveBrowse = async () => {
+    try {
+      setOneDriveLoading(true);
+      const res = await fetch('/api/admin/onedrive/list', {
+        headers: { 'Authorization': 'Bearer admin' }
+      });
+      if (!res.ok) {
+        alert('Unable to browse OneDrive. Make sure you clicked Connect OneDrive and completed login.');
+        return;
+      }
+      const data = await res.json();
+      setOneDriveFiles(data.items || []);
+
+      if (!data.items || data.items.length === 0) {
+        alert('No images found in your OneDrive (root or folder).');
+        return;
+      }
+
+      // Simple prompt-based picker for now
+      const choices = data.items
+        .map((f: any, idx: number) => `${idx + 1}. ${f.name} (${Math.round((f.size || 0) / 1024)} KB)`)
+        .join('\n');
+      const choice = window.prompt(`Select an image by number:\n${choices}`);
+      if (!choice) return;
+      const idx = parseInt(choice, 10) - 1;
+      if (isNaN(idx) || idx < 0 || idx >= data.items.length) {
+        alert('Invalid selection');
+        return;
+      }
+
+      const selected = data.items[idx];
+      // Get share link
+      const shareRes = await fetch('/api/admin/onedrive/share', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer admin',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ itemId: selected.id })
+      });
+      if (!shareRes.ok) {
+        alert('Failed to create share link for the selected file.');
+        return;
+      }
+      const shareData = await shareRes.json();
+      setGalleryForm(prev => ({ ...prev, url: shareData.url }));
+      setSelectedFiles([]);
+      setUploadStatus('success');
+      setUploadProgress(100);
+      alert(`Selected from OneDrive: ${selected.name}\nShare link set. Click Save to create the gallery item.`);
+    } catch (error) {
+      console.error('OneDrive browse error:', error);
+      alert('Failed to browse OneDrive. Please try again.');
+    } finally {
+      setOneDriveLoading(false);
+      setUploadProgress(0);
+    }
+  };
+
   const handleOneDriveUpload = async () => {
     try {
       const fileInput = document.createElement('input');
@@ -424,6 +483,10 @@ export default function Admin() {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [emailMessage, setEmailMessage] = useState('');
+
+  // OneDrive browse state
+  const [oneDriveFiles, setOneDriveFiles] = useState<{ id: string; name: string; webUrl: string; size: number; mimeType?: string }[]>([]);
+  const [oneDriveLoading, setOneDriveLoading] = useState(false);
 
   const tabs = [
     { id: 'events', label: 'Events', icon: Calendar },
@@ -1600,19 +1663,41 @@ export default function Admin() {
                       </div>
                       
                       {/* OneDrive Upload */}
-                      <div className="border-2 border-dashed border-blue-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
+                      <div className="border-2 border-dashed border-blue-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors space-y-2">
                         <Cloud className="h-6 w-6 text-blue-400 mx-auto mb-2" />
-                        <p className="text-sm text-blue-600 mb-1">Upload from OneDrive</p>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="border-blue-300 text-blue-600 hover:bg-blue-50"
-                          onClick={handleOneDriveUpload}
-                        >
-                          <Cloud className="h-4 w-4 mr-2" />
-                          Connect OneDrive
-                        </Button>
+                        <p className="text-sm text-blue-600 mb-1">OneDrive</p>
+                        <div className="flex flex-col gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                            onClick={handleOneDriveConnect}
+                          >
+                            <Cloud className="h-4 w-4 mr-2" />
+                            Connect OneDrive
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                            onClick={handleOneDriveUpload}
+                          >
+                            <Cloud className="h-4 w-4 mr-2" />
+                            Upload from device to OneDrive
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                            onClick={handleOneDriveBrowse}
+                            disabled={oneDriveLoading}
+                          >
+                            {oneDriveLoading ? 'Loading...' : 'Choose from OneDrive'}
+                          </Button>
+                        </div>
                       </div>
                       
                       {/* URL Fallback */}
