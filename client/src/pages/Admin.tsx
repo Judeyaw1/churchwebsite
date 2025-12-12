@@ -340,26 +340,70 @@ export default function Admin() {
     }
   };
 
-  const handleOneDriveUpload = async () => {
+  const handleOneDriveConnect = async () => {
     try {
-      // Lightweight flow: ask for a OneDrive share link and use it directly
-      const link = window.prompt('Paste the OneDrive image share link:');
-      if (!link) return;
-
-      // Basic validation
-      if (!link.startsWith('http')) {
-        alert('Please paste a valid OneDrive sharing link.');
+      const res = await fetch('/api/onedrive/auth-start', {
+        headers: { 'Authorization': 'Bearer admin' }
+      });
+      if (!res.ok) {
+        alert('OneDrive not configured. Please set env vars on the server.');
         return;
       }
+      const data = await res.json();
+      window.open(data.authUrl, '_blank', 'width=600,height=700');
+      alert('After signing in to Microsoft, return here and upload.');
+    } catch (error) {
+      console.error('OneDrive connect error:', error);
+      alert('Failed to start OneDrive auth. Please try again.');
+    }
+  };
 
-      // Clear local file selection and set URL
-      setSelectedFiles([]);
-      setGalleryForm(prev => ({ ...prev, url: link }));
-      setUploadStatus('success');
-      alert('OneDrive link added. Click Save to create the gallery item.');
+  const handleOneDriveUpload = async () => {
+    try {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.multiple = false;
+
+      fileInput.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        setUploadStatus('uploading');
+        setUploadProgress(0);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await fetch('/api/admin/onedrive/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer admin'
+          },
+          body: formData
+        });
+
+        if (!res.ok) {
+          setUploadStatus('error');
+          alert('OneDrive upload failed. If not connected, click Connect OneDrive first.');
+          return;
+        }
+
+        const data = await res.json();
+        setGalleryForm(prev => ({ ...prev, url: data.url }));
+        setSelectedFiles([]);
+        setUploadStatus('success');
+        setUploadProgress(100);
+        alert('Uploaded to OneDrive. Click Save to create the gallery item.');
+      };
+
+      fileInput.click();
     } catch (error) {
       console.error('OneDrive upload error:', error);
-      alert('Failed to add OneDrive link. Please try again.');
+      setUploadStatus('error');
+      alert('Failed to upload to OneDrive. Please try again.');
+    } finally {
+      setUploadProgress(0);
     }
   };
   

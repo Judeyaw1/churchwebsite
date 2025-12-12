@@ -6,8 +6,49 @@ import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
 import { insertEventSchema, insertLiveStreamSchema, insertGalleryImageSchema, insertMessageSchema } from "@shared/schema";
+import fetch from "node-fetch";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // In-memory OneDrive tokens (for demo; consider persistent storage for production)
+  let onedriveTokens: {
+    accessToken: string;
+    refreshToken: string;
+    expiresAt: number; // epoch ms
+  } | null = null;
+
+  const onedriveClientId = process.env.MICROSOFT_CLIENT_ID || "";
+  const onedriveClientSecret = process.env.MICROSOFT_CLIENT_SECRET || "";
+  const onedriveRedirectUri = process.env.ONEDRIVE_REDIRECT_URI || `${process.env.BASE_URL || ''}/onedrive-callback`;
+  const onedriveFolder = process.env.ONEDRIVE_TARGET_FOLDER || "ChurchGallery";
+  const tenantId = process.env.MICROSOFT_TENANT_ID || "common";
+
+  const ensureAccessToken = async () => {
+    if (!onedriveTokens) throw new Error("OneDrive not connected");
+    const now = Date.now();
+    if (now < onedriveTokens.expiresAt - 60_000) return onedriveTokens.accessToken;
+
+    // Refresh token
+    const tokenRes = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: onedriveClientId,
+        client_secret: onedriveClientSecret,
+        grant_type: "refresh_token",
+        refresh_token: onedriveTokens.refreshToken,
+        redirect_uri: onedriveRedirectUri,
+      }),
+    });
+    if (!tokenRes.ok) throw new Error("Failed to refresh OneDrive token");
+    const tokenJson: any = await tokenRes.json();
+    onedriveTokens = {
+      accessToken: tokenJson.access_token,
+      refreshToken: tokenJson.refresh_token || onedriveTokens.refreshToken,
+      expiresAt: Date.now() + (tokenJson.expires_in || 3600) * 1000,
+    };
+    return onedriveTokens.accessToken;
+  };
+
   // Health check endpoint for Railway
   app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({ 
@@ -212,6 +253,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: 'Failed to cleanup past events' });
+    }
+  });
+
+  // ===== OneDrive Integration =====
+  // Start auth
+  app.get('/api/onedrive/auth-start', requireAuth, async (_req, res) => {
+    if (!onedriveClientId || !onedriveClientSecret || !onedriveRedirectUri) {
+      return res.status(500).json({ message: 'OneDrive env vars not set' });
+    }
+    const scopes = encodeURIComponent('offline_access Files.ReadWrite Files.ReadWrite.AppFolder');
+    const redirect = encodeURIComponent(onedriveRedirectUri);
+    const authUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?client_id=${onedriveClientId}&response_type=code&redirect_uri=${redirect}&scope=${scopes}`;
+    res.json({ authUrl });
+  });
+
+  // Callback
+  app.get('/onedrive-callback', async (req, res) => {
+    try {
+      const code = req.query.code as string;
+      if (!code) return res.status(400).send('Missing code');
+      const tokenRes = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: onedriveClientId,
+          client_secret: onedriveClientSecret,
+          grant_type: "authorization_code",
+          code,
+          redirect_uri: onedriveRedirectUri,
+        }),
+      });
+      if (!tokenRes.ok) throw new Error('Failed to exchange code');
+      const tokenJson: any = await tokenRes.json();
+      onedriveTokens = {
+        accessToken: tokenJson.access_token,
+        refreshToken: tokenJson.refresh_token,
+        expiresAt: Date.now() + (tokenJson.expires_in || 3600) * 1000,
+      };
+      // Simple callback page to close the popup
+      res.send(`<html><body style="font-family: sans-serif; text-align:center; padding:20px;">
+        <h2>OneDrive connected</h2>
+        <p>You can close this window and return to the admin panel.</p>
+        <script>window.close();</script>
+      </body></html>`);
+    } catch (error) {
+      console.error('OneDrive callback error:', error);
+      res.status(500).send('OneDrive connection failed');
+    }
+  });
+
+  // Upload to OneDrive
+  app.post('/api/admin/onedrive/upload', requireAuth, upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ message: 'No file provided' });
+      const accessToken = await ensureAccessToken();
+
+      const targetPath = `${onedriveFolder}/${req.file.originalname}`;
+      const uploadUrl = `https://graph.microsoft.com/v1.0/me/drive/root:/${encodeURIComponent(targetPath)}:/content`;
+
+      const fileBuffer = fs.readFileSync(req.file.path);
+      const uploadRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': req.file.mimetype || 'application/octet-stream'
+        },
+        body: fileBuffer
+      });
+
+      fs.unlinkSync(req.file.path);
+
+      if (!uploadRes.ok) {
+        const errTxt = await uploadRes.text();
+        console.error('OneDrive upload failed:', errTxt);
+        return res.status(500).json({ message: 'OneDrive upload failed' });
+      }
+
+      const uploadJson: any = await uploadRes.json();
+      const webUrl = uploadJson?.webUrl;
+      if (!webUrl) {
+        return res.status(500).json({ message: 'No shareable link returned from OneDrive' });
+      }
+
+      res.json({ url: webUrl });
+    } catch (error) {
+      console.error('OneDrive upload error:', error);
+      res.status(500).json({ message: 'OneDrive upload failed' });
     }
   });
 
