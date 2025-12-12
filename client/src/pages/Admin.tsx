@@ -342,16 +342,9 @@ export default function Admin() {
 
   const handleOneDriveConnect = async () => {
     try {
-      const res = await fetch('/api/onedrive/auth-start', {
-        headers: { 'Authorization': 'Bearer admin' }
-      });
-      if (!res.ok) {
-        alert('OneDrive not configured. Please set env vars on the server.');
-        return;
-      }
-      const data = await res.json();
-      window.open(data.authUrl, '_blank', 'width=600,height=700');
-      alert('After signing in to Microsoft, return here and upload.');
+      // Use redirect flow so we don't need auth headers in the popup
+      window.open('/api/onedrive/auth-start?redirect=1', '_blank', 'width=600,height=700');
+      alert('After signing in to Microsoft, return here and click "Choose from OneDrive" or upload again.');
     } catch (error) {
       console.error('OneDrive connect error:', error);
       alert('Failed to start OneDrive auth. Please try again.');
@@ -361,6 +354,19 @@ export default function Admin() {
   const handleOneDriveBrowse = async () => {
     try {
       setOneDriveLoading(true);
+      // Check status first
+      const statusRes = await fetch('/api/admin/onedrive/status', {
+        headers: { 'Authorization': 'Bearer admin' }
+      });
+      if (statusRes.ok) {
+        const status = await statusRes.json();
+        if (!status.connected) {
+          alert('Please click "Connect OneDrive" and sign in first.');
+          setOneDriveLoading(false);
+          return;
+        }
+      }
+
       const res = await fetch('/api/admin/onedrive/list', {
         headers: { 'Authorization': 'Bearer admin' }
       });

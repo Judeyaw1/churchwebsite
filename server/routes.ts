@@ -258,13 +258,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ===== OneDrive Integration =====
   // Start auth
-  app.get('/api/onedrive/auth-start', requireAuth, async (_req, res) => {
+  app.get('/api/onedrive/auth-start', async (req, res) => {
     if (!onedriveClientId || !onedriveClientSecret || !onedriveRedirectUri) {
       return res.status(500).json({ message: 'OneDrive env vars not set' });
     }
     const scopes = encodeURIComponent('offline_access Files.ReadWrite Files.ReadWrite.AppFolder');
     const redirect = encodeURIComponent(onedriveRedirectUri);
     const authUrl = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?client_id=${onedriveClientId}&response_type=code&redirect_uri=${redirect}&scope=${scopes}`;
+    // If redirect=1, send a 302 directly (useful for window.open without headers)
+    if (req.query.redirect === '1') {
+      return res.redirect(authUrl);
+    }
     res.json({ authUrl });
   });
 
@@ -341,6 +345,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('OneDrive upload error:', error);
       res.status(500).json({ message: 'OneDrive upload failed' });
     }
+  });
+
+  // OneDrive status
+  app.get('/api/admin/onedrive/status', requireAuth, async (_req, res) => {
+    if (!onedriveTokens) {
+      return res.json({ connected: false });
+    }
+    res.json({
+      connected: true,
+      expiresAt: onedriveTokens.expiresAt
+    });
   });
 
   // List OneDrive files (images) in a folder (default root)
