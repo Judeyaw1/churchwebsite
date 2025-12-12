@@ -351,6 +351,25 @@ export default function Admin() {
     }
   };
 
+  const handleOneDriveStatus = async () => {
+    try {
+      const res = await fetch('/api/admin/onedrive/status', {
+        headers: { 'Authorization': 'Bearer admin' }
+      });
+      if (!res.ok) {
+        setOneDriveStatus('disconnected');
+        alert('Not connected. Click Connect OneDrive.');
+        return;
+      }
+      const data = await res.json();
+      setOneDriveStatus(data.connected ? 'connected' : 'disconnected');
+    } catch (error) {
+      console.error('OneDrive status error:', error);
+      setOneDriveStatus('disconnected');
+      alert('Unable to check OneDrive status.');
+    }
+  };
+
   const handleOneDriveBrowse = async () => {
     try {
       setOneDriveLoading(true);
@@ -493,6 +512,7 @@ export default function Admin() {
   // OneDrive browse state
   const [oneDriveFiles, setOneDriveFiles] = useState<{ id: string; name: string; webUrl: string; size: number; mimeType?: string }[]>([]);
   const [oneDriveLoading, setOneDriveLoading] = useState(false);
+  const [oneDriveStatus, setOneDriveStatus] = useState<'unknown' | 'connected' | 'disconnected'>('unknown');
 
   const tabs = [
     { id: 'events', label: 'Events', icon: Calendar },
@@ -1703,6 +1723,18 @@ export default function Admin() {
                           >
                             {oneDriveLoading ? 'Loading...' : 'Choose from OneDrive'}
                           </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                            onClick={handleOneDriveStatus}
+                          >
+                            Check OneDrive status
+                          </Button>
+                          <p className="text-xs text-blue-200">
+                            Status: {oneDriveStatus === 'connected' ? 'Connected' : oneDriveStatus === 'disconnected' ? 'Not connected' : 'Unknown'}
+                          </p>
                         </div>
                       </div>
                       
