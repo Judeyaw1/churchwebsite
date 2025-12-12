@@ -24,7 +24,6 @@ export default function Navigation({ className = '' }: NavigationProps) {
   const navItems = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
-    { label: 'Services', href: '/#services' },
     { label: 'Events', href: '/events' },
     { label: 'Groups', href: '#', hasDropdown: true },
     { label: 'Admin', href: '/admin/login', icon: LogIn } // Admin login link with icon
