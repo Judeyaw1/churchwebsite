@@ -283,7 +283,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                     </div>
                   ) : galleryImages.length > 0 ? (
                     <>
-                      <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-3 relative">
+                      <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-3 relative transition-all duration-300">
                         <img
                           src={galleryImages[currentImageIndex].url}
                           alt={galleryImages[currentImageIndex].title}
@@ -326,7 +326,11 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                           {galleryImages.map((image, index) => (
                             <button
                               key={image.id}
-                              onClick={() => setCurrentImageIndex(index)}
+                              onClick={(e) => {
+                                setCurrentImageIndex(index);
+                                // Ensure the selected thumb scrolls into view
+                                e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                              }}
                               className={`min-w-[110px] max-w-[140px] aspect-[4/3] overflow-hidden rounded-lg bg-black/30 flex items-center justify-center p-1 transition-all duration-300 ${
                                 index === currentImageIndex 
                                   ? 'ring-2 ring-white/50 scale-105' 
