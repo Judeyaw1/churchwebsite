@@ -342,39 +342,24 @@ export default function Admin() {
 
   const handleOneDriveUpload = async () => {
     try {
-      // Simple OneDrive integration using Microsoft Graph API
-      // This is a basic implementation - in production you'd need proper OAuth flow
-      
-      const clientId = 'your-microsoft-app-client-id'; // Would be from environment variables
-      const redirectUri = window.location.origin + '/onedrive-callback';
-      
-      // For demo purposes, we'll show a file picker dialog
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'image/*';
-      fileInput.multiple = false;
-      
-      fileInput.onchange = async (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (file) {
-          setSelectedFile(file);
-          setUploadStatus('idle');
-          
-          // In a real implementation, you would:
-          // 1. Authenticate with Microsoft Graph
-          // 2. Upload to OneDrive
-          // 3. Get the shareable URL
-          // 4. Set that URL in the gallery form
-          
-          alert(`Selected: ${file.name}\n\nFor full OneDrive integration:\n1. Register app with Microsoft\n2. Implement OAuth flow\n3. Use Microsoft Graph API to upload\n4. Get shareable URL`);
-        }
-      };
-      
-      fileInput.click();
-      
+      // Lightweight flow: ask for a OneDrive share link and use it directly
+      const link = window.prompt('Paste the OneDrive image share link:');
+      if (!link) return;
+
+      // Basic validation
+      if (!link.startsWith('http')) {
+        alert('Please paste a valid OneDrive sharing link.');
+        return;
+      }
+
+      // Clear local file selection and set URL
+      setSelectedFiles([]);
+      setGalleryForm(prev => ({ ...prev, url: link }));
+      setUploadStatus('success');
+      alert('OneDrive link added. Click Save to create the gallery item.');
     } catch (error) {
       console.error('OneDrive upload error:', error);
-      alert('OneDrive integration requires Microsoft app registration and OAuth setup.');
+      alert('Failed to add OneDrive link. Please try again.');
     }
   };
   
