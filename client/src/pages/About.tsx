@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
@@ -15,12 +15,28 @@ export default function About() {
   const historyRef = useRef(null);
   const valuesRef = useRef(null);
   const leadershipRef = useRef(null);
+  const [galleryImages, setGalleryImages] = useState<{ id: string; url: string; title: string }[]>([]);
   
   const heroInView = useInView(heroRef, { once: true, amount: 0.3 });
   const missionInView = useInView(missionRef, { once: true, amount: 0.3 });
   const historyInView = useInView(historyRef, { once: true, amount: 0.3 });
   const valuesInView = useInView(valuesRef, { once: true, amount: 0.3 });
   const leadershipInView = useInView(leadershipRef, { once: true, amount: 0.3 });
+
+  useEffect(() => {
+    const loadGallery = async () => {
+      try {
+        const res = await fetch('/api/gallery');
+        if (res.ok) {
+          const data = await res.json();
+          setGalleryImages(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch gallery images for About page', err);
+      }
+    };
+    loadGallery();
+  }, []);
 
   const values = [
     {
@@ -150,9 +166,10 @@ export default function About() {
               className="relative"
             >
               <img
-                src={pastorImageJpg}
-                alt="United Bethel Presbyterian Church"
+                src={galleryImages[0]?.url || pastorImageJpg}
+                alt={galleryImages[0]?.title || "United Bethel Presbyterian Church"}
                 className="w-full h-96 object-cover rounded-2xl shadow-lg"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-2xl" />
               <div className="absolute bottom-6 left-6 text-white">
