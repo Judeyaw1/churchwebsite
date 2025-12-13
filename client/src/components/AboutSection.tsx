@@ -354,7 +354,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                         <img
                           src={image.src}
                           alt={image.alt}
-                          className="w-full h-full object-cover object-top"
+                          className="w-full h-full object-cover object-[50%_25%]"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-5" />
                         <div className="absolute bottom-4 left-4 text-white z-20 pointer-events-none">
@@ -416,7 +416,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                         <img
                           src={image.src}
                           alt={image.alt}
-                          className="w-full h-full object-cover object-top"
+                          className="w-full h-full object-cover object-[50%_25%]"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-5" />
                         <div className="absolute bottom-4 left-4 text-white z-20 pointer-events-none">
@@ -478,7 +478,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                         <img
                           src={image.src}
                           alt={image.alt}
-                          className="w-full h-full object-cover object-top"
+                          className="w-full h-full object-cover object-[50%_25%]"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-5" />
                         <div className="absolute bottom-4 left-4 text-white z-20 pointer-events-none">
