@@ -119,6 +119,20 @@ export const subscribers = pgTable("subscribers", {
   unsubscribedAt: timestamp("unsubscribed_at"),
 });
 
+// Blog posts table
+export const blogPosts = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  author: text("author").notNull(),
+  image: text("image"),
+  excerpt: text("excerpt"), // Short summary for preview
+  publishedAt: timestamp("published_at").defaultNow().notNull(),
+  isPublished: boolean("is_published").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -179,6 +193,15 @@ export const insertEventRsvpSchema = createInsertSchema(eventRsvps).pick({
   email: true,
 });
 
+export const insertBlogPostSchema = createInsertSchema(blogPosts).pick({
+  title: true,
+  content: true,
+  author: true,
+  image: true,
+  excerpt: true,
+  isPublished: true,
+});
+
 // Type exports
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -203,3 +226,6 @@ export type Subscriber = typeof subscribers.$inferSelect;
 
 export type InsertEventRsvp = z.infer<typeof insertEventRsvpSchema>;
 export type EventRsvp = typeof eventRsvps.$inferSelect;
+
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BlogPost = typeof blogPosts.$inferSelect;

@@ -18,6 +18,8 @@ import {
   type Registration,
   type InsertEventRsvp,
   type EventRsvp,
+  type BlogPost,
+  type InsertBlogPost,
   users,
   events,
   liveStreams,
@@ -25,7 +27,8 @@ import {
   messages,
   subscribers,
   registrations,
-  eventRsvps
+  eventRsvps,
+  blogPosts
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -90,6 +93,14 @@ export interface IStorage {
   updateSubscriber(id: string, subscriber: Partial<InsertSubscriber>): Promise<Subscriber | undefined>;
   deleteSubscriber(id: string): Promise<boolean>;
   unsubscribeSubscriber(email: string): Promise<boolean>;
+  
+  // Blog methods
+  getBlogPosts(): Promise<BlogPost[]>;
+  getPublishedBlogPosts(): Promise<BlogPost[]>;
+  getBlogPost(id: string): Promise<BlogPost | undefined>;
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: string, post: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: string): Promise<boolean>;
 }
 
 export class PostgresStorage implements IStorage {
@@ -384,6 +395,43 @@ export class PostgresStorage implements IStorage {
       .where(and(eq(eventRsvps.eventId, eventId), eq(eventRsvps.email, email)))
       .limit(1);
     return result[0];
+  }
+
+  // Blog methods
+  async getBlogPosts(): Promise<BlogPost[]> {
+    return await db.select().from(blogPosts).orderBy(desc(blogPosts.publishedAt));
+  }
+
+  async getPublishedBlogPosts(): Promise<BlogPost[]> {
+    return await db
+      .select()
+      .from(blogPosts)
+      .where(eq(blogPosts.isPublished, true))
+      .orderBy(desc(blogPosts.publishedAt));
+  }
+
+  async getBlogPost(id: string): Promise<BlogPost | undefined> {
+    const result = await db.select().from(blogPosts).where(eq(blogPosts.id, id)).limit(1);
+    return result[0];
+  }
+
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const result = await db.insert(blogPosts).values(post).returning();
+    return result[0];
+  }
+
+  async updateBlogPost(id: string, postUpdate: Partial<InsertBlogPost>): Promise<BlogPost | undefined> {
+    const result = await db
+      .update(blogPosts)
+      .set({ ...postUpdate, updatedAt: new Date() })
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteBlogPost(id: string): Promise<boolean> {
+    const result = await db.delete(blogPosts).where(eq(blogPosts.id, id));
+    return result.rowCount > 0;
   }
 }
 

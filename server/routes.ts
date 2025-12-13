@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertEventSchema, insertLiveStreamSchema, insertGalleryImageSchema, insertMessageSchema, insertRegistrationSchema, insertEventRsvpSchema } from "@shared/schema";
+import { insertEventSchema, insertLiveStreamSchema, insertGalleryImageSchema, insertMessageSchema, insertRegistrationSchema, insertEventRsvpSchema, insertBlogPostSchema } from "@shared/schema";
 import fetch from "node-fetch";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -675,6 +675,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'Message deleted successfully' });
     } catch (error) {
       res.status(500).json({ message: 'Failed to delete message' });
+    }
+  });
+
+  // Blog Posts - Public routes
+  app.get('/api/blog', async (req, res) => {
+    try {
+      const posts = await storage.getPublishedBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch blog posts' });
+    }
+  });
+
+  app.get('/api/blog/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const post = await storage.getBlogPost(id);
+      if (!post) {
+        return res.status(404).json({ message: 'Blog post not found' });
+      }
+      // Only return published posts to public
+      if (!post.isPublished) {
+        return res.status(404).json({ message: 'Blog post not found' });
+      }
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch blog post' });
+    }
+  });
+
+  // Blog Posts - Admin routes
+  app.get('/api/admin/blog', requireAuth, async (req, res) => {
+    try {
+      const posts = await storage.getBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch blog posts' });
+    }
+  });
+
+  app.post('/api/admin/blog', requireAuth, async (req, res) => {
+    try {
+      const validatedData = insertBlogPostSchema.parse(req.body);
+      const post = await storage.createBlogPost(validatedData);
+      res.json(post);
+    } catch (error) {
+      res.status(400).json({ message: 'Invalid blog post data' });
+    }
+  });
+
+  app.put('/api/admin/blog/:id', requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertBlogPostSchema.partial().parse(req.body);
+      const post = await storage.updateBlogPost(id, validatedData);
+      if (!post) {
+        return res.status(404).json({ message: 'Blog post not found' });
+      }
+      res.json(post);
+    } catch (error) {
+      res.status(400).json({ message: 'Invalid blog post data' });
+    }
+  });
+
+  app.delete('/api/admin/blog/:id', requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteBlogPost(id);
+      if (!success) {
+        return res.status(404).json({ message: 'Blog post not found' });
+      }
+      res.json({ message: 'Blog post deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to delete blog post' });
     }
   });
 

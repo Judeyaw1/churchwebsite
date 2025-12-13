@@ -22,7 +22,8 @@ import {
   Loader2,
   Mail,
   Users,
-  Crop
+  Crop,
+  BookOpen
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,9 +69,22 @@ interface Message {
   priority: 'low' | 'medium' | 'high';
 }
 
+interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  image?: string;
+  excerpt?: string;
+  publishedAt: string;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function Admin() {
   const [location, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<'events' | 'livestream' | 'gallery' | 'messages' | 'subscribers'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'livestream' | 'gallery' | 'messages' | 'subscribers' | 'blog'>('events');
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -104,12 +118,17 @@ export default function Admin() {
       const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
       
       // Fetch all data in parallel
-      const [eventsRes, streamsRes, galleryRes, messagesRes, subscribersRes] = await Promise.all([
+      const [eventsRes, streamsRes, galleryRes, messagesRes, subscribersRes, blogRes] = await Promise.all([
         fetch('/api/events'),
         fetch('/api/live-streams'),
         fetch('/api/gallery'),
         fetch('/api/messages'),
         fetch('/api/admin/subscribers', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }),
+        fetch('/api/admin/blog', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -141,6 +160,11 @@ export default function Admin() {
       if (subscribersRes.ok) {
         const subscribersData = await subscribersRes.json();
         setSubscribers(subscribersData);
+      }
+
+      if (blogRes.ok) {
+        const blogData = await blogRes.json();
+        setBlogPosts(blogData);
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -503,6 +527,19 @@ export default function Admin() {
     priority: 'medium' as 'low' | 'medium' | 'high'
   });
 
+  const [blogForm, setBlogForm] = useState({
+    title: '',
+    content: '',
+    author: '',
+    image: '',
+    excerpt: '',
+    isPublished: true
+  });
+
+  const [blogImageFile, setBlogImageFile] = useState<File | null>(null);
+  const [blogUploadProgress, setBlogUploadProgress] = useState(0);
+  const [blogUploadStatus, setBlogUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+
   // Data from database
   const [events, setEvents] = useState<Event[]>([]);
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
@@ -513,6 +550,7 @@ export default function Admin() {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [emailMessage, setEmailMessage] = useState('');
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
 
   // OneDrive browse state
   const [oneDriveFiles, setOneDriveFiles] = useState<{ id: string; name: string; webUrl: string; size: number; mimeType?: string }[]>([]);
@@ -524,7 +562,8 @@ export default function Admin() {
     { id: 'livestream', label: 'Live Streams', icon: Video },
     { id: 'gallery', label: 'Gallery', icon: Camera },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
-    { id: 'subscribers', label: 'Subscribers', icon: Users }
+    { id: 'subscribers', label: 'Subscribers', icon: Users },
+    { id: 'blog', label: 'Blog', icon: BookOpen }
   ];
 
   const getPriorityColor = (priority: string) => {
@@ -649,6 +688,9 @@ export default function Admin() {
       case 'messages':
         allIds = messages.map(m => m.id);
         break;
+      case 'blog':
+        allIds = blogPosts.map(b => b.id);
+        break;
     }
     setSelectedItems(new Set(allIds));
   };
@@ -667,6 +709,7 @@ export default function Admin() {
     setStreamForm({ title: '', url: '', schedule: '', isLive: false });
     setGalleryForm({ title: '', url: '', date: '', category: 'Worship' });
     setMessageForm({ title: '', content: '', date: '', priority: 'medium' });
+    setBlogForm({ title: '', content: '', author: '', image: '', excerpt: '', isPublished: true });
     // Reset file upload states
     setSelectedFiles([]);
     setUploadProgress(0);
@@ -708,6 +751,11 @@ export default function Admin() {
         console.log('Found message:', message);
         if (message) setMessageForm(message);
         break;
+      case 'blog':
+        const blogPost = blogPosts.find(b => b.id === id);
+        console.log('Found blog post:', blogPost);
+        if (blogPost) setBlogForm(blogPost);
+        break;
     }
     console.log('After handleEdit, showForm:', true);
   };
@@ -730,6 +778,9 @@ export default function Admin() {
         break;
       case 'messages':
         setMessageForm(prev => ({ ...prev, [field]: value }));
+        break;
+      case 'blog':
+        setBlogForm(prev => ({ ...prev, [field]: value }));
         break;
     }
   };
@@ -817,6 +868,22 @@ export default function Admin() {
             endpoint = '/api/admin/messages';
             data = messageForm;
             break;
+          case 'blog':
+            endpoint = '/api/admin/blog';
+            // If a blog image file is selected, upload it first
+            if (blogImageFile) {
+              try {
+                const uploadedUrl = await uploadEventThumbnail(blogImageFile);
+                data = { ...blogForm, image: uploadedUrl };
+              } catch (error) {
+                console.error('Blog image upload failed:', error);
+                alert('Failed to upload blog image. Please try again.');
+                return;
+              }
+            } else {
+              data = blogForm;
+            }
+            break;
         }
 
         const response = await fetch(endpoint, {
@@ -860,6 +927,22 @@ export default function Admin() {
             endpoint = `/api/admin/messages/${editingItem}`;
             data = messageForm;
             break;
+          case 'blog':
+            endpoint = `/api/admin/blog/${editingItem}`;
+            // If a blog image file is selected, upload it first
+            if (blogImageFile) {
+              try {
+                const uploadedUrl = await uploadEventThumbnail(blogImageFile);
+                data = { ...blogForm, image: uploadedUrl };
+              } catch (error) {
+                console.error('Blog image upload failed:', error);
+                alert('Failed to upload blog image. Please try again.');
+                return;
+              }
+            } else {
+              data = blogForm;
+            }
+            break;
         }
 
         const response = await fetch(endpoint, {
@@ -889,6 +972,8 @@ export default function Admin() {
     setShowForm(false);
     setIsAddingNew(false);
     setEditingItem(null);
+    setBlogImageFile(null);
+    setBlogUploadStatus('idle');
   };
 
   const handleLogout = () => {
@@ -1479,6 +1564,60 @@ export default function Admin() {
                   ))}
                 </div>
               )}
+
+              {/* Blog Management */}
+              {activeTab === 'blog' && (
+                <div className="space-y-4">
+                  {blogPosts.map((post) => (
+                    <Card key={post.id} className="bg-white/5 border-white/20">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-lg font-semibold text-white">{post.title}</h3>
+                              <Badge className={post.isPublished ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                                {post.isPublished ? 'Published' : 'Draft'}
+                              </Badge>
+                            </div>
+                            <div className="flex flex-wrap gap-4 text-sm text-white/70 mb-2">
+                              <span>✍️ {post.author}</span>
+                              <span>📅 {new Date(post.publishedAt).toLocaleDateString()}</span>
+                            </div>
+                            <p className="text-white/80 text-sm line-clamp-2">
+                              {post.excerpt || post.content.substring(0, 150) + '...'}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="border-white/30 text-white"
+                              onClick={() => handleEdit('blog', post.id)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="border-red-300 text-red-300 hover:bg-red-300/10"
+                              onClick={() => handleDelete('blog', post.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {blogPosts.length === 0 && (
+                    <div className="text-center py-12">
+                      <BookOpen className="h-16 w-16 text-white/60 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-white mb-2">No blog posts yet</h3>
+                      <p className="text-white/80">Click "Add New Blog" to create your first post.</p>
+                    </div>
+                  )}
+                </div>
+              )}
               </div>
               )}
             </div>
@@ -1938,6 +2077,119 @@ export default function Admin() {
                         <option value="high">High</option>
                       </select>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Blog Form */}
+              {activeTab === 'blog' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                    <Input
+                      value={blogForm.title}
+                      onChange={(e) => setBlogForm(prev => ({ ...prev, title: e.target.value }))}
+                      className="bg-gray-50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Author *</label>
+                    <Input
+                      value={blogForm.author}
+                      onChange={(e) => setBlogForm(prev => ({ ...prev, author: e.target.value }))}
+                      className="bg-gray-50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Excerpt (Short Summary)</label>
+                    <textarea
+                      value={blogForm.excerpt}
+                      onChange={(e) => setBlogForm(prev => ({ ...prev, excerpt: e.target.value }))}
+                      className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="Brief summary for preview..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
+                    <textarea
+                      value={blogForm.content}
+                      onChange={(e) => setBlogForm(prev => ({ ...prev, content: e.target.value }))}
+                      className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={10}
+                      placeholder="Write your blog post content here..."
+                    />
+                  </div>
+                  
+                  {/* Blog Image Upload */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-3">Blog Image</label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (!file.type.startsWith('image/')) {
+                              alert('Please select an image file');
+                              return;
+                            }
+                            if (file.size > 10 * 1024 * 1024) {
+                              alert('File size must be less than 10MB');
+                              return;
+                            }
+                            setBlogImageFile(file);
+                            setBlogUploadStatus('idle');
+                          }
+                        }}
+                        className="hidden"
+                        id="blogImageUpload"
+                      />
+                      
+                      {!blogImageFile && (
+                        <label htmlFor="blogImageUpload" className="cursor-pointer">
+                          <div className="flex flex-col items-center">
+                            <FileImage className="h-12 w-12 text-gray-400 mb-2" />
+                            <p className="text-sm text-gray-600 mb-2">
+                              Click to upload blog image
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              PNG, JPG, GIF up to 10MB
+                            </p>
+                          </div>
+                        </label>
+                      )}
+                      
+                      {blogImageFile && (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-center space-x-2">
+                            <FileImage className="h-5 w-5 text-green-500" />
+                            <span className="text-sm text-gray-700">{blogImageFile.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => setBlogImageFile(null)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="isPublished"
+                      checked={blogForm.isPublished}
+                      onChange={(e) => setBlogForm(prev => ({ ...prev, isPublished: e.target.checked }))}
+                      className="mr-2"
+                    />
+                    <label htmlFor="isPublished" className="text-sm font-medium text-gray-700">
+                      Publish immediately
+                    </label>
                   </div>
                 </div>
               )}
