@@ -288,6 +288,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Subscribers - Admin routes
+  app.get('/api/admin/subscribers', requireAuth, async (req, res) => {
+    try {
+      const subs = await storage.getSubscribers();
+      res.json(subs);
+    } catch (error) {
+      console.error('Failed to fetch subscribers', error);
+      res.status(500).json({ message: 'Failed to fetch subscribers' });
+    }
+  });
+
   // Cleanup past events (Admin only)
   app.post('/api/admin/events/cleanup', requireAuth, async (req, res) => {
     try {

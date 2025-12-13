@@ -101,6 +101,7 @@ export default function Admin() {
   const fetchData = async () => {
     try {
       setIsLoading(true);
+      const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
       
       // Fetch all data in parallel
       const [eventsRes, streamsRes, galleryRes, messagesRes, subscribersRes] = await Promise.all([
@@ -108,7 +109,11 @@ export default function Admin() {
         fetch('/api/live-streams'),
         fetch('/api/gallery'),
         fetch('/api/messages'),
-        fetch('/api/admin/subscribers')
+        fetch('/api/admin/subscribers', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
       ]);
 
       if (eventsRes.ok) {
@@ -1160,6 +1165,62 @@ export default function Admin() {
                       </CardContent>
                     </Card>
                   ))}
+                </div>
+              )}
+
+              {/* Subscribers Management */}
+              {activeTab === 'subscribers' && (
+                <div className="space-y-4">
+                  <Card className="bg-white/5 border-white/20">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="text-lg font-semibold text-white">Subscribers</h3>
+                          <p className="text-white/60 text-sm">{subscribers.length} total</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="border-white/30 text-white hover:bg-white/10"
+                          onClick={fetchData}
+                        >
+                          Refresh
+                        </Button>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full text-left text-sm text-white/80">
+                          <thead className="text-white/60 border-b border-white/10">
+                            <tr>
+                              <th className="py-2 pr-4">Email</th>
+                              <th className="py-2 pr-4">Name</th>
+                              <th className="py-2 pr-4">Status</th>
+                              <th className="py-2 pr-4">Subscribed</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {subscribers.map((sub) => (
+                              <tr key={sub.id} className="border-b border-white/5">
+                                <td className="py-2 pr-4">{sub.email}</td>
+                                <td className="py-2 pr-4">{sub.name || '—'}</td>
+                                <td className="py-2 pr-4">
+                                  <Badge className={sub.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800'}>
+                                    {sub.isActive ? 'Active' : 'Unsubscribed'}
+                                  </Badge>
+                                </td>
+                                <td className="py-2 pr-4">{sub.subscribedAt ? new Date(sub.subscribedAt).toLocaleDateString() : '—'}</td>
+                              </tr>
+                            ))}
+                            {subscribers.length === 0 && (
+                              <tr>
+                                <td colSpan={4} className="py-4 text-center text-white/60">
+                                  No subscribers yet.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               )}
 
