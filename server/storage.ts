@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { 
   type User, 
   type InsertUser, 
@@ -16,13 +16,16 @@ import {
   type InsertSubscriber,
   type InsertRegistration,
   type Registration,
+  type InsertEventRsvp,
+  type EventRsvp,
   users,
   events,
   liveStreams,
   galleryImages,
   messages,
   subscribers,
-  registrations
+  registrations,
+  eventRsvps
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -50,6 +53,11 @@ export interface IStorage {
   // Registration methods
   createRegistration(reg: InsertRegistration): Promise<void>;
   getRegistrationsForEvent(eventId: string): Promise<Registration[]>;
+  
+  // RSVP methods (for non-registration events)
+  createEventRsvp(rsvp: InsertEventRsvp): Promise<EventRsvp>;
+  getEventRsvpCount(eventId: string): Promise<number>;
+  getEventRsvpByEmail(eventId: string, email: string): Promise<EventRsvp | undefined>;
   
   // Live Stream methods
   getLiveStreams(): Promise<LiveStream[]>;
@@ -353,6 +361,29 @@ export class PostgresStorage implements IStorage {
       .from(registrations)
       .where(eq(registrations.eventId, eventId))
       .orderBy(desc(registrations.createdAt));
+  }
+
+  // RSVP methods (for non-registration events)
+  async createEventRsvp(rsvp: InsertEventRsvp): Promise<EventRsvp> {
+    const result = await db.insert(eventRsvps).values(rsvp).returning();
+    return result[0];
+  }
+
+  async getEventRsvpCount(eventId: string): Promise<number> {
+    const result = await db
+      .select()
+      .from(eventRsvps)
+      .where(eq(eventRsvps.eventId, eventId));
+    return result.length;
+  }
+
+  async getEventRsvpByEmail(eventId: string, email: string): Promise<EventRsvp | undefined> {
+    const result = await db
+      .select()
+      .from(eventRsvps)
+      .where(and(eq(eventRsvps.eventId, eventId), eq(eventRsvps.email, email)))
+      .limit(1);
+    return result[0];
   }
 }
 

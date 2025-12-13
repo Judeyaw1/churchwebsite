@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertEventSchema, insertLiveStreamSchema, insertGalleryImageSchema, insertMessageSchema, insertRegistrationSchema } from "@shared/schema";
+import { insertEventSchema, insertLiveStreamSchema, insertGalleryImageSchema, insertMessageSchema, insertRegistrationSchema, insertEventRsvpSchema } from "@shared/schema";
 import fetch from "node-fetch";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -146,7 +146,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Automatically delete past events before fetching
       await storage.deletePastEvents();
       const events = await storage.getEvents();
-      res.json(events);
+      
+      // For non-registration events, get RSVP counts and update currentAttendees
+      const eventsWithRsvpCounts = await Promise.all(events.map(async (event) => {
+        if (!event.registrationRequired) {
+          const rsvpCount = await storage.getEventRsvpCount(event.id);
+          // Update the event's currentAttendees to match RSVP count if different
+          if (event.currentAttendees !== rsvpCount) {
+            await storage.updateEvent(event.id, { currentAttendees: rsvpCount });
+            return { ...event, currentAttendees: rsvpCount };
+          }
+        }
+        return event;
+      }));
+      
+      res.json(eventsWithRsvpCounts);
     } catch (error) {
       res.status(500).json({ message: 'Failed to fetch events' });
     }
@@ -206,6 +220,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Registration failed', error);
       res.status(500).json({ message: 'Failed to register for event' });
+    }
+  });
+
+  // Event RSVP - public (for non-registration events)
+  app.post('/api/events/:id/rsvp', async (req, res) => {
+    try {
+      const eventId = req.params.id;
+      const event = await storage.getEvent(eventId);
+      if (!event) return res.status(404).json({ message: 'Event not found' });
+
+      // Only allow RSVP for non-registration events
+      if (event.registrationRequired) {
+        return res.status(400).json({ message: 'This event requires registration. Please use the registration form.' });
+      }
+
+      const email = req.body.email;
+      if (!email || !email.includes('@')) {
+        return res.status(400).json({ message: 'Valid email address is required' });
+      }
+
+      // Check if already RSVP'd
+      const existingRsvp = await storage.getEventRsvpByEmail(eventId, email);
+      if (existingRsvp) {
+        return res.status(400).json({ message: 'You have already indicated you will attend this event' });
+      }
+
+      const body = {
+        eventId,
+        email: email.trim().toLowerCase(),
+      };
+
+      const parseResult = insertEventRsvpSchema.safeParse(body);
+      if (!parseResult.success) {
+        return res.status(400).json({ message: 'Invalid RSVP data', issues: parseResult.error.flatten() });
+      }
+
+      await storage.createEventRsvp(body);
+
+      // Update event's currentAttendees count
+      const current = event.currentAttendees ?? 0;
+      await storage.updateEvent(eventId, { currentAttendees: current + 1 });
+
+      res.status(201).json({ 
+        message: 'RSVP successful', 
+        rsvpCount: current + 1
+      });
+    } catch (error) {
+      console.error('RSVP failed', error);
+      res.status(500).json({ message: 'Failed to RSVP for event' });
     }
   });
 

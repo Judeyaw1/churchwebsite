@@ -68,6 +68,14 @@ export const registrations = pgTable("registrations", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Event RSVPs table (for non-registration events - simple "planning to attend")
+export const eventRsvps = pgTable("event_rsvps", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  eventId: varchar("event_id").notNull(),
+  email: text("email").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Live streams table
 export const liveStreams = pgTable("live_streams", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -166,6 +174,11 @@ export const insertSubscriberSchema = createInsertSchema(subscribers).pick({
   name: true,
 });
 
+export const insertEventRsvpSchema = createInsertSchema(eventRsvps).pick({
+  eventId: true,
+  email: true,
+});
+
 // Type exports
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -187,3 +200,6 @@ export type Registration = typeof registrations.$inferSelect;
 
 export type InsertSubscriber = z.infer<typeof insertSubscriberSchema>;
 export type Subscriber = typeof subscribers.$inferSelect;
+
+export type InsertEventRsvp = z.infer<typeof insertEventRsvpSchema>;
+export type EventRsvp = typeof eventRsvps.$inferSelect;

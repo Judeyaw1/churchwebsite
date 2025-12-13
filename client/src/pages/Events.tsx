@@ -44,6 +44,10 @@ export default function Events() {
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
   const [isSubmittingRegistration, setIsSubmittingRegistration] = useState(false);
+  const [rsvpEmail, setRsvpEmail] = useState('');
+  const [rsvpSuccess, setRsvpSuccess] = useState(false);
+  const [rsvpError, setRsvpError] = useState<string | null>(null);
+  const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -111,6 +115,34 @@ export default function Events() {
       setRegistrationError(error.message || 'Registration failed');
     } finally {
       setIsSubmittingRegistration(false);
+    }
+  };
+
+  const submitRsvp = async () => {
+    if (!selectedEvent || !rsvpEmail) return;
+    setIsSubmittingRsvp(true);
+    setRsvpError(null);
+    try {
+      const resp = await fetch(`/api/events/${selectedEvent.id}/rsvp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: rsvpEmail
+        })
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.message || 'RSVP failed');
+      }
+      setRsvpSuccess(true);
+      setRsvpEmail('');
+      fetchEvents(); // refresh counts
+    } catch (error: any) {
+      setRsvpError(error.message || 'RSVP failed');
+    } finally {
+      setIsSubmittingRsvp(false);
     }
   };
 
@@ -347,12 +379,17 @@ export default function Events() {
                       </p>
 
                       {/* Attendee Info */}
-                      {event.maxAttendees && (
+                      {event.maxAttendees ? (
                         <div className="flex items-center text-sm text-white/70 mb-4">
                           <Users className="h-4 w-4 mr-1" />
                           {event.currentAttendees}/{event.maxAttendees} registered
                         </div>
-                      )}
+                      ) : !event.registrationRequired && event.currentAttendees !== undefined && event.currentAttendees > 0 ? (
+                        <div className="flex items-center text-sm text-white/70 mb-4">
+                          <Users className="h-4 w-4 mr-1" />
+                          {event.currentAttendees} planning to attend
+                        </div>
+                      ) : null}
 
                       {/* Registration Status */}
                       <div className="flex items-center justify-between">
@@ -426,7 +463,12 @@ export default function Events() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setSelectedEvent(null)}
+            onClick={() => {
+              setSelectedEvent(null);
+              setRsvpSuccess(false);
+              setRsvpEmail('');
+              setRsvpError(null);
+            }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -497,7 +539,7 @@ export default function Events() {
                     <p className="font-medium text-gray-900">{selectedEvent.location}</p>
                   </div>
                 </div>
-                {selectedEvent.maxAttendees && (
+                {selectedEvent.maxAttendees ? (
                   <div className="flex items-center">
                     <Users className="h-5 w-5 text-gray-600 mr-3" />
                     <div>
@@ -507,7 +549,17 @@ export default function Events() {
                       </p>
                     </div>
                   </div>
-                )}
+                ) : !selectedEvent.registrationRequired && selectedEvent.currentAttendees !== undefined && selectedEvent.currentAttendees > 0 ? (
+                  <div className="flex items-center">
+                    <Users className="h-5 w-5 text-gray-600 mr-3" />
+                    <div>
+                      <p className="text-sm text-gray-600">Planning to Attend</p>
+                      <p className="font-medium text-gray-900">
+                        {selectedEvent.currentAttendees} {selectedEvent.currentAttendees === 1 ? 'person' : 'people'}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               <div>
@@ -521,25 +573,61 @@ export default function Events() {
                 {selectedEvent.registrationRequired ? (
                   <Button
                     className="flex-1 bg-blue-600 hover:bg-blue-700"
-                    onClick={() => {
-                      setRegistrationError(null);
-                      setRegistrationSuccess(false);
-                      setShowRegistrationForm(true);
-                    }}
+            onClick={() => {
+              setRegistrationError(null);
+              setRegistrationSuccess(false);
+              setRsvpError(null);
+              setRsvpSuccess(false);
+              setRsvpEmail('');
+              setShowRegistrationForm(true);
+            }}
                   >
                     Register Now
                   </Button>
                 ) : (
-                  <Button
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                    onClick={() => {
-                      console.log(`Attending ${selectedEvent.title}`);
-                      setSelectedEvent(null);
-                    }}
-                  >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    I'll Attend
-                  </Button>
+                  <div className="flex-1 space-y-3">
+                    {!rsvpSuccess ? (
+                      <>
+                        <Input
+                          type="email"
+                          placeholder="Enter your email"
+                          value={rsvpEmail}
+                          onChange={(e) => setRsvpEmail(e.target.value)}
+                          className="bg-gray-50"
+                          required
+                        />
+                        <Button
+                          className="w-full bg-green-600 hover:bg-green-700"
+                          onClick={submitRsvp}
+                          disabled={!rsvpEmail || isSubmittingRsvp}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          {isSubmittingRsvp ? 'Submitting...' : "I'll Attend"}
+                        </Button>
+                        {rsvpError && (
+                          <p className="text-sm text-red-600 text-center">{rsvpError}</p>
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-center space-y-3">
+                        <div className="flex items-center justify-center gap-2 text-green-600">
+                          <CheckCircle className="h-5 w-5" />
+                          <p className="font-medium">You're planning to attend!</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => {
+                            setRsvpSuccess(false);
+                            setRsvpEmail('');
+                            setRsvpError(null);
+                          }}
+                        >
+                          RSVP for Another Event
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 )}
                 <Button
                   variant="outline"

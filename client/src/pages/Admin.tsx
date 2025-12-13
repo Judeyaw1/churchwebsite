@@ -206,15 +206,15 @@ export default function Admin() {
         const file = files[i];
         console.log(`Processing file ${i}:`, file.name, file.type, file.size);
         
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
           console.warn(`${file.name} is not an image file. Skipping.`);
           alert(`${file.name} is not an image file. Skipping.`);
           continue;
-        }
+      }
         
-        // Validate file size (max 10MB)
-        if (file.size > 10 * 1024 * 1024) {
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
           console.warn(`${file.name} is too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Skipping.`);
           alert(`${file.name} is too large (max 10MB). Skipping.`);
           continue;
@@ -227,7 +227,7 @@ export default function Admin() {
       
       if (validFiles.length > 0) {
         setSelectedFiles(validFiles);
-        setUploadStatus('idle');
+      setUploadStatus('idle');
       } else {
         console.log('No valid files to upload');
         alert('No valid image files were selected. Please select image files under 10MB each.');
@@ -453,7 +453,7 @@ export default function Admin() {
       fileInput.type = 'file';
       fileInput.accept = 'image/*';
       fileInput.multiple = false;
-
+      
       fileInput.onchange = async (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
         if (!file) return;
@@ -485,7 +485,7 @@ export default function Admin() {
         setUploadProgress(100);
         alert('Uploaded to OneDrive. Click Save to create the gallery item.');
       };
-
+      
       fileInput.click();
     } catch (error) {
       console.error('OneDrive upload error:', error);
@@ -1048,6 +1048,7 @@ export default function Admin() {
             </div>
 
             {/* Add New Button */}
+            {activeTab !== 'subscribers' && (
             <div className="mb-8 text-center">
               <Button
                 onClick={handleAddNew}
@@ -1057,6 +1058,7 @@ export default function Admin() {
                 Add New {tabs.find(t => t.id === activeTab)?.label}
               </Button>
             </div>
+            )}
 
               {/* Loading State */}
               {isLoading && (
@@ -1092,8 +1094,12 @@ export default function Admin() {
                                 {event.category}
                               </Badge>
                             <Badge className="ml-2 bg-amber-100 text-amber-800">
-                              {(event.currentAttendees ?? 0)}{event.maxAttendees ? ` / ${event.maxAttendees}` : ''} registered
-                            </Badge>
+                              {event.registrationRequired ? (
+                                <>{(event.currentAttendees ?? 0)}{event.maxAttendees ? ` / ${event.maxAttendees}` : ''} registered</>
+                              ) : (
+                                <>{(event.currentAttendees ?? 0)} planning to attend</>
+                              )}
+                              </Badge>
                             </div>
                           </div>
                           <div className="flex gap-2">
@@ -1277,8 +1283,8 @@ export default function Admin() {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {galleryImages.map((image) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {galleryImages.map((image) => (
                     <Card key={image.id} className="bg-white/5 border-white/20 overflow-hidden relative">
                       {/* Checkbox */}
                       <div className="absolute top-2 left-2 z-10">
@@ -1341,8 +1347,8 @@ export default function Admin() {
                         </div>
                       </CardContent>
                     </Card>
-                    ))}
-                  </div>
+                  ))}
+                </div>
                 </>
               )}
 
@@ -1757,16 +1763,16 @@ export default function Admin() {
                         <Cloud className="h-6 w-6 text-blue-400 mx-auto mb-2" />
                         <p className="text-sm text-blue-600 mb-1">OneDrive (Connect · Upload · Choose)</p>
                         <div className="flex flex-col gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="border-blue-300 text-blue-600 hover:bg-blue-50"
                             onClick={handleOneDriveConnect}
-                          >
-                            <Cloud className="h-4 w-4 mr-2" />
-                            Connect OneDrive
-                          </Button>
+                        >
+                          <Cloud className="h-4 w-4 mr-2" />
+                          Connect OneDrive
+                        </Button>
                           <Button
                             type="button"
                             variant="outline"
@@ -1821,12 +1827,12 @@ export default function Admin() {
                           </p>
                           {selectedFiles.map((file, index) => (
                             <div key={index} className="p-3 bg-gray-50 rounded-lg">
-                              <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between">
                                 <div className="flex items-center flex-1 min-w-0">
                                   <FileImage className="h-4 w-4 text-gray-500 mr-2 flex-shrink-0" />
                                   <span className="text-sm text-gray-700 truncate">{file.name}</span>
                                   <span className="text-xs text-gray-500 ml-2">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                                </div>
+                            </div>
                                 <div className="flex items-center gap-2">
                                   <button
                                     type="button"
@@ -1845,8 +1851,8 @@ export default function Admin() {
                                   >
                                     ×
                                   </button>
-                                </div>
-                              </div>
+                            </div>
+                          </div>
                             </div>
                           ))}
                           {uploadStatus === 'uploading' && (
