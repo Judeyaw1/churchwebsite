@@ -55,6 +55,18 @@ export const events = pgTable("events", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Event registrations table
+export const registrations = pgTable("registrations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  eventId: varchar("event_id").notNull(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  attendees: integer("attendees").notNull().default(1),
+  message: text("message"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Live streams table
 export const liveStreams = pgTable("live_streams", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -117,6 +129,15 @@ export const insertEventSchema = createInsertSchema(events).pick({
   image: true,
 });
 
+export const insertRegistrationSchema = createInsertSchema(registrations).pick({
+  eventId: true,
+  name: true,
+  email: true,
+  phone: true,
+  attendees: true,
+  message: true,
+});
+
 export const insertLiveStreamSchema = createInsertSchema(liveStreams).pick({
   title: true,
   url: true,
@@ -158,6 +179,9 @@ export type GalleryImage = typeof galleryImages.$inferSelect;
 
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messages.$inferSelect;
+
+export type InsertRegistration = z.infer<typeof insertRegistrationSchema>;
+export type Registration = typeof registrations.$inferSelect;
 
 export type InsertSubscriber = z.infer<typeof insertSubscriberSchema>;
 export type Subscriber = typeof subscribers.$inferSelect;

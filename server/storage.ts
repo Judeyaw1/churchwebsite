@@ -14,12 +14,15 @@ import {
   type InsertMessage,
   type Subscriber,
   type InsertSubscriber,
+  type InsertRegistration,
+  type Registration,
   users,
   events,
   liveStreams,
   galleryImages,
   messages,
-  subscribers
+  subscribers,
+  registrations
 } from "@shared/schema";
 
 if (!process.env.DATABASE_URL) {
@@ -44,6 +47,9 @@ export interface IStorage {
   deleteEvent(id: string): Promise<boolean>;
   getUpcomingEvents(limit?: number): Promise<Event[]>;
   deletePastEvents(): Promise<number>; // Returns count of deleted events
+  // Registration methods
+  createRegistration(reg: InsertRegistration): Promise<void>;
+  getRegistrationsForEvent(eventId: string): Promise<Registration[]>;
   
   // Live Stream methods
   getLiveStreams(): Promise<LiveStream[]>;
@@ -334,6 +340,19 @@ export class PostgresStorage implements IStorage {
       .where(eq(subscribers.email, email))
       .returning();
     return result.length > 0;
+  }
+
+  // Registration methods
+  async createRegistration(reg: InsertRegistration): Promise<void> {
+    await db.insert(registrations).values(reg);
+  }
+
+  async getRegistrationsForEvent(eventId: string): Promise<Registration[]> {
+    return await db
+      .select()
+      .from(registrations)
+      .where(eq(registrations.eventId, eventId))
+      .orderBy(desc(registrations.createdAt));
   }
 }
 

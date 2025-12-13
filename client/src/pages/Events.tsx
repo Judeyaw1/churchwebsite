@@ -41,6 +41,8 @@ export default function Events() {
     message: ''
   });
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
+  const [isSubmittingRegistration, setIsSubmittingRegistration] = useState(false);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -78,6 +80,37 @@ export default function Events() {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  const submitRegistration = async () => {
+    if (!selectedEvent) return;
+    setIsSubmittingRegistration(true);
+    setRegistrationError(null);
+    try {
+      const resp = await fetch(`/api/events/${selectedEvent.id}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: registrationForm.name,
+          email: registrationForm.email,
+          phone: registrationForm.phone,
+          guests: registrationForm.guests,
+          message: registrationForm.message
+        })
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.message || 'Registration failed');
+      }
+      setRegistrationSuccess(true);
+      fetchEvents(); // refresh counts if needed
+    } catch (error: any) {
+      setRegistrationError(error.message || 'Registration failed');
+    } finally {
+      setIsSubmittingRegistration(false);
+    }
+  };
 
 
   const categories = ['all', 'Special Event', 'Worship Service', 'Special Service', 'Membership', 'Youth', 'Community Service', 'Adult Ministry', 'Children\'s Ministry'];
@@ -486,7 +519,11 @@ export default function Events() {
                 {selectedEvent.registrationRequired ? (
                   <Button
                     className="flex-1 bg-blue-600 hover:bg-blue-700"
-                    onClick={() => setShowRegistrationForm(true)}
+                    onClick={() => {
+                      setRegistrationError(null);
+                      setRegistrationSuccess(false);
+                      setShowRegistrationForm(true);
+                    }}
                   >
                     Register Now
                   </Button>
@@ -528,6 +565,7 @@ export default function Events() {
             onClick={() => {
               setShowRegistrationForm(false);
               setRegistrationSuccess(false);
+              setRegistrationError(null);
             }}
           >
             <motion.div
@@ -563,8 +601,7 @@ export default function Events() {
                   className="p-6 space-y-4"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    console.log('Registration submitted:', registrationForm);
-                    setRegistrationSuccess(true);
+                    submitRegistration();
                   }}
                 >
                   <div>
@@ -635,9 +672,10 @@ export default function Events() {
                   <div className="flex flex-col sm:flex-row gap-3 pt-4">
                     <Button
                       type="submit"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      disabled={isSubmittingRegistration}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-60"
                     >
-                      Submit Registration
+                      {isSubmittingRegistration ? 'Submitting...' : 'Submit Registration'}
                     </Button>
                     <Button
                       type="button"
@@ -651,6 +689,9 @@ export default function Events() {
                       Cancel
                     </Button>
                   </div>
+                  {registrationError && (
+                    <p className="text-sm text-red-600 text-center">{registrationError}</p>
+                  )}
                 </form>
               </>
             ) : (

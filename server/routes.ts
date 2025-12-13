@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { insertEventSchema, insertLiveStreamSchema, insertGalleryImageSchema, insertMessageSchema } from "@shared/schema";
+import { insertEventSchema, insertLiveStreamSchema, insertGalleryImageSchema, insertMessageSchema, insertRegistrationSchema } from "@shared/schema";
 import fetch from "node-fetch";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -164,6 +164,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Event registration - public
+  app.post('/api/events/:id/register', async (req, res) => {
+    try {
+      const eventId = req.params.id;
+      const event = await storage.getEvent(eventId);
+      if (!event) return res.status(404).json({ message: 'Event not found' });
+
+      const body = {
+        eventId,
+        name: req.body.name,
+        email: req.body.email,
+        phone: req.body.phone || null,
+        attendees: Math.max(1, 1 + (parseInt(req.body.guests ?? '0') || 0)),
+        message: req.body.message || null,
+      };
+
+      const parseResult = insertRegistrationSchema.safeParse(body);
+      if (!parseResult.success) {
+        return res.status(400).json({ message: 'Invalid registration data', issues: parseResult.error.flatten() });
+      }
+
+      // Capacity check
+      const max = event.maxAttendees ?? null;
+      const current = event.currentAttendees ?? 0;
+      const requested = body.attendees;
+      if (max !== null && current + requested > max) {
+        return res.status(400).json({ message: 'Event is full or not enough seats available' });
+      }
+
+      await storage.createRegistration(body);
+      await storage.updateEvent(eventId, { currentAttendees: current + requested });
+
+      res.status(201).json({ 
+        message: 'Registration successful', 
+        attendeesRegistered: requested, 
+        remaining: max !== null ? Math.max(0, max - (current + requested)) : null 
+      });
+    } catch (error) {
+      console.error('Registration failed', error);
+      res.status(500).json({ message: 'Failed to register for event' });
+    }
+  });
+
   // Live Streams - Public routes
   app.get('/api/live-streams', async (req, res) => {
     try {
@@ -253,6 +296,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: 'Failed to cleanup past events' });
+    }
+  });
+
+  // Event registrations - Admin view
+  app.get('/api/admin/events/:id/registrations', requireAuth, async (req, res) => {
+    try {
+      const regs = await storage.getRegistrationsForEvent(req.params.id);
+      res.json(regs);
+    } catch (error) {
+      console.error('Failed to fetch registrations', error);
+      res.status(500).json({ message: 'Failed to fetch registrations' });
     }
   });
 
