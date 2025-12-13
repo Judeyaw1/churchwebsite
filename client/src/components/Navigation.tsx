@@ -21,6 +21,36 @@ export default function Navigation({ className = '' }: NavigationProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      
+      // Close Groups dropdown if clicking outside
+      if (isGroupsOpen) {
+        const groupsDropdown = target.closest('[data-groups-dropdown]');
+        const groupsButton = target.closest('[data-groups-button]');
+        if (!groupsDropdown && !groupsButton) {
+          setIsGroupsOpen(false);
+        }
+      }
+      
+      // Close mobile menu when clicking outside
+      if (isMenuOpen) {
+        const navElement = target.closest('nav');
+        const menuButton = target.closest('[data-testid="button-mobile-menu"]');
+        if (!navElement && !menuButton) {
+          setIsMenuOpen(false);
+        }
+      }
+    };
+
+    if (isGroupsOpen || isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isGroupsOpen, isMenuOpen]);
+
   const navItems = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
@@ -87,10 +117,12 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 {item.hasDropdown ? (
                   <div
                     className="relative"
+                    data-groups-dropdown
                     onMouseEnter={() => setIsGroupsOpen(true)}
                     onMouseLeave={() => setIsGroupsOpen(false)}
                   >
                     <button
+                      data-groups-button
                       className={`transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2 rounded-lg ${
                         isScrolled 
                           ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
@@ -111,6 +143,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2 }}
                           className="absolute top-full left-0 mt-2 w-48 bg-black/80 backdrop-blur-xl rounded-lg shadow-xl border border-white/20 py-2 z-50"
+                          data-groups-dropdown
                         >
                           {groupsItems.map((groupItem, groupIndex) => (
                             <Link key={groupItem.label} href={groupItem.href}>
@@ -150,7 +183,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
             >
               <Button 
                 variant="default" 
-                className="bg-white hover:bg-black/90 hover:text-white text-black"
+                className="bg-black hover:bg-black/90 text-white border border-white/20"
                 data-testid="button-visit-us"
                 onClick={() => console.log('Visit Us clicked')}
               >
@@ -282,7 +315,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 >
                   <Button 
                     variant="default" 
-                    className="w-full bg-accent hover:bg-accent/90 py-3 text-base font-semibold"
+                    className="w-full bg-black hover:bg-black/90 text-white border border-white/20 py-3 text-base font-semibold"
                     data-testid="button-mobile-visit-us"
                     onClick={() => {
                       setIsMenuOpen(false);

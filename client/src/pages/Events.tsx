@@ -303,7 +303,10 @@ export default function Events() {
                 >
                   <Card className="hover-elevate transition-all duration-300 overflow-hidden bg-white/5 border-white/20">
                     {/* Event Image */}
-                    <div className="aspect-video overflow-hidden relative">
+                    <div 
+                      className="aspect-video overflow-hidden relative cursor-pointer"
+                      onClick={() => setSelectedEvent(event)}
+                    >
                       {event.image ? (
                       <img
                         src={`${event.image}?v=${Math.random()}`}
@@ -323,8 +326,9 @@ export default function Events() {
                         />
                       ) : null}
                       <div 
-                        className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center absolute top-0 left-0"
+                        className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center absolute top-0 left-0 cursor-pointer"
                         style={{ display: event.image ? 'none' : 'flex' }}
+                        onClick={() => setSelectedEvent(event)}
                       >
                         <Calendar className="h-16 w-16 text-white/60" />
                       </div>
