@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
 import { Heart, Users, Book, Globe, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import communityImage from '@assets/generated_images/Church_community_fellowship_gathering_6de85642.png';
 import pastorImage from '@assets/generated_images/Church_pastor_professional_headshot_1618d5ab.png';
@@ -19,6 +18,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [currentLeftImageIndex, setCurrentLeftImageIndex] = useState(0);
   const [currentRightImageIndex, setCurrentRightImageIndex] = useState(0);
+  const [galleryImages, setGalleryImages] = useState<{ url: string; title: string }[]>([]);
 
   const communityImages = [
     {
@@ -83,48 +83,91 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
     }
   ];
 
+  // Load gallery images for replacements
+  useEffect(() => {
+    const loadGallery = async () => {
+      try {
+        const res = await fetch('/api/gallery');
+        if (res.ok) {
+          const data = await res.json();
+          setGalleryImages(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch gallery images for About section', err);
+      }
+    };
+    loadGallery();
+  }, []);
+
+  const heroSources = galleryImages.length
+    ? galleryImages.map((g) => ({
+        src: g.url,
+        alt: g.title || 'Gallery image',
+        title: g.title || 'Gallery image',
+        description: 'Life at United Bethel'
+      }))
+    : communityImages;
+
+  const leftSources = galleryImages.length
+    ? galleryImages.map((g) => ({
+        src: g.url,
+        alt: g.title || 'Gallery image',
+        title: g.title || 'Gallery image',
+        description: 'Our people and moments'
+      }))
+    : leftCardImages;
+
+  const rightSources = galleryImages.length
+    ? galleryImages.map((g) => ({
+        src: g.url,
+        alt: g.title || 'Gallery image',
+        title: g.title || 'Gallery image',
+        description: 'Community in action'
+      }))
+    : rightCardImages;
+
   // Auto-slide functionality for images
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => 
-        prevIndex === communityImages.length - 1 ? 0 : prevIndex + 1
+        prevIndex === heroSources.length - 1 ? 0 : prevIndex + 1
       );
     }, 4000); // Change image every 4 seconds
 
     return () => clearInterval(interval);
-  }, [communityImages.length]);
+  }, [heroSources.length]);
 
   // Auto-slide functionality for left card images
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentLeftImageIndex((prevIndex) => 
-        prevIndex === leftCardImages.length - 1 ? 0 : prevIndex + 1
+        prevIndex === leftSources.length - 1 ? 0 : prevIndex + 1
       );
     }, 3500); // Change left image every 3.5 seconds
 
     return () => clearInterval(interval);
-  }, [leftCardImages.length]);
+  }, [leftSources.length]);
 
   // Auto-slide functionality for right card images
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentRightImageIndex((prevIndex) => 
-        prevIndex === rightCardImages.length - 1 ? 0 : prevIndex + 1
+        prevIndex === rightSources.length - 1 ? 0 : prevIndex + 1
       );
     }, 4000); // Change right image every 4 seconds
 
     return () => clearInterval(interval);
-  }, [rightCardImages.length]);
+  }, [rightSources.length]);
 
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => 
-      prevIndex === communityImages.length - 1 ? 0 : prevIndex + 1
+      prevIndex === heroSources.length - 1 ? 0 : prevIndex + 1
     );
   };
 
   const prevImage = () => {
     setCurrentImageIndex((prevIndex) => 
-      prevIndex === 0 ? communityImages.length - 1 : prevIndex - 1
+      prevIndex === 0 ? heroSources.length - 1 : prevIndex - 1
     );
   };
 
@@ -304,7 +347,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                     animate={{ x: `-${currentImageIndex * 100}%` }}
                     transition={{ duration: 0.5, ease: 'easeInOut' }}
                   >
-                    {communityImages.map((image, index) => (
+                    {heroSources.map((image, index) => (
                       <div key={index} className="w-full flex-shrink-0 relative">
                         <img
                           src={image.src}
@@ -338,7 +381,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
 
                   {/* Dots Indicator */}
                   <div className="absolute bottom-4 right-4 flex space-x-2">
-                    {communityImages.map((_, index) => (
+                    {heroSources.map((_, index) => (
                       <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
@@ -366,7 +409,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                     animate={{ x: `-${currentLeftImageIndex * 100}%` }}
                     transition={{ duration: 0.5, ease: 'easeInOut' }}
                   >
-                    {leftCardImages.map((image, index) => (
+                    {leftSources.map((image, index) => (
                       <div key={index} className="w-full flex-shrink-0 relative">
                         <img
                           src={image.src}
@@ -428,7 +471,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                     animate={{ x: `-${currentRightImageIndex * 100}%` }}
                     transition={{ duration: 0.5, ease: 'easeInOut' }}
                   >
-                    {rightCardImages.map((image, index) => (
+                    {rightSources.map((image, index) => (
                       <div key={index} className="w-full flex-shrink-0 relative">
                         <img
                           src={image.src}
