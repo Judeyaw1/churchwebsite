@@ -90,7 +90,9 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
         const res = await fetch('/api/gallery');
         if (res.ok) {
           const data = await res.json();
-          setGalleryImages(data);
+          // Shuffle to mix visuals
+          const shuffled = [...data].sort(() => Math.random() - 0.5);
+          setGalleryImages(shuffled);
         }
       } catch (err) {
         console.error('Failed to fetch gallery images for About section', err);
