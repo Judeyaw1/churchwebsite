@@ -355,6 +355,15 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                           src={image.src}
                           alt={image.alt}
                           className="w-full h-full object-cover object-[50%_25%]"
+                          onError={(e) => {
+                            // Fallback to local image if gallery image fails
+                            const target = e.currentTarget;
+                            if (galleryImages.length > 0 && !target.src.includes('generated_images')) {
+                              // Try fallback to local images
+                              const fallbackIndex = index % communityImages.length;
+                              target.src = communityImages[fallbackIndex].src;
+                            }
+                          }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-5" />
                         <div className="absolute bottom-4 left-4 text-white z-20 pointer-events-none">
@@ -417,6 +426,14 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                           src={image.src}
                           alt={image.alt}
                           className="w-full h-full object-cover object-[50%_25%]"
+                          onError={(e) => {
+                            // Fallback to local image if gallery image fails
+                            const target = e.currentTarget;
+                            if (galleryImages.length > 0 && !target.src.includes('generated_images')) {
+                              const fallbackIndex = index % leftCardImages.length;
+                              target.src = leftCardImages[fallbackIndex].src;
+                            }
+                          }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-5" />
                         <div className="absolute bottom-4 left-4 text-white z-20 pointer-events-none">
@@ -479,6 +496,14 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                           src={image.src}
                           alt={image.alt}
                           className="w-full h-full object-cover object-[50%_25%]"
+                          onError={(e) => {
+                            // Fallback to local image if gallery image fails
+                            const target = e.currentTarget;
+                            if (galleryImages.length > 0 && !target.src.includes('generated_images')) {
+                              const fallbackIndex = index % rightCardImages.length;
+                              target.src = rightCardImages[fallbackIndex].src;
+                            }
+                          }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-5" />
                         <div className="absolute bottom-4 left-4 text-white z-20 pointer-events-none">

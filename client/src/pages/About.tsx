@@ -170,6 +170,10 @@ export default function About() {
                 alt={galleryImages[0]?.title || "United Bethel Presbyterian Church"}
                 className="w-full h-96 object-cover rounded-2xl shadow-lg"
                 loading="lazy"
+                onError={(e) => {
+                  console.error('Failed to load gallery image:', galleryImages[0]?.url);
+                  e.currentTarget.src = pastorImageJpg;
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-2xl" />
               <div className="absolute bottom-6 left-6 text-white">

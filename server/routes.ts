@@ -126,17 +126,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Serve uploaded files with caching headers
-  app.use('/uploads', (req, res, next) => {
-    // Set cache headers for images
-    res.set({
-      'Cache-Control': 'public, max-age=31536000, immutable', // 1 year cache
-      'Expires': new Date(Date.now() + 31536000000).toUTCString()
-    });
-    express.static(uploadsDir, {
-      maxAge: '1y', // 1 year cache
-      etag: true
-    })(req, res, next);
-  });
+  // This must be before Vite middleware to ensure uploads are served correctly
+  app.use('/uploads', express.static(uploadsDir, {
+    maxAge: '1y', // 1 year cache
+    etag: true,
+    setHeaders: (res) => {
+      res.set({
+        'Cache-Control': 'public, max-age=31536000, immutable', // 1 year cache
+      });
+    }
+  }));
 
   // ===== PUBLIC API ROUTES (for website components) =====
 

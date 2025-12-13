@@ -65,12 +65,12 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  // Only apply Vite middleware to non-API routes
+  // Only apply Vite middleware to non-API routes and non-upload routes
   app.use((req, res, next) => {
     const url = req.originalUrl;
     
-    // Skip Vite middleware for health check and API routes
-    if (url === '/health' || url.startsWith('/api/') || url === '/api') {
+    // Skip Vite middleware for health check, API routes, and uploads
+    if (url === '/health' || url.startsWith('/api/') || url === '/api' || url.startsWith('/uploads/')) {
       return next();
     }
     
