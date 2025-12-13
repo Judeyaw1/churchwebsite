@@ -1086,6 +1086,9 @@ export default function Admin() {
                               <Badge className="ml-2 bg-blue-100 text-blue-800">
                                 {event.category}
                               </Badge>
+                            <Badge className="ml-2 bg-amber-100 text-amber-800">
+                              {(event.currentAttendees ?? 0)}{event.maxAttendees ? ` / ${event.maxAttendees}` : ''} registered
+                            </Badge>
                             </div>
                           </div>
                           <div className="flex gap-2">

@@ -171,12 +171,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const event = await storage.getEvent(eventId);
       if (!event) return res.status(404).json({ message: 'Event not found' });
 
+      const requestedAttendees = Math.max(1, parseInt(req.body.guests ?? '1') || 1);
       const body = {
         eventId,
         name: req.body.name,
         email: req.body.email,
         phone: req.body.phone || null,
-        attendees: Math.max(1, 1 + (parseInt(req.body.guests ?? '0') || 0)),
+        attendees: requestedAttendees,
+        guestNames: req.body.guestNames || null,
         message: req.body.message || null,
       };
 

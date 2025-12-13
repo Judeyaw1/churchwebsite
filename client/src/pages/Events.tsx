@@ -37,7 +37,8 @@ export default function Events() {
     name: '',
     email: '',
     phone: '',
-    guests: '0',
+    guests: '1',
+    guestNames: '',
     message: ''
   });
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
@@ -95,7 +96,8 @@ export default function Events() {
           name: registrationForm.name,
           email: registrationForm.email,
           phone: registrationForm.phone,
-          guests: registrationForm.guests,
+              guests: registrationForm.guests,
+              guestNames: registrationForm.guestNames,
           message: registrationForm.message
         })
       });
@@ -644,15 +646,28 @@ export default function Events() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Number of Guests
+                      Number of Guests (including you)
                     </label>
                     <Input
                       type="number"
-                      min="0"
+                      min="1"
                       max="10"
                       value={registrationForm.guests}
                       onChange={(e) => setRegistrationForm(prev => ({ ...prev, guests: e.target.value }))}
                       className="bg-gray-50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Other Guest Names (if more than 1)
+                    </label>
+                    <textarea
+                      value={registrationForm.guestNames}
+                      onChange={(e) => setRegistrationForm(prev => ({ ...prev, guestNames: e.target.value }))}
+                      className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={2}
+                      placeholder="List additional guest names"
                     />
                   </div>
 
@@ -707,12 +722,12 @@ export default function Events() {
                 <div className="space-y-3">
                   <Button
                     className="w-full bg-blue-600 hover:bg-blue-700"
-                    onClick={() => {
-                      setShowRegistrationForm(false);
-                      setSelectedEvent(null);
-                      setRegistrationSuccess(false);
-                      setRegistrationForm({ name: '', email: '', phone: '', guests: '0', message: '' });
-                    }}
+                      onClick={() => {
+                        setShowRegistrationForm(false);
+                        setSelectedEvent(null);
+                        setRegistrationSuccess(false);
+                        setRegistrationForm({ name: '', email: '', phone: '', guests: '1', guestNames: '', message: '' });
+                      }}
                   >
                     Close
                   </Button>

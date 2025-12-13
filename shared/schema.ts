@@ -63,6 +63,7 @@ export const registrations = pgTable("registrations", {
   email: text("email").notNull(),
   phone: text("phone"),
   attendees: integer("attendees").notNull().default(1),
+  guestNames: text("guest_names"),
   message: text("message"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -135,6 +136,7 @@ export const insertRegistrationSchema = createInsertSchema(registrations).pick({
   email: true,
   phone: true,
   attendees: true,
+  guestNames: true,
   message: true,
 });
 
