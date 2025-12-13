@@ -720,8 +720,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertBlogPostSchema.parse(req.body);
       const post = await storage.createBlogPost(validatedData);
       res.json(post);
-    } catch (error) {
-      res.status(400).json({ message: 'Invalid blog post data' });
+    } catch (error: any) {
+      console.error('Blog post creation error:', error);
+      if (error.errors) {
+        return res.status(400).json({ 
+          message: 'Invalid blog post data', 
+          errors: error.errors 
+        });
+      }
+      res.status(400).json({ message: error.message || 'Invalid blog post data' });
     }
   });
 

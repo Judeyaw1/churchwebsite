@@ -870,30 +870,54 @@ export default function Admin() {
             break;
           case 'blog':
             endpoint = '/api/admin/blog';
+            // Validate required fields
+            if (!blogForm.title || !blogForm.content || !blogForm.author) {
+              alert('Please fill in all required fields: Title, Content, and Author');
+              setEditStatus('idle');
+              return;
+            }
+            // Prepare data - convert empty strings to null for optional fields
+            const blogData: any = {
+              title: blogForm.title.trim(),
+              content: blogForm.content.trim(),
+              author: blogForm.author.trim(),
+              excerpt: blogForm.excerpt?.trim() || null,
+              isPublished: blogForm.isPublished,
+              image: blogForm.image || null
+            };
+            
             // If a blog image file is selected, upload it first
             if (blogImageFile) {
               try {
                 const uploadedUrl = await uploadEventThumbnail(blogImageFile);
-                data = { ...blogForm, image: uploadedUrl };
+                blogData.image = uploadedUrl;
               } catch (error) {
                 console.error('Blog image upload failed:', error);
                 alert('Failed to upload blog image. Please try again.');
+                setEditStatus('idle');
                 return;
               }
-            } else {
-              data = blogForm;
             }
+            data = blogData;
             break;
         }
 
+        console.log('Saving blog post:', { endpoint, data, activeTab });
         const response = await fetch(endpoint, {
           method: 'POST',
           headers,
           body: JSON.stringify(data)
         });
 
+        const responseData = await response.json().catch(() => ({}));
+        console.log('Blog post response:', { status: response.status, data: responseData });
+
         if (response.ok) {
           setEditStatus('success');
+          // Reset blog form and image before refreshing
+          setBlogForm({ title: '', content: '', author: '', image: '', excerpt: '', isPublished: true });
+          setBlogImageFile(null);
+          setBlogUploadStatus('idle');
           // Refresh data from database
           await fetchData();
           // Reset form after successful save
@@ -903,7 +927,9 @@ export default function Admin() {
           setHasUnsavedChanges(false);
         } else {
           setEditStatus('error');
-          console.error('Failed to create item');
+          const errorMessage = responseData.message || 'Failed to create blog post';
+          console.error('Failed to create blog post:', errorMessage, responseData);
+          alert(`Failed to create blog post: ${errorMessage}`);
         }
       } else {
         // Update existing item
@@ -929,19 +955,29 @@ export default function Admin() {
             break;
           case 'blog':
             endpoint = `/api/admin/blog/${editingItem}`;
+            // Prepare data - convert empty strings to null for optional fields
+            const blogUpdateData: any = {
+              title: blogForm.title.trim(),
+              content: blogForm.content.trim(),
+              author: blogForm.author.trim(),
+              excerpt: blogForm.excerpt?.trim() || null,
+              isPublished: blogForm.isPublished
+            };
+            
             // If a blog image file is selected, upload it first
             if (blogImageFile) {
               try {
                 const uploadedUrl = await uploadEventThumbnail(blogImageFile);
-                data = { ...blogForm, image: uploadedUrl };
+                blogUpdateData.image = uploadedUrl;
               } catch (error) {
                 console.error('Blog image upload failed:', error);
                 alert('Failed to upload blog image. Please try again.');
                 return;
               }
-            } else {
-              data = blogForm;
+            } else if (blogForm.image) {
+              blogUpdateData.image = blogForm.image;
             }
+            data = blogUpdateData;
             break;
         }
 
