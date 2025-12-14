@@ -142,6 +142,23 @@ export default function Media() {
                         alt={image.title}
                         className="max-w-full max-h-full object-contain rounded"
                         loading="lazy"
+                        onError={(e) => {
+                          console.error('Failed to load gallery image:', image.url, image.title);
+                          const target = e.currentTarget;
+                          target.style.display = 'none';
+                          // Show placeholder
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `
+                              <div class="flex flex-col items-center justify-center h-full text-white/50">
+                                <svg class="h-12 w-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <p class="text-xs">Image unavailable</p>
+                              </div>
+                            `;
+                          }
+                        }}
                       />
                     </div>
                     <CardContent className="p-3">
