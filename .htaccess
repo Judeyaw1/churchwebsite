@@ -1,0 +1,25 @@
+# Hosting.com Configuration
+# This file helps route requests to your Node.js application
+
+# Enable Rewrite Engine
+RewriteEngine On
+
+# Don't rewrite requests for existing files or directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Don't rewrite API routes, uploads, or health check
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteCond %{REQUEST_URI} !^/uploads/
+RewriteCond %{REQUEST_URI} !^/health
+
+# For Node.js apps on Hosting.com, you may need to proxy to your Node.js server
+# Uncomment and adjust if Hosting.com uses a proxy setup:
+# RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+
+# If Hosting.com serves static files directly, serve the built app
+# This assumes your built files are in dist/public
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /dist/public/index.html [L]
+

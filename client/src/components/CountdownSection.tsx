@@ -77,7 +77,7 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
         return false;
       }
       
-      const now = new Date();
+    const now = new Date();
       const isUpcoming = eventDateTime.getTime() > now.getTime();
       
       if (isUpcoming) {
@@ -91,9 +91,9 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
     }
   }).sort((a, b) => {
     try {
-      const dateA = new Date(`${a.date} ${a.time}`);
-      const dateB = new Date(`${b.date} ${b.time}`);
-      return dateA.getTime() - dateB.getTime();
+    const dateA = new Date(`${a.date} ${a.time}`);
+    const dateB = new Date(`${b.date} ${b.time}`);
+    return dateA.getTime() - dateB.getTime();
     } catch (error) {
       return 0;
     }
