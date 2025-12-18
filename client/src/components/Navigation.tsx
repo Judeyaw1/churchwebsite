@@ -100,7 +100,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 isScrolled ? 'text-white' : 'text-white'
               }`}>
                 <span className="hidden sm:inline">United Bethel Presbyterian</span>
-                <span className="sm:hidden">UBP</span>
+                <span className="sm:hidden">UBPC</span>
               </span>
             </motion.a>
           </Link>
