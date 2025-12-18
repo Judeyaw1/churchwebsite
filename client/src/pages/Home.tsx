@@ -1,4 +1,5 @@
 import React from 'react';
+import Snowfall from 'react-snowfall';
 import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
 import CountdownSection from '@/components/CountdownSection';
@@ -11,7 +12,19 @@ import Footer from '@/components/Footer';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Snowfall Effect */}
+      <Snowfall
+        snowflakeCount={100}
+        style={{
+          position: 'fixed',
+          width: '100vw',
+          height: '100vh',
+          zIndex: 1000,
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Navigation with Theme Toggle */}
       <Navigation />
       
