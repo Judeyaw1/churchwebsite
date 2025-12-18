@@ -50,13 +50,16 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Snowfall
-          snowflakeCount={150}
+          snowflakeCount={220}
+          color="rgba(255,255,255,0.95)"
           style={{
             position: "fixed",
+            top: 0,
+            left: 0,
             width: "100vw",
             height: "100vh",
             pointerEvents: "none",
-            zIndex: 10,
+            zIndex: 9999,
           }}
         />
         <Toaster />
