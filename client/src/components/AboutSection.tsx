@@ -101,32 +101,9 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
     loadGallery();
   }, []);
 
-  const heroSources = galleryImages.length
-    ? galleryImages.map((g) => ({
-        src: g.url,
-        alt: g.title || 'Gallery image',
-        title: g.title || 'Gallery image',
-        description: 'Life at United Bethel'
-      }))
-    : communityImages;
-
-  const leftSources = galleryImages.length
-    ? galleryImages.map((g) => ({
-        src: g.url,
-        alt: g.title || 'Gallery image',
-        title: g.title || 'Gallery image',
-        description: 'Our people and moments'
-      }))
-    : leftCardImages;
-
-  const rightSources = galleryImages.length
-    ? galleryImages.map((g) => ({
-        src: g.url,
-        alt: g.title || 'Gallery image',
-        title: g.title || 'Gallery image',
-        description: 'Community in action'
-      }))
-    : rightCardImages;
+  const heroSources = communityImages;
+  const leftSources = leftCardImages;
+  const rightSources = rightCardImages;
 
   // Auto-slide functionality for images
   useEffect(() => {
