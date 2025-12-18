@@ -50,7 +50,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Snowfall
-          snowflakeCount={220}
+          snowflakeCount={60}
+          speed={[0.2, 1]}
           color="rgba(255,255,255,0.95)"
           style={{
             position: "fixed",
