@@ -3,6 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import compression from "compression";
 import { registerRoutes } from "./routes";
 import { log } from "./vite";
+import { handleHealthRequest } from "./health";
 
 const app = express();
 
@@ -13,23 +14,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Register health check routes immediately to avoid Vite middleware interference
-app.get('/api/health', (req: Request, res: Response) => {
-  res.status(200).json({ 
-    status: 'healthy', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    port: process.env.PORT || '3000'
-  });
-});
-
-app.get('/health', (req: Request, res: Response) => {
-  res.status(200).json({ 
-    status: 'healthy', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    port: process.env.PORT || '3000'
-  });
-});
+app.get('/api/health', handleHealthRequest);
+app.get('/health', handleHealthRequest);
 
 app.get('/api', (req: Request, res: Response) => {
   res.status(200).json({ 

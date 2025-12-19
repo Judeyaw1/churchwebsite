@@ -49,25 +49,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return onedriveTokens.accessToken;
   };
 
-  // Health check endpoint for Railway
-  app.get('/health', (req: Request, res: Response) => {
-    res.status(200).json({ 
-      status: 'healthy', 
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      port: process.env.PORT || '3000'
-    });
-  });
-
-  app.get('/api/health', (req: Request, res: Response) => {
-    res.status(200).json({ 
-      status: 'healthy', 
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      port: process.env.PORT || '3000'
-    });
-  });
-
   // Authentication middleware (simple check for admin routes)
   const requireAuth = (req: Request, res: Response, next: any) => {
     const authHeader = req.headers.authorization;

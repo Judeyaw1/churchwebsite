@@ -39,6 +39,34 @@ if (!process.env.DATABASE_URL) {
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const db = drizzle(pool);
 
+export type DatabaseHealthStatus = {
+  status: "healthy" | "unhealthy";
+  latencyMs: number;
+  error?: string;
+};
+
+export async function checkDatabaseHealth(): Promise<DatabaseHealthStatus> {
+  const start = process.hrtime.bigint();
+  try {
+    await pool.query("SELECT 1");
+    const latencyMs =
+      Number(process.hrtime.bigint() - start) / 1_000_000;
+    return {
+      status: "healthy",
+      latencyMs,
+    };
+  } catch (error: any) {
+    const latencyMs =
+      Number(process.hrtime.bigint() - start) / 1_000_000;
+    console.error("Database health check failed:", error);
+    return {
+      status: "unhealthy",
+      latencyMs,
+      error: error?.message ?? "Unknown database error",
+    };
+  }
+}
+
 export interface IStorage {
   // User methods
   getUser(id: string): Promise<User | undefined>;

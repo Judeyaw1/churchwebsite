@@ -157,6 +157,19 @@ Railway provides:
 - **Metrics**: Performance and usage statistics
 - **Deployments**: Deployment history and status
 
+### Health Monitoring
+
+The app exposes `GET /api/health`, which now validates API uptime and performs a live database query. To have Railway automatically restart unhealthy instances:
+
+1. In your Railway service, go to **Settings → Health Checks**.
+2. Add a new check with:
+   - **Path**: `/api/health`
+   - **Port**: `3000` (or leave blank to use the service default)
+   - **Interval**: 30 seconds
+   - **Timeout**: 10 seconds
+   - **Expected Status**: `200`
+3. Save the configuration—Railway will mark the deployment unhealthy if the endpoint degrades (it returns HTTP 503 when the database is unreachable).
+
 ## Security Considerations
 
 1. **Change Default Password**: Update admin credentials
