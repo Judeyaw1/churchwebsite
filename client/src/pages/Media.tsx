@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Camera, ExternalLink, Play } from "lucide-react";
+import { fetchWithCache } from "@/lib/fetchWithCache";
 
 interface GalleryImage {
   id: string;
@@ -30,17 +31,12 @@ export default function Media() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [galleryRes, streamsRes] = await Promise.all([
-          fetch("/api/gallery"),
-          fetch("/api/live-streams"),
+        const [galleryData, streamData] = await Promise.all([
+          fetchWithCache<GalleryImage[]>("/api/gallery", { ttl: 1000 * 60 * 2 }),
+          fetchWithCache<LiveStream[]>("/api/live-streams", { ttl: 1000 * 60 }),
         ]);
-
-        if (galleryRes.ok) {
-          setGalleryImages(await galleryRes.json());
-        }
-        if (streamsRes.ok) {
-          setLiveStreams(await streamsRes.json());
-        }
+        setGalleryImages(galleryData);
+        setLiveStreams(streamData);
       } catch (error) {
         console.error("Failed to load media:", error);
       } finally {
@@ -141,6 +137,8 @@ export default function Media() {
                         src={image.url}
                         alt={image.title}
                         className="w-full h-full object-cover rounded"
+                        loading="lazy"
+                        decoding="async"
                         loading="lazy"
                         onError={(e) => {
                           console.error('Failed to load gallery image:', image.url, image.title);

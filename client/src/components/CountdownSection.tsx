@@ -4,6 +4,7 @@ import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Calendar, Clock, MapPin } from 'lucide-react';
 import EventCountdown from '@/components/EventCountdown';
+import { fetchWithCache } from '@/lib/fetchWithCache';
 
 interface Event {
   id: string;
@@ -30,14 +31,11 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('/api/events');
-        if (response.ok) {
-          const eventsData = await response.json();
-          console.log('CountdownSection: Fetched events:', eventsData);
-          setEvents(eventsData);
-        } else {
-          console.error('CountdownSection: Failed to fetch events, status:', response.status);
-        }
+        const eventsData = await fetchWithCache<Event[]>('/api/events', {
+          ttl: 1000 * 60,
+        });
+        console.log('CountdownSection: Fetched events:', eventsData);
+        setEvents(eventsData);
       } catch (error) {
         console.error('CountdownSection: Failed to fetch events:', error);
       } finally {

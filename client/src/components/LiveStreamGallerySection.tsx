@@ -5,6 +5,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Play, Camera, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { fetchWithCache } from '@/lib/fetchWithCache';
 
 interface LiveStream {
   id: string;
@@ -39,24 +40,15 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [streamsRes, galleryRes] = await Promise.all([
-          fetch('/api/live-streams'),
-          fetch('/api/gallery')
+        const [streamsData, galleryData] = await Promise.all([
+          fetchWithCache<LiveStream[]>('/api/live-streams', { ttl: 1000 * 60 }),
+          fetchWithCache<GalleryImage[]>('/api/gallery', { ttl: 1000 * 60 * 2 }),
         ]);
 
-        if (streamsRes.ok) {
-          const streamsData = await streamsRes.json();
-          setLiveStreams(streamsData);
-        }
-
-        if (galleryRes.ok) {
-          const galleryData = await galleryRes.json();
-          console.log('Gallery data fetched:', galleryData.length, 'images');
-          console.log('First gallery image URL:', galleryData[0]?.url);
-          setGalleryImages(galleryData);
-        } else {
-          console.error('Gallery fetch failed:', galleryRes.status, galleryRes.statusText);
-        }
+        setLiveStreams(streamsData);
+        console.log('Gallery data fetched:', galleryData.length, 'images');
+        console.log('First gallery image URL:', galleryData[0]?.url);
+        setGalleryImages(galleryData);
       } catch (error) {
         console.error('Failed to fetch live streams and gallery data:', error);
       } finally {
@@ -297,6 +289,8 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                           src={galleryImages[currentImageIndex].url}
                           alt={galleryImages[currentImageIndex].title}
                           className="w-full h-full object-cover rounded-lg"
+                          loading="lazy"
+                          decoding="async"
                           onLoad={() => {
                             console.log('Gallery image loaded:', galleryImages[currentImageIndex].url);
                           }}
@@ -347,6 +341,8 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                                 src={image.url}
                                 alt={image.title}
                                 className="w-full h-full object-cover rounded"
+                                loading="lazy"
+                                decoding="async"
                                 onLoad={() => {
                                   console.log('Gallery thumbnail loaded:', image.url);
                                 }}

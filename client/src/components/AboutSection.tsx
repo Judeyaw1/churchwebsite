@@ -5,6 +5,7 @@ import { Heart, Users, Book, Globe, ChevronDown, ChevronUp, ChevronLeft, Chevron
 import communityImage from '@assets/generated_images/image1.JPG';
 import pastorImage from '@assets/generated_images/Church_pastor_professional_headshot_1618d5ab.png';
 import pastorImageJpg from '@assets/generated_images/pastor_mark_jpg.jpg';
+import { fetchWithCache } from '@/lib/fetchWithCache';
 
 const missionImageModules = import.meta.glob<{ default: string }>(
   '@assets/generated_images/image*.JPG',
@@ -152,13 +153,12 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
   useEffect(() => {
     const loadGallery = async () => {
       try {
-        const res = await fetch('/api/gallery');
-        if (res.ok) {
-          const data = await res.json();
-          // Shuffle to mix visuals
-          const shuffled = [...data].sort(() => Math.random() - 0.5);
-          setGalleryImages(shuffled);
-        }
+        const data = await fetchWithCache<{ url: string; title: string }[]>(
+          '/api/gallery',
+          { ttl: 1000 * 60 * 2 }
+        );
+        const shuffled = [...data].sort(() => Math.random() - 0.5);
+        setGalleryImages(shuffled);
       } catch (err) {
         console.error('Failed to fetch gallery images for About section', err);
       }
@@ -396,6 +396,8 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                         <img
                           src={image.src}
                           alt={image.alt}
+                          loading={index === 0 ? 'eager' : 'lazy'}
+                          decoding="async"
                           className="w-full h-full object-cover object-center"
                           onError={(e) => {
                             // Fallback to local image if gallery image fails
@@ -463,6 +465,8 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                         <img
                           src={image.src}
                           alt={image.alt}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover object-center"
                           onError={(e) => {
                             // Fallback to local image if gallery image fails
@@ -529,6 +533,8 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                         <img
                           src={image.src}
                           alt={image.alt}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover object-center"
                           onError={(e) => {
                             // Fallback to local image if gallery image fails

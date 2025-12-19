@@ -1421,6 +1421,8 @@ export default function Admin() {
                           src={image.url} 
                           alt={image.title}
                           className="w-full h-full object-cover rounded"
+                          loading="lazy"
+                          decoding="async"
                           onLoad={() => {
                             console.log('Image loaded successfully:', image.url);
                           }}

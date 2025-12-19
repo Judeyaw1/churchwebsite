@@ -238,7 +238,7 @@ export default function Footer({ className = '' }: FooterProps) {
               className="hover:text-white transition-colors duration-200 ml-1"
               data-testid="link-privacy-policy"
             >
-              Privacy Policy
+              JoseSolutions
             </a>
           </p>
         </motion.div>

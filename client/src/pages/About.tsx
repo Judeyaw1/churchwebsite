@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import communityImage from '@assets/generated_images/image1.JPG';
 import pastorImage from '@assets/generated_images/Church_pastor_professional_headshot_1618d5ab.png';
 import pastorImageJpg from '@assets/generated_images/pastor_mark_jpg.jpg';
+import { fetchWithCache } from '@/lib/fetchWithCache';
 
 export default function About() {
   const heroRef = useRef(null);
@@ -26,11 +27,11 @@ export default function About() {
   useEffect(() => {
     const loadGallery = async () => {
       try {
-        const res = await fetch('/api/gallery');
-        if (res.ok) {
-          const data = await res.json();
-          setGalleryImages(data);
-        }
+        const data = await fetchWithCache<{ id: string; url: string; title: string }[]>(
+          '/api/gallery',
+          { ttl: 1000 * 60 * 2 }
+        );
+        setGalleryImages(data);
       } catch (err) {
         console.error('Failed to fetch gallery images for About page', err);
       }

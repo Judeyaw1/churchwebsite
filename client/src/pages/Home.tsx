@@ -1,14 +1,21 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import Snowfall from 'react-snowfall';
 import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
-import CountdownSection from '@/components/CountdownSection';
-import AboutSection from '@/components/AboutSection';
-import ServicesSection from '@/components/ServicesSection';
-import LiveStreamGallerySection from '@/components/LiveStreamGallerySection';
-import PastorSection from '@/components/PastorSection';
-import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
+
+const CountdownSection = lazy(() => import('@/components/CountdownSection'));
+const AboutSection = lazy(() => import('@/components/AboutSection'));
+const ServicesSection = lazy(() => import('@/components/ServicesSection'));
+const LiveStreamGallerySection = lazy(() => import('@/components/LiveStreamGallerySection'));
+const PastorSection = lazy(() => import('@/components/PastorSection'));
+const ContactSection = lazy(() => import('@/components/ContactSection'));
+
+const SectionFallback = ({ label }: { label: string }) => (
+  <div className="py-20 text-center text-white/60">
+    Loading {label}…
+  </div>
+);
 
 export default function Home() {
   return (
@@ -30,12 +37,24 @@ export default function Home() {
       {/* Page Sections */}
       <main>
         <HeroSection />
-        <CountdownSection />
-        <AboutSection />
-        <ServicesSection />
-        <LiveStreamGallerySection />
-        <PastorSection />
-        <ContactSection />
+        <Suspense fallback={<SectionFallback label="Countdown" />}>
+          <CountdownSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback label="About" />}>
+          <AboutSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback label="Ministries" />}>
+          <ServicesSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback label="Live Stream & Gallery" />}>
+          <LiveStreamGallerySection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback label="Pastor" />}>
+          <PastorSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback label="Contact" />}>
+          <ContactSection />
+        </Suspense>
       </main>
 
       {/* Footer */}

@@ -6,6 +6,7 @@ import { Clock, MapPin, Calendar, Users, Music, Baby, GraduationCap } from 'luci
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { fetchWithCache } from '@/lib/fetchWithCache';
 
 interface ServicesSectionProps {
   className?: string;
@@ -36,11 +37,10 @@ export default function ServicesSection({ className = '' }: ServicesSectionProps
   const fetchEvents = async () => {
     try {
       // Add cache-busting parameter to ensure fresh data
-      const response = await fetch(`/api/events?t=${Date.now()}`);
-      if (response.ok) {
-        const eventsData = await response.json();
-        setEvents(eventsData);
-      }
+      const eventsData = await fetchWithCache<Event[]>('/api/events', {
+        ttl: 1000 * 60,
+      });
+      setEvents(eventsData);
     } catch (error) {
       console.error('Failed to fetch events:', error);
     } finally {
