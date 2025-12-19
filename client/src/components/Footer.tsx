@@ -75,7 +75,7 @@ export default function Footer({ className = '' }: FooterProps) {
       items: [
         { text: 'Home', href: '/home' },
         { text: 'About', href: '/about' },
-        { text: 'Services', href: '/services' },
+        { text: 'Gallery/Live', href: '/Gallery/Live' },
         { text: 'Events', href: '/events' }
       ]
     },
