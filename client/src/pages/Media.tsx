@@ -136,11 +136,11 @@ export default function Media() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {galleryImages.map((image) => (
                   <Card key={image.id} className="bg-white/5 border-white/10 overflow-hidden">
-                    <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-2">
+                    <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-2 overflow-hidden">
                       <img
                         src={image.url}
                         alt={image.title}
-                        className="max-w-full max-h-full object-contain rounded"
+                        className="w-full h-full object-cover rounded"
                         loading="lazy"
                         onError={(e) => {
                           console.error('Failed to load gallery image:', image.url, image.title);
@@ -187,4 +187,3 @@ export default function Media() {
     </div>
   );
 }
-

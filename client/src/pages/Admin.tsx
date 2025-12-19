@@ -1416,11 +1416,11 @@ export default function Admin() {
                           className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                       </div>
-                      <div className="aspect-video bg-black/30 flex items-center justify-center p-2 relative">
+                      <div className="aspect-video bg-black/30 flex items-center justify-center p-2 relative overflow-hidden">
                         <img 
                           src={image.url} 
                           alt={image.title}
-                          className="max-w-full max-h-full object-contain rounded"
+                          className="w-full h-full object-cover rounded"
                           onLoad={() => {
                             console.log('Image loaded successfully:', image.url);
                           }}

@@ -109,7 +109,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="mt-2 p-0 h-auto text-white hover:text-white/80"
+                          className="mt-2 h-auto text-white transition-colors duration-300 border border-white/70 rounded-full px-3 py-1 hover:bg-white/10"
                           data-testid={`button-${info.title.toLowerCase().replace(' ', '-')}`}
                           onClick={() => {
                             if (info.title === 'Visit Us') {

@@ -2,9 +2,122 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { Heart, Users, Book, Globe, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
-import communityImage from '@assets/generated_images/Church_community_fellowship_gathering_6de85642.png';
+import communityImage from '@assets/generated_images/image1.JPG';
 import pastorImage from '@assets/generated_images/Church_pastor_professional_headshot_1618d5ab.png';
 import pastorImageJpg from '@assets/generated_images/pastor_mark_jpg.jpg';
+
+const missionImageModules = import.meta.glob<{ default: string }>(
+  '@assets/generated_images/image*.JPG',
+  { eager: true }
+);
+
+const missionImages = Object.entries(missionImageModules)
+  .map(([path, mod]) => {
+    const match = path.match(/image(\d+)\.JPG$/i);
+    if (!match) return null;
+    return {
+      index: Number(match[1]),
+      src: mod.default,
+    };
+  })
+  .filter((entry): entry is { index: number; src: string } => entry !== null);
+
+const getImagesInRange = (start: number, end: number) =>
+  missionImages
+    .filter(({ index }) => index >= start && index <= end)
+    .sort((a, b) => a.index - b.index);
+
+const heroImageMetadata: Record<
+  number,
+  { alt: string; title?: string; description?: string }
+> = {
+  1: {
+    alt: 'Worship leader praising during service',
+    title: 'Praise & Worship',
+    description: 'Lifting our voices together',
+  },
+  2: {
+    alt: 'Women celebrating together at church',
+    title: 'Joyful Fellowship',
+    description: 'Sharing life in community',
+  },
+  3: {
+    alt: 'Congregant praying in vibrant attire',
+    title: 'Spirit-Filled Prayer',
+    description: "Seeking God's presence",
+  },
+  4: {
+    alt: 'Member greeting others during service',
+    title: 'Warm Hospitality',
+    description: 'Welcoming every person',
+  },
+  5: {
+    alt: 'Church member interceding during worship',
+    title: 'Faith in Action',
+    description: 'Living out the gospel daily',
+  },
+};
+
+const leftCardMetadata: Record<
+  number,
+  { alt: string; title?: string; description?: string }
+> = {
+  5: {
+    alt: 'Member praying during worship',
+    title: 'Prayerful Hearts',
+    description: 'Seeking God in unity',
+  },
+  6: {
+    alt: 'Smiling youth during service',
+    title: 'Youthful Joy',
+    description: 'Raising the next generation',
+  },
+  7: {
+    alt: 'Church leader greeting warmly',
+    title: 'Faithful Leadership',
+    description: 'Serving with grace',
+  },
+  8: {
+    alt: 'Elder worshiping with reverence',
+    title: 'Honoring Heritage',
+    description: 'Celebrating our legacy',
+  },
+  9: {
+    alt: 'Young adult smiling in fellowship',
+    title: 'Vibrant Community',
+    description: 'Growing friendships here',
+  },
+  10: {
+    alt: 'Member rejoicing during service',
+    title: 'Joyful Praise',
+    description: 'Rejoicing in the Lord',
+  },
+};
+
+const rightCardMetadata: Record<
+  number,
+  { alt: string; title?: string; description?: string }
+> = {
+  11: {
+    alt: 'Congregant smiling during fellowship',
+    title: 'Church Family',
+    description: 'Celebrating life together',
+  },
+  12: {
+    alt: 'Member reflecting during worship',
+    title: 'Quiet Devotion',
+    description: "Listening for God's voice",
+  },
+  13: {
+    alt: 'Joyful worshipper greeting others',
+    title: 'Radical Welcome',
+    description: 'Inviting everyone in',
+  },
+};
+
+const defaultImageContent = (index: number) => ({
+  alt: `Church community image ${index}`,
+});
 
 interface AboutSectionProps {
   className?: string;
@@ -20,68 +133,20 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
   const [currentRightImageIndex, setCurrentRightImageIndex] = useState(0);
   const [galleryImages, setGalleryImages] = useState<{ url: string; title: string }[]>([]);
 
-  const communityImages = [
-    {
-      src: communityImage,
-      alt: "Church community fellowship gathering",
-      title: "Community Fellowship",
-      description: "Growing together in faith"
-    },
-    {
-      src: pastorImage,
-      alt: "Church pastor professional headshot",
-      title: "Pastoral Leadership",
-      description: "Guiding with wisdom and grace"
-    },
-    {
-      src: pastorImageJpg,
-      alt: "Modern church exterior building",
-      title: "Our Church Home",
-      description: "A place of worship and community"
-    }
-  ];
+  const communityImages = getImagesInRange(1, 5).map(({ src, index }) => ({
+    src,
+    ...(heroImageMetadata[index] ?? defaultImageContent(index)),
+  }));
 
-  const leftCardImages = [
-    {
-      src: pastorImage,
-      alt: "Pastor leading worship",
-      title: "Spiritual Leadership",
-      description: "Guiding our faith journey"
-    },
-    {
-      src: communityImage,
-      alt: "Community gathering",
-      title: "Fellowship",
-      description: "Building lasting relationships"
-    },
-    {
-      src: pastorImageJpg,
-      alt: "Church sanctuary",
-      title: "Worship Space",
-      description: "A sacred place of prayer"
-    }
-  ];
+  const leftCardImages = getImagesInRange(5, 10).map(({ src, index }) => ({
+    src,
+    ...(leftCardMetadata[index] ?? defaultImageContent(index)),
+  }));
 
-  const rightCardImages = [
-    {
-      src: pastorImageJpg,
-      alt: "Church exterior",
-      title: "Our Home",
-      description: "Welcome to our church"
-    },
-    {
-      src: pastorImage,
-      alt: "Pastor teaching",
-      title: "Biblical Teaching",
-      description: "Learning God's word together"
-    },
-    {
-      src: communityImage,
-      alt: "Community service",
-      title: "Service",
-      description: "Serving others in love"
-    }
-  ];
+  const rightCardImages = getImagesInRange(11, 13).map(({ src, index }) => ({
+    src,
+    ...(rightCardMetadata[index] ?? defaultImageContent(index)),
+  }));
 
   // Load gallery images for replacements
   useEffect(() => {
@@ -331,7 +396,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                         <img
                           src={image.src}
                           alt={image.alt}
-                          className="w-full h-full object-cover object-[50%_25%]"
+                          className="w-full h-full object-cover object-center"
                           onError={(e) => {
                             // Fallback to local image if gallery image fails
                             const target = e.currentTarget;
@@ -342,11 +407,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                             }
                           }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-5" />
-                        <div className="absolute bottom-4 left-4 text-white z-20 pointer-events-none">
-                          <h3 className="font-serif text-xl font-semibold drop-shadow-lg">{image.title}</h3>
-                          <p className="text-sm opacity-90 drop-shadow-md">{image.description}</p>
-                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-5" />
                       </div>
                     ))}
                   </motion.div>
@@ -402,7 +463,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                         <img
                           src={image.src}
                           alt={image.alt}
-                          className="w-full h-full object-cover object-[50%_25%]"
+                          className="w-full h-full object-cover object-center"
                           onError={(e) => {
                             // Fallback to local image if gallery image fails
                             const target = e.currentTarget;
@@ -412,11 +473,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                             }
                           }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-5" />
-                        <div className="absolute bottom-4 left-4 text-white z-20 pointer-events-none">
-                          <h3 className="font-serif text-xl font-semibold drop-shadow-lg">{image.title}</h3>
-                          <p className="text-sm opacity-90 drop-shadow-md">{image.description}</p>
-                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-5" />
                       </div>
                     ))}
                   </motion.div>
@@ -472,7 +529,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                         <img
                           src={image.src}
                           alt={image.alt}
-                          className="w-full h-full object-cover object-[50%_25%]"
+                          className="w-full h-full object-cover object-center"
                           onError={(e) => {
                             // Fallback to local image if gallery image fails
                             const target = e.currentTarget;
@@ -482,11 +539,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                             }
                           }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-5" />
-                        <div className="absolute bottom-4 left-4 text-white z-20 pointer-events-none">
-                          <h3 className="font-serif text-xl font-semibold drop-shadow-lg">{image.title}</h3>
-                          <p className="text-sm opacity-90 drop-shadow-md">{image.description}</p>
-                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-5" />
                       </div>
                     ))}
                   </motion.div>
@@ -533,11 +586,11 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
             >
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-primary">30+</div>
+                  <div className="text-2xl font-bold text-primary">6+</div>
                   <div className="text-xs text-muted-foreground">Years Serving</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-primary">500+</div>
+                  <div className="text-2xl font-bold text-primary">75+</div>
                   <div className="text-xs text-muted-foreground">Families</div>
                 </div>
               </div>

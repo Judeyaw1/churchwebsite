@@ -292,11 +292,11 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                     </div>
                   ) : galleryImages.length > 0 ? (
                     <>
-                      <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-3 relative transition-all duration-300">
+                      <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-3 relative transition-all duration-300 overflow-hidden">
                         <img
                           src={galleryImages[currentImageIndex].url}
                           alt={galleryImages[currentImageIndex].title}
-                          className="max-w-full max-h-full object-contain rounded-lg"
+                          className="w-full h-full object-cover rounded-lg"
                           onLoad={() => {
                             console.log('Gallery image loaded:', galleryImages[currentImageIndex].url);
                           }}
@@ -346,7 +346,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                               <img
                                 src={image.url}
                                 alt={image.title}
-                                className="max-w-full max-h-full object-contain rounded"
+                                className="w-full h-full object-cover rounded"
                                 onLoad={() => {
                                   console.log('Gallery thumbnail loaded:', image.url);
                                 }}

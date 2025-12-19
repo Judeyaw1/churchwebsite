@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import { Heart, Users, Book, Globe, Calendar, MapPin, Clock, Award, Target, Lightbulb } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import communityImage from '@assets/generated_images/Church_community_fellowship_gathering_6de85642.png';
+import communityImage from '@assets/generated_images/image1.JPG';
 import pastorImage from '@assets/generated_images/Church_pastor_professional_headshot_1618d5ab.png';
 import pastorImageJpg from '@assets/generated_images/pastor_mark_jpg.jpg';
 
@@ -399,4 +399,3 @@ export default function About() {
     </div>
   );
 }
-

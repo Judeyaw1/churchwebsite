@@ -16,10 +16,10 @@ export default function Home() {
       {/* Snowfall Effect */}
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 50, pointerEvents: 'none' }}>
         <Snowfall
-          snowflakeCount={150}
+          snowflakeCount={60}
           speed={[0.5, 3]}
           wind={[-0.5, 3]}
-          radius={[0.5, 3]}
+          radius={[0.4, 2]}
         />
       </div>
 
