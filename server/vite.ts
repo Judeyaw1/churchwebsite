@@ -114,8 +114,8 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  // Use process.cwd() to be robust in bundled/ESM and containerized environments
-  const distPath = path.resolve(process.cwd(), "dist", "public");
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const distPath = path.resolve(__dirname, "..", "dist", "public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
@@ -127,6 +127,11 @@ export function serveStatic(app: Express) {
     express.static(distPath, {
       maxAge: "1y",
       immutable: true,
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith(".html")) {
+          res.setHeader("Cache-Control", "no-cache");
+        }
+      },
     }),
   );
 
