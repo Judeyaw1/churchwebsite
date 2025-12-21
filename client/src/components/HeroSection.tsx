@@ -192,7 +192,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
           </a>
           
           <a
-            href="https://twitter.com/unitedbethelpresbyterian"
+            href="https://www.tiktok.com/@ubpc_md_usa?_r=1&_t=ZP-92PhPbkitVX"
             target="_blank"
             rel="noopener noreferrer"
             className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 group"

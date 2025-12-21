@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Facebook, Instagram, Youtube, CheckCircle, AlertCircle } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Facebook, Twitter, Youtube, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface FooterProps {
@@ -92,7 +92,7 @@ export default function Footer({ className = '' }: FooterProps) {
 
   const socialLinks = [
     { icon: Facebook, label: 'Facebook', href: 'https://facebook.com/unitedbethelpresbyterian' },
-    { icon: Instagram, label: 'Instagram', href: 'https://instagram.com/unitedbethelpresbyterian' },
+    { icon: Twitter, label: 'Tiktok', href: 'https://www.tiktok.com/@ubpc_md_usa?_r=1&_t=ZP-92PhPbkitVX' },
     { icon: Youtube, label: 'YouTube', href: 'http://www.youtube.com/@ubpcmedia6480' }
   ];
 
