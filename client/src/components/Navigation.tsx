@@ -83,26 +83,28 @@ export default function Navigation({ className = '' }: NavigationProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/">
-            <motion.a
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="flex items-center cursor-pointer hover:opacity-80 transition-opacity duration-300"
-            >
-              <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRslI3U8-lsDRRpnOt-lxkEMYZvV6Wtdzv3TQ&s"
-                alt="United Bethel Presbyterian logo"
-                className="h-8 w-8 rounded-full object-contain bg-transparent mr-2"
-                loading="eager"
-                decoding="async"
-              />
-              <span className={`font-serif text-lg sm:text-xl lg:text-2xl font-bold transition-colors duration-300 ${
-                isScrolled ? 'text-white' : 'text-white'
-              }`}>
-                <span className="hidden sm:inline">United Bethel Presbyterian</span>
-                <span className="sm:hidden">UBPC</span>
-              </span>
-            </motion.a>
+            <a className="flex items-center cursor-pointer hover:opacity-80 transition-opacity duration-300">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="flex items-center"
+              >
+                <img
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRslI3U8-lsDRRpnOt-lxkEMYZvV6Wtdzv3TQ&s"
+                  alt="United Bethel Presbyterian logo"
+                  className="h-8 w-8 rounded-full object-contain bg-transparent mr-2"
+                  loading="eager"
+                  decoding="async"
+                />
+                <span className={`font-serif text-lg sm:text-xl lg:text-2xl font-bold transition-colors duration-300 ${
+                  isScrolled ? 'text-white' : 'text-white'
+                }`}>
+                  <span className="hidden sm:inline">United Bethel Presbyterian</span>
+                  <span className="sm:hidden">UBPC</span>
+                </span>
+              </motion.div>
+            </a>
           </Link>
 
           {/* Desktop Navigation */}

@@ -92,7 +92,7 @@ export default function Footer({ className = '' }: FooterProps) {
 
   const socialLinks = [
     { icon: Facebook, label: 'Facebook', href: 'https://facebook.com/unitedbethelpresbyterian' },
-    { icon: Tiktok, label: 'TikTok', href: 'https://www.tiktok.com/@ubpc_md_usa?_r=1&_t=ZP-92PhPbkitVX' },
+    { icon: Music, label: 'TikTok', href: 'https://www.tiktok.com/@ubpc_md_usa?_r=1&_t=ZP-92PhPbkitVX' },
     { icon: Youtube, label: 'YouTube', href: 'http://www.youtube.com/@ubpcmedia6480' }
   ];
 
