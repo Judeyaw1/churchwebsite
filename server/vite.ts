@@ -125,6 +125,7 @@ export function serveStatic(app: Express) {
 
   app.use(
     express.static(distPath, {
+      index: false,
       maxAge: "1y",
       immutable: true,
       setHeaders: (res, filePath) => {
@@ -137,11 +138,19 @@ export function serveStatic(app: Express) {
     }),
   );
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
+  // fall through to index.html if the request expects HTML
+  app.get("*", (req, res, next) => {
+    if (!req.accepts("html")) {
+      return next();
+    }
+
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
     res.sendFile(path.resolve(distPath, "index.html"));
+  });
+
+  app.use((req, res) => {
+    res.status(404).end();
   });
 }
