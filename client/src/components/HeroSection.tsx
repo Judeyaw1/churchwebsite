@@ -196,10 +196,10 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 group"
-            aria-label="Follow us on Twitter/X"
+            aria-label="Follow us on TikTok"
           >
             <svg className="w-6 h-6 text-white group-hover:text-white/90" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-1.843 4.793 4.793 0 0 1-1.03-2.993h-3.6v13.354a3.022 3.022 0 1 1-2.996-3.023c.275 0 .546.037.807.107V9.47a6.608 6.608 0 0 0-.807-.05C5.033 9.42 2.4 12.06 2.4 15.23c0 3.17 2.633 5.79 5.793 5.79a5.793 5.793 0 0 0 5.793-5.79V9.868a8.39 8.39 0 0 0 4.32 1.2V7.5a4.793 4.793 0 0 1-2.717-.814z"/>
             </svg>
           </a>
           
