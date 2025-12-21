@@ -289,7 +289,6 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                           src={galleryImages[currentImageIndex].url}
                           alt={galleryImages[currentImageIndex].title}
                           className="w-full h-full object-cover rounded-lg"
-                          loading="lazy"
                           decoding="async"
                           onLoad={() => {
                             console.log('Gallery image loaded:', galleryImages[currentImageIndex].url);
@@ -340,7 +339,6 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                                 src={image.url}
                                 alt={image.title}
                                 className="w-full h-full object-cover rounded"
-                                loading="lazy"
                                 decoding="async"
                                 onLoad={() => {
                                   console.log('Gallery thumbnail loaded:', image.url);
