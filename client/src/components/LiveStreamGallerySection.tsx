@@ -298,7 +298,6 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                             console.error('Gallery image failed to load:', galleryImages[currentImageIndex].url);
                             console.error('Attempted URL:', e.currentTarget.src);
                           }}
-                          loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
                         
@@ -350,7 +349,6 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                                   console.error('Gallery thumbnail failed to load:', image.url);
                                   console.error('Attempted URL:', e.currentTarget.src);
                                 }}
-                                loading="lazy"
                               />
                             </button>
                           ))}

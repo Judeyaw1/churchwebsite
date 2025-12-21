@@ -139,7 +139,6 @@ export default function Media() {
                         className="w-full h-full object-cover rounded"
                         loading="lazy"
                         decoding="async"
-                        loading="lazy"
                         onError={(e) => {
                           console.error('Failed to load gallery image:', image.url, image.title);
                           const target = e.currentTarget;

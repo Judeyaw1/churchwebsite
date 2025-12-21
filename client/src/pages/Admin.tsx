@@ -1431,7 +1431,6 @@ export default function Admin() {
                             console.error('Image title:', image.title);
                             e.currentTarget.style.display = 'none';
                           }}
-                          loading="lazy"
                         />
                         {/* Fallback placeholder */}
                         <div className="absolute inset-0 flex items-center justify-center text-white/50 text-xs pointer-events-none opacity-50">
