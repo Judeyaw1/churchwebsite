@@ -6,7 +6,7 @@ import { Heart, Users, Book, Globe, Calendar, MapPin, Clock, Award, Target, Ligh
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import communityImage from '@assets/generated_images/image1.JPG';
-import pastorImage from '@assets/generated_images/Church_pastor_professional_headshot_1618d5ab.png';
+import pastorImage from '@attached_assets/generated_images/pastor_mark_jpg.jpg';
 import pastorImageJpg from '@assets/generated_images/pastor_mark_jpg.jpg';
 import { fetchWithCache } from '@/lib/fetchWithCache';
 
