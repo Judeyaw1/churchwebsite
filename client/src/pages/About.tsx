@@ -6,7 +6,7 @@ import { Heart, Users, Book, Globe, Calendar, MapPin, Clock, Award, Target, Ligh
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import communityImage from '@assets/generated_images/image1.JPG';
-import pastorImage from '@attached_assets/generated_images/pastor_mark_jpg.jpg';
+import pastorImage from '@assets/generated_images/Church_pastor_professional_headshot_1618d5ab.png';
 import pastorImageJpg from '@assets/generated_images/pastor_mark_jpg.jpg';
 import { fetchWithCache } from '@/lib/fetchWithCache';
 
@@ -66,7 +66,7 @@ export default function About() {
     {
       name: 'Rev. Mark Asiedu Frimpong',
       position: 'Senior Pastor',
-      image: pastorImage,
+      image: pastorImageJpg,
       bio: 'Rev. Mark Asiedu Frimpong is a dedicated servant of God with over 15 years of pastoral experience. Born and baptized in the Presbyterian Church, he began his personal walk with God during college and has since served faithfully in ministry.',
       education: 'Master of Divinity, Princeton Theological Seminary',
       experience: '15+ years in pastoral ministry'
