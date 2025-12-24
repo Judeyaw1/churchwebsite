@@ -170,6 +170,19 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
   const leftSources = leftCardImages;
   const rightSources = rightCardImages;
 
+  useEffect(() => {
+    const sources = [
+      ...heroSources,
+      ...leftSources,
+      ...rightSources,
+    ].map((image) => image.src);
+
+    sources.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
   // Auto-slide functionality for images
   useEffect(() => {
     const interval = setInterval(() => {
