@@ -143,17 +143,6 @@ export default function AdminLogin() {
                 </motion.div>
               )}
 
-              {/* Demo Credentials Info */}
-              <div className="p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg">
-                <p className="text-blue-300 text-xs text-center mb-2">
-                  <strong>Demo Credentials:</strong>
-                </p>
-                <p className="text-blue-300/80 text-xs text-center">
-                  Username: <code className="bg-white/10 px-1 rounded">admin</code><br />
-                  Password: <code className="bg-white/10 px-1 rounded">church2024</code>
-                </p>
-              </div>
-
               {/* Submit Button */}
               <Button
                 type="submit"

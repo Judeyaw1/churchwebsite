@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Facebook, Music, Youtube, CheckCircle, AlertCircle } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Facebook, Youtube, CheckCircle, AlertCircle } from 'lucide-react';
+import { SiTiktok } from 'react-icons/si';
 import { Button } from '@/components/ui/button';
 
 interface FooterProps {
@@ -57,8 +58,8 @@ export default function Footer({ className = '' }: FooterProps) {
       items: [
         { icon: MapPin, text: '9045 Maier Road' },
         { text: 'Laurel, MD 20723' },
-        { icon: Phone, text: '(555) 123-4567' },
-        { icon: Mail, text: 'unitedbethelpresbyterian@gmail.com', href: 'mailto:unitedbethelpresbyterian@gmail.com' }
+        { icon: Phone, text: '(301)-339-3258' },
+        { icon: Mail, text: '', href: '' }
       ]
     },
     {
@@ -92,7 +93,7 @@ export default function Footer({ className = '' }: FooterProps) {
 
   const socialLinks = [
     { icon: Facebook, label: 'Facebook', href: 'https://facebook.com/unitedbethelpresbyterian' },
-    { icon: Music, label: 'TikTok', href: 'https://www.tiktok.com/@ubpc_md_usa?_r=1&_t=ZP-92PhPbkitVX' },
+    { icon: SiTiktok, label: 'TikTok', href: 'https://www.tiktok.com/@ubpc_md_usa?_r=1&_t=ZP-92PhPbkitVX' },
     { icon: Youtube, label: 'YouTube', href: 'http://www.youtube.com/@ubpcmedia6480' }
   ];
 
