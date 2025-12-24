@@ -114,8 +114,8 @@ export default function EventCountdown({
           <div className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-2 sm:mb-4 break-words whitespace-normal leading-tight">
             Coming Soon
           </div>
-          <div className="text-sm sm:text-lg md:text-xl text-purple-200 uppercase tracking-wide">
-            Event Scheduled
+          <div className="text-sm sm:text-lg md:text-xl text-white uppercase tracking-wide">
+            Upcoming Event
           </div>
         </div>
       </div>
