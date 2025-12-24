@@ -332,7 +332,6 @@ export default function Admin() {
       setUploadStatus('success');
       return result.url;
     } catch (error) {
-      console.error('Upload error:', error);
       setUploadStatus('error');
       throw error;
     }
@@ -363,7 +362,6 @@ export default function Admin() {
       setEventUploadStatus('success');
       return result.url;
     } catch (error) {
-      console.error('Upload error:', error);
       setEventUploadStatus('error');
       throw error;
     }
