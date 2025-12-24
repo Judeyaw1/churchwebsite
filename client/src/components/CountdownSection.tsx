@@ -201,6 +201,7 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
                 eventDate={nextEvent.date}
                 eventTime={nextEvent.time}
                 eventTitle={nextEvent.title}
+                eventImage={nextEvent.image}
                 className="w-full max-w-full"
               />
             </div>

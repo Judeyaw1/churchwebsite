@@ -6,6 +6,7 @@ interface EventCountdownProps {
   eventDate: string;
   eventTime: string;
   eventTitle: string;
+  eventImage?: string;
   className?: string;
 }
 
@@ -20,6 +21,7 @@ export default function EventCountdown({
   eventDate, 
   eventTime, 
   eventTitle,
+  eventImage,
   className = ''
 }: EventCountdownProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -94,9 +96,21 @@ export default function EventCountdown({
   }
 
   if (!showCountdown) {
+    const backgroundStyle = eventImage
+      ? { backgroundImage: `url(${eventImage})` }
+      : undefined;
+
     return (
-      <div className={`bg-purple-800 rounded-lg p-4 sm:p-10 md:p-12 shadow-lg w-full sm:w-auto ${className}`}>
-        <div className="text-center">
+      <div
+        className={`relative overflow-hidden rounded-lg p-4 sm:p-10 md:p-12 shadow-lg w-full sm:w-auto ${
+          eventImage ? 'bg-center bg-cover' : 'bg-purple-800'
+        } ${className}`}
+        style={backgroundStyle}
+      >
+        {eventImage && (
+          <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
+        )}
+        <div className="relative z-10 text-center">
           <div className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-2 sm:mb-4 break-words whitespace-normal leading-tight">
             Coming Soon
           </div>

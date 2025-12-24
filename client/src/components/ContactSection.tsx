@@ -29,13 +29,13 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
     {
       icon: MapPin,
       title: 'Visit Us',
-      details: ['9045 Maier Road', 'Laurel, MD 20723'],
+      details: ['9045 Maier Road','Suite D ','Laurel, MD 20723'],
       action: 'Get Directions'
     },
     {
       icon: Phone,
       title: 'Call Us',
-      details: ['Main: (555) 123-4567', 'Prayer: (555) 123-PRAY'],
+      details: ['Main: (301)-339-3258', 'Prayer: (301)-327-0307'],
       action: 'Call Now'
     },
     {

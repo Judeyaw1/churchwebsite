@@ -57,7 +57,7 @@ export default function Footer({ className = '' }: FooterProps) {
       title: 'Visit Us',
       items: [
         { icon: MapPin, text: '9045 Maier Road' },
-        { text: 'Laurel, MD 20723' },
+        { text: 'Suite','Laurel, MD 20723' },
         { icon: Phone, text: '(301)-339-3258' },
         { icon: Mail, text: '', href: '' }
       ]
@@ -84,9 +84,11 @@ export default function Footer({ className = '' }: FooterProps) {
       title: 'Groups',
       items: [
         { text: 'Men\'s Fellowship', href: '/groups/mens-fellowship' },
+        { text: 'Women\'s Fellowship', href: '/groups/womens-fellowship' },
         { text: 'YAF', href: '/groups/yaf' },
         { text: 'YPG', href: '/groups/ypg' },
-        { text: 'JY', href: '/groups/jy' }
+        { text: 'JY', href: '/groups/jy' },
+        { text: 'JY', href: '/groups/jy' },
       ]
     }
   ];
