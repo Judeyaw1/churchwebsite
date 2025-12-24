@@ -63,7 +63,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
 
   const groupsItems = [
     { label: 'Men\'s Fellowship', href: '/groups/mens-fellowship' },
-    { label: 'Women\'s fellowship', href: '/groups/womens-fellowship' },
+    { label: 'Women\'s Fellowship', href: '/groups/womens-fellowship' },
     { label: 'YAF', href: '/groups/yaf' },
     { label: 'YPG', href: '/groups/ypg' },
     { label: 'JY', href: '/groups/jy' },
