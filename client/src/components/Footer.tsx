@@ -57,7 +57,7 @@ export default function Footer({ className = '' }: FooterProps) {
       title: 'Visit Us',
       items: [
         { icon: MapPin, text: '9045 Maier Road' },
-        { text: 'Suite','Laurel, MD 20723' },
+        { text: 'Laurel, MD 20723' },
         { icon: Phone, text: '(301)-339-3258' },
         { icon: Mail, text: '', href: '' }
       ]
