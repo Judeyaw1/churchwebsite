@@ -23,18 +23,11 @@ async function seedDatabase() {
 
   try {
     // Create admin user
-    const adminUsername = process.env.ADMIN_USERNAME;
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    if (!adminUsername || !adminPassword) {
-      console.log("⚠️  Admin credentials not configured. Skipping admin user creation.");
-    } else {
-      console.log("👤 Creating admin user...");
-      await db.insert(users).values({
-        username: adminUsername,
-        password: adminPassword, // In production, this should be hashed
-      }).onConflictDoNothing();
-      console.log("- Admin user created");
-    }
+    console.log("👤 Creating admin user...");
+    await db.insert(users).values({
+      username: 'admin',
+      password: 'church2024', // In production, this should be hashed
+    }).onConflictDoNothing();
 
     // Create sample events
     console.log("📅 Creating sample events...");

@@ -100,7 +100,7 @@ export default function Admin() {
 
   // Check authentication on component mount
   useEffect(() => {
-    const isAuthenticated = !!localStorage.getItem('adminToken');
+    const isAuthenticated = localStorage.getItem('adminAuth') === 'true';
     if (!isAuthenticated) {
       setLocation('/admin/login');
     }
@@ -115,7 +115,7 @@ export default function Admin() {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem('adminToken') || '';
+      const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
       
       // Fetch all data in parallel
       const [eventsRes, streamsRes, galleryRes, messagesRes, subscribersRes, blogRes] = await Promise.all([
@@ -315,7 +315,7 @@ export default function Admin() {
     setUploadProgress(0);
     
     try {
-      const token = localStorage.getItem('adminToken') || '';
+      const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
       const response = await fetch('/api/upload', {
         method: 'POST',
         headers: {
@@ -345,7 +345,7 @@ export default function Admin() {
     setEventUploadProgress(0);
     
     try {
-      const token = localStorage.getItem('adminToken') || '';
+      const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
       const response = await fetch('/api/upload', {
         method: 'POST',
         headers: {
@@ -381,7 +381,7 @@ export default function Admin() {
   const handleOneDriveStatus = async () => {
     try {
       const res = await fetch('/api/admin/onedrive/status', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}` }
+        headers: { 'Authorization': 'Bearer admin' }
       });
       if (!res.ok) {
         setOneDriveStatus('disconnected');
@@ -402,7 +402,7 @@ export default function Admin() {
       setOneDriveLoading(true);
       // Check status first
       const statusRes = await fetch('/api/admin/onedrive/status', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}` }
+        headers: { 'Authorization': 'Bearer admin' }
       });
       if (statusRes.ok) {
         const status = await statusRes.json();
@@ -414,7 +414,7 @@ export default function Admin() {
       }
 
       const res = await fetch('/api/admin/onedrive/list', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}` }
+        headers: { 'Authorization': 'Bearer admin' }
       });
       if (!res.ok) {
         alert('Unable to browse OneDrive. Make sure you clicked Connect OneDrive and completed login.');
@@ -445,7 +445,7 @@ export default function Admin() {
       const shareRes = await fetch('/api/admin/onedrive/share', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
+          'Authorization': 'Bearer admin',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ itemId: selected.id })
@@ -489,7 +489,7 @@ export default function Admin() {
         const res = await fetch('/api/admin/onedrive/upload', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`
+            'Authorization': 'Bearer admin'
           },
           body: formData
         });
@@ -579,7 +579,7 @@ export default function Admin() {
         setIsDeleting(true);
         setDeleteProgress(0);
         
-        const token = localStorage.getItem('adminToken') || '';
+        const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
         setDeleteProgress(50);
         
         const response = await fetch(`/api/admin/${type}/${id}`, {
@@ -623,7 +623,7 @@ export default function Admin() {
         setIsDeleting(true);
         setDeleteProgress(0);
         
-        const token = localStorage.getItem('adminToken') || '';
+        const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
         const items = Array.from(selectedItems);
         
         // Delete items one by one with progress
@@ -786,7 +786,7 @@ export default function Admin() {
   const handleSave = async () => {
     try {
       setEditStatus('saving');
-      const token = localStorage.getItem('adminToken') || '';
+      const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
       const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -1013,7 +1013,6 @@ export default function Admin() {
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {
       localStorage.removeItem('adminAuth');
-      localStorage.removeItem('adminToken');
       localStorage.removeItem('adminUser');
       setLocation('/admin/login');
     }
@@ -1029,7 +1028,7 @@ export default function Admin() {
     setEmailMessage('');
 
     try {
-      const token = localStorage.getItem('adminToken') || '';
+      const token = localStorage.getItem('adminAuth') === 'true' ? 'admin' : '';
       const response = await fetch('/api/admin/send-message', {
         method: 'POST',
         headers: {
