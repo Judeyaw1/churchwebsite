@@ -86,6 +86,15 @@ export default function Navigation({ className = '' }: NavigationProps) {
     { label: 'Singing Band', href: '/ministry/Singing Band' },
   ];
 
+  const handleVisitUs = () => {
+    const target = document.getElementById('contact');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    window.location.href = '/#contact';
+  };
+
   
   
 
@@ -236,7 +245,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 variant="default" 
                 className="bg-black hover:bg-black/90 text-white border border-white/20"
                 data-testid="button-visit-us"
-                onClick={() => console.log('Visit Us clicked')}
+                onClick={handleVisitUs}
               >
                 Visit Us
               </Button>
@@ -386,7 +395,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                     data-testid="button-mobile-visit-us"
                     onClick={() => {
                       setIsMenuOpen(false);
-                      console.log('Visit Us clicked');
+                      handleVisitUs();
                     }}
                   >
                     Visit Us
