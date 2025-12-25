@@ -21,21 +21,36 @@ export default function AdminLogin() {
     setIsLoading(true);
     setError('');
 
-    // Simulate API call - in real app, this would call your backend
-    setTimeout(() => {
-      // Demo credentials - in production, this would be handled by your backend
-      if (formData.username === 'admin' && formData.password === 'church2024') {
-        // Store auth token/session (in real app, this would be a JWT token)
-        localStorage.setItem('adminAuth', 'true');
-        localStorage.setItem('adminUser', formData.username);
-        
-        // Redirect to admin dashboard
-        window.location.href = '/admin';
-      } else {
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
         setError('Invalid username or password');
         setIsLoading(false);
+        return;
       }
-    }, 1000);
+
+      const data = await response.json();
+      if (!data?.token) {
+        setError('Login failed. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      localStorage.setItem('adminAuth', 'true');
+      localStorage.setItem('adminToken', data.token);
+      localStorage.setItem('adminUser', data.user?.username || formData.username);
+      window.location.href = '/admin';
+    } catch (error) {
+      setError('Login failed. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
