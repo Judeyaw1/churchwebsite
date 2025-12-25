@@ -35,10 +35,10 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
   return (
     <section className={`relative min-h-screen flex items-center justify-center overflow-hidden ${className}`}>
       {/* Background Video */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 bg-black">
         <video
           ref={videoRef}
-          className="w-full h-full object-contain sm:object-cover"
+          className="w-full h-full object-contain sm:object-cover bg-black"
           muted={isMuted}
           loop
           playsInline
@@ -119,7 +119,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
               <span className="font-semibold">Location</span>
             </div>
             <p className="text-white/90">
-              <a href="https://maps.google.com/?q=9045+Maier+Road,+Laurel,+MD+20723">9045 Maier Rd<br />Laurel, MD 20723</a>
+              <a href="https://maps.google.com/?q=9045+Maier+Road,+Laurel,+MD+20723">9045 Maier Rd<br /> Suite D, Laurel, MD 20723</a>
             </p>
           </div>
           
