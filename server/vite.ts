@@ -138,6 +138,13 @@ export function serveStatic(app: Express) {
     }),
   );
 
+  app.get("/", (_req, res) => {
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    res.sendFile(path.resolve(distPath, "index.html"));
+  });
+
   // fall through to index.html if the request expects HTML
   app.get("*", (req, res, next) => {
     if (!req.accepts("html")) {
