@@ -127,7 +127,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                   loading="eager"
                   decoding="async"
                 />
-                <span className={`font-serif text-lg sm:text-xl lg:text-2xl font-bold transition-colors duration-300 ${
+                <span className={`font-serif text-base sm:text-lg lg:text-xl font-bold transition-colors duration-300 ${
                   isScrolled ? 'text-white' : 'text-white'
                 }`}>
                   <span className="hidden sm:inline">United Bethel Presbyterian</span>
