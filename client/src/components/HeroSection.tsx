@@ -38,7 +38,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
       <div className="absolute inset-0 z-0">
         <video
           ref={videoRef}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain sm:object-cover"
           muted={isMuted}
           loop
           playsInline
