@@ -311,7 +311,7 @@ export default function Events() {
                       <img
                         src={`${event.image}?v=${Math.random()}`}
                         alt={event.title}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-contain bg-black transition-transform duration-300"
                           onLoad={() => {
                             console.log('Image loaded successfully:', event.image);
                             console.log('Full image URL:', `${event.image}?v=${Math.random()}`);
@@ -487,7 +487,7 @@ export default function Events() {
                   <img
                     src={`${selectedEvent.image}?v=${Math.random()}`}
                     alt={selectedEvent.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain bg-black"
                     onError={(e) => {
                       console.error('Modal image failed to load:', selectedEvent.image);
                       e.currentTarget.style.display = 'none';

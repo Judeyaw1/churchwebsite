@@ -169,7 +169,7 @@ export default function About() {
               <img
                 src={galleryImages[0]?.url || pastorImageJpg}
                 alt={galleryImages[0]?.title || "United Bethel Presbyterian Church"}
-                className="w-full h-96 object-cover rounded-2xl shadow-lg"
+                className="w-full h-96 object-contain bg-black rounded-2xl shadow-lg"
                 loading="lazy"
                 onError={(e) => {
                   console.error('Failed to load gallery image:', galleryImages[0]?.url);
@@ -210,7 +210,7 @@ export default function About() {
               <img
                 src={communityImage}
                 alt="Church community gathering"
-                className="w-full h-96 object-cover rounded-2xl shadow-lg"
+                className="w-full h-96 object-contain bg-black rounded-2xl shadow-lg"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-2xl" />
               <div className="absolute bottom-6 left-6 text-white">
@@ -340,7 +340,7 @@ export default function About() {
                     <img
                       src={leader.image}
                       alt={leader.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain bg-black transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   </div>

@@ -411,7 +411,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                           alt={image.alt}
                           loading={index === 0 ? 'eager' : 'lazy'}
                           decoding="async"
-                          className="w-full h-full object-cover object-center"
+                          className="w-full h-full object-contain bg-black"
                           onError={(e) => {
                             // Fallback to local image if gallery image fails
                             const target = e.currentTarget;
@@ -480,7 +480,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                           alt={image.alt}
                           loading="lazy"
                           decoding="async"
-                          className="w-full h-full object-cover object-center"
+                          className="w-full h-full object-contain bg-black"
                           onError={(e) => {
                             // Fallback to local image if gallery image fails
                             const target = e.currentTarget;
@@ -548,7 +548,7 @@ export default function AboutSection({ className = '' }: AboutSectionProps) {
                           alt={image.alt}
                           loading="lazy"
                           decoding="async"
-                          className="w-full h-full object-cover object-center"
+                          className="w-full h-full object-contain bg-black"
                           onError={(e) => {
                             // Fallback to local image if gallery image fails
                             const target = e.currentTarget;
