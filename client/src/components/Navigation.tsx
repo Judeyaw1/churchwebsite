@@ -95,6 +95,10 @@ export default function Navigation({ className = '' }: NavigationProps) {
     window.location.href = '/#contact';
   };
 
+  const handleHomeClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    window.location.href = '/';
+  };
   
   
 
@@ -112,30 +116,32 @@ export default function Navigation({ className = '' }: NavigationProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/">
-            <a className="flex items-center cursor-pointer hover:opacity-80 transition-opacity duration-300">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                className="flex items-center"
-              >
-                <img
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRslI3U8-lsDRRpnOt-lxkEMYZvV6Wtdzv3TQ&s"
-                  alt="United Bethel Presbyterian logo"
-                  className="h-8 w-8 rounded-full object-contain bg-transparent mr-2"
-                  loading="eager"
-                  decoding="async"
-                />
-                <span className={`font-serif text-base sm:text-lg lg:text-xl font-bold transition-colors duration-300 ${
-                  isScrolled ? 'text-white' : 'text-white'
-                }`}>
-                  <span className="hidden sm:inline">United Bethel Presbyterian</span>
-                  <span className="sm:hidden">UBPC</span>
-                </span>
-              </motion.div>
-            </a>
-          </Link>
+          <a
+            href="/"
+            onClick={handleHomeClick}
+            className="flex items-center cursor-pointer hover:opacity-80 transition-opacity duration-300"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="flex items-center"
+            >
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRslI3U8-lsDRRpnOt-lxkEMYZvV6Wtdzv3TQ&s"
+                alt="United Bethel Presbyterian logo"
+                className="h-8 w-8 rounded-full object-contain bg-transparent mr-2"
+                loading="eager"
+                decoding="async"
+              />
+              <span className={`font-serif text-base sm:text-lg lg:text-xl font-bold transition-colors duration-300 ${
+                isScrolled ? 'text-white' : 'text-white'
+              }`}>
+                <span className="hidden sm:inline">United Bethel Presbyterian</span>
+                <span className="sm:hidden">UBPC</span>
+              </span>
+            </motion.div>
+          </a>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
@@ -219,6 +225,20 @@ export default function Navigation({ className = '' }: NavigationProps) {
                       )}
                     </AnimatePresence>
                   </div>
+                ) : item.label === 'Home' ? (
+                  <a
+                    href="/"
+                    onClick={handleHomeClick}
+                    className={`transition-all duration-300 font-medium text-sm flex items-center gap-2 px-3 py-2 rounded-lg ${
+                      isScrolled 
+                        ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
+                        : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
+                    }`}
+                    data-testid={`link-nav-${item.label.toLowerCase()}`}
+                    title={item.label}
+                  >
+                    {item.icon ? <item.icon className="h-5 w-5" /> : item.label}
+                  </a>
                 ) : (
                   <Link href={item.href}>
                     <a
@@ -365,6 +385,23 @@ export default function Navigation({ className = '' }: NavigationProps) {
                           )}
                         </AnimatePresence>
                       </div>
+                    ) : item.label === 'Home' ? (
+                      <a
+                        href="/"
+                        onClick={(event) => {
+                          setIsMenuOpen(false);
+                          handleHomeClick(event);
+                        }}
+                        className={`block transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
+                          isScrolled 
+                            ? 'text-white hover:text-white/80' 
+                            : 'text-white hover:text-white/80'
+                        }`}
+                        data-testid={`link-mobile-${item.label.toLowerCase()}`}
+                      >
+                        {item.icon && <item.icon className="h-5 w-5 flex-shrink-0" />}
+                        <span className="text-base">{item.label}</span>
+                      </a>
                     ) : (
                       <Link href={item.href}>
                         <a
