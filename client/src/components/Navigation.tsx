@@ -12,6 +12,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isGroupsOpen, setIsGroupsOpen] = useState(false);
+  const [isMinistryOpen, setIsMinistryOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +35,15 @@ export default function Navigation({ className = '' }: NavigationProps) {
           setIsGroupsOpen(false);
         }
       }
+
+      // Close Ministry dropdown if clicking outside
+      if (isMinistryOpen) {
+        const ministryDropdown = target.closest('[data-ministry-dropdown]');
+        const ministryButton = target.closest('[data-ministry-button]');
+        if (!ministryDropdown && !ministryButton) {
+          setIsMinistryOpen(false);
+        }
+      }
       
       // Close mobile menu when clicking outside
       if (isMenuOpen) {
@@ -45,11 +55,11 @@ export default function Navigation({ className = '' }: NavigationProps) {
       }
     };
 
-    if (isGroupsOpen || isMenuOpen) {
+    if (isGroupsOpen || isMinistryOpen || isMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [isGroupsOpen, isMenuOpen]);
+  }, [isGroupsOpen, isMinistryOpen, isMenuOpen]);
 
   const navItems = [
     { label: 'Home', href: '/' },
@@ -57,7 +67,8 @@ export default function Navigation({ className = '' }: NavigationProps) {
     { label: 'Events', href: '/events' },
     { label: 'Blog', href: '/blog' },
     { label: 'Gallery/Live', href: '/gallery' },
-    { label: 'Groups', href: '#', hasDropdown: true },
+    { label: 'Groups', href: '#', hasDropdown: true, dropdownKey: 'groups' },
+    { label: 'Ministry', href: '#', hasDropdown: true, dropdownKey: 'ministry' },
     { label: 'Admin', href: '/admin/login', icon: LogIn } // Admin login link with icon
   ];
 
@@ -69,6 +80,14 @@ export default function Navigation({ className = '' }: NavigationProps) {
     { label: 'JY', href: '/groups/jy' },
     { label: 'CPC', href: '/groups/CPC' },
   ];
+
+  const ministryItems = [
+    { label: 'Leviate', href: '/ministry/Leviate' },
+    { label: 'Singing Band', href: '/ministry/Singing Band' },
+  ];
+
+  
+  
 
   return (
     <motion.nav
@@ -122,13 +141,29 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 {item.hasDropdown ? (
                   <div
                     className="relative"
-                    data-groups-dropdown
-                    onMouseEnter={() => setIsGroupsOpen(true)}
-                    onMouseLeave={() => setIsGroupsOpen(false)}
+                    data-groups-dropdown={item.dropdownKey === 'groups' ? true : undefined}
+                    data-ministry-dropdown={item.dropdownKey === 'ministry' ? true : undefined}
+                    onMouseEnter={() => {
+                      if (item.dropdownKey === 'groups') {
+                        setIsGroupsOpen(true);
+                        setIsMinistryOpen(false);
+                      } else {
+                        setIsMinistryOpen(true);
+                        setIsGroupsOpen(false);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (item.dropdownKey === 'groups') {
+                        setIsGroupsOpen(false);
+                      } else {
+                        setIsMinistryOpen(false);
+                      }
+                    }}
                   >
                     <button
-                      data-groups-button
-                      className={`transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2 rounded-lg ${
+                      data-groups-button={item.dropdownKey === 'groups' ? true : undefined}
+                      data-ministry-button={item.dropdownKey === 'ministry' ? true : undefined}
+                      className={`transition-all duration-300 font-medium text-sm flex items-center gap-2 px-3 py-2 rounded-lg ${
                         isScrolled 
                           ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
                           : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
@@ -136,25 +171,36 @@ export default function Navigation({ className = '' }: NavigationProps) {
                       data-testid={`link-nav-${item.label.toLowerCase()}`}
                     >
                       {item.label}
-                      <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isGroupsOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform duration-200 ${
+                          item.dropdownKey === 'groups' ? (isGroupsOpen ? 'rotate-180' : '') : (isMinistryOpen ? 'rotate-180' : '')
+                        }`}
+                      />
                     </button>
                     
                     {/* Dropdown Menu */}
                     <AnimatePresence>
-                      {isGroupsOpen && (
+                      {(item.dropdownKey === 'groups' ? isGroupsOpen : isMinistryOpen) && (
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2 }}
                           className="absolute top-full left-0 mt-2 w-48 bg-black/80 backdrop-blur-xl rounded-lg shadow-xl border border-white/20 py-2 z-50"
-                          data-groups-dropdown
+                          data-groups-dropdown={item.dropdownKey === 'groups' ? true : undefined}
+                          data-ministry-dropdown={item.dropdownKey === 'ministry' ? true : undefined}
                         >
-                          {groupsItems.map((groupItem, groupIndex) => (
+                          {(item.dropdownKey === 'groups' ? groupsItems : ministryItems).map((groupItem) => (
                             <Link key={groupItem.label} href={groupItem.href}>
                               <a
                                 className="block px-4 py-2 text-white hover:bg-white/10 transition-colors duration-200"
-                                onClick={() => setIsGroupsOpen(false)}
+                                onClick={() => {
+                                  if (item.dropdownKey === 'groups') {
+                                    setIsGroupsOpen(false);
+                                  } else {
+                                    setIsMinistryOpen(false);
+                                  }
+                                }}
                               >
                                 {groupItem.label}
                               </a>
@@ -167,7 +213,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 ) : (
                   <Link href={item.href}>
                     <a
-                      className={`transition-all duration-300 font-medium flex items-center gap-2 px-3 py-2 rounded-lg ${
+                      className={`transition-all duration-300 font-medium text-sm flex items-center gap-2 px-3 py-2 rounded-lg ${
                         isScrolled 
                           ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
                           : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
@@ -256,20 +302,32 @@ export default function Navigation({ className = '' }: NavigationProps) {
                     {item.hasDropdown ? (
                       <div>
                         <button
-                          className={`w-full text-left transition-colors duration-300 font-medium py-3 px-3 rounded-lg flex items-center justify-between hover:bg-white/10 ${
+                          className={`w-full text-left transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center justify-between hover:bg-white/10 ${
                             isScrolled 
                               ? 'text-white hover:text-white/80' 
                               : 'text-white hover:text-white/80'
                           }`}
-                          onClick={() => setIsGroupsOpen(!isGroupsOpen)}
+                          onClick={() => {
+                            if (item.dropdownKey === 'groups') {
+                              setIsGroupsOpen(!isGroupsOpen);
+                              setIsMinistryOpen(false);
+                            } else {
+                              setIsMinistryOpen(!isMinistryOpen);
+                              setIsGroupsOpen(false);
+                            }
+                          }}
                         >
                           <span className="text-base">{item.label}</span>
-                          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isGroupsOpen ? 'rotate-180' : ''}`} />
+                          <ChevronDown
+                            className={`h-4 w-4 transition-transform duration-200 ${
+                              item.dropdownKey === 'groups' ? (isGroupsOpen ? 'rotate-180' : '') : (isMinistryOpen ? 'rotate-180' : '')
+                            }`}
+                          />
                         </button>
                         
                         {/* Mobile Dropdown */}
                         <AnimatePresence>
-                          {isGroupsOpen && (
+                          {(item.dropdownKey === 'groups' ? isGroupsOpen : isMinistryOpen) && (
                             <motion.div
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
@@ -277,13 +335,17 @@ export default function Navigation({ className = '' }: NavigationProps) {
                               transition={{ duration: 0.2 }}
                               className="ml-4 mt-2 space-y-2 bg-black/60 backdrop-blur-sm rounded-lg p-2"
                             >
-                              {groupsItems.map((groupItem, groupIndex) => (
+                              {(item.dropdownKey === 'groups' ? groupsItems : ministryItems).map((groupItem) => (
                                 <Link key={groupItem.label} href={groupItem.href}>
                                   <a
                                     className="block py-2 px-3 text-white hover:text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
                                     onClick={() => {
                                       setIsMenuOpen(false);
-                                      setIsGroupsOpen(false);
+                                      if (item.dropdownKey === 'groups') {
+                                        setIsGroupsOpen(false);
+                                      } else {
+                                        setIsMinistryOpen(false);
+                                      }
                                     }}
                                   >
                                     {groupItem.label}
@@ -297,7 +359,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                     ) : (
                       <Link href={item.href}>
                         <a
-                          className={`block transition-colors duration-300 font-medium py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
+                          className={`block transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
                             isScrolled 
                               ? 'text-white hover:text-white/80' 
                               : 'text-white hover:text-white/80'

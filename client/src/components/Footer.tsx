@@ -90,7 +90,7 @@ export default function Footer({ className = '' }: FooterProps) {
         { text: 'JY', href: '/groups/jy' },
         { text: 'CPC', href: '/groups/CPC' },
       ]
-    }
+    },
   ];
 
   const socialLinks = [

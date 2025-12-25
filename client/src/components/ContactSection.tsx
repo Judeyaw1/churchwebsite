@@ -155,7 +155,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-white/80">9045 Maier Road, Laurel, MD</p>
+                      <p className="text-sm text-white/80">9045 Maier Road, Suite D,Laurel, MD</p>
                     </div>
                     <Button
                       variant="outline"
