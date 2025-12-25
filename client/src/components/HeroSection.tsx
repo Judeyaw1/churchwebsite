@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Calendar, MapPin, Clock, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { useState, useRef } from 'react';
-import heroImage from '@assets/generated_images/UBPC.MOV';
+import heroVideoMp4 from '@assets/generated_images/UBPC.mp4';
+import heroVideoMov from '@assets/generated_images/UBPC.MOV';
 
 interface HeroSectionProps {
   className?: string;
@@ -47,7 +48,8 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
             console.log('Video failed to load');
           }}
         >
-          <source src={heroImage} type="video/quicktime" />
+          <source src={heroVideoMp4} type="video/mp4" />
+          <source src={heroVideoMov} type="video/quicktime" />
         </video>
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/60" />
       </div>

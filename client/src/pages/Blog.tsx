@@ -124,7 +124,7 @@ export default function Blog() {
                           <img
                             src={post.image}
                             alt={post.title}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-contain bg-black transition-transform duration-300"
                           />
                         </div>
                       )}
@@ -185,7 +185,7 @@ export default function Blog() {
                       <img
                         src={selectedPost.image}
                         alt={selectedPost.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain bg-black"
                       />
                     </div>
                   )}
@@ -238,4 +238,3 @@ export default function Blog() {
     </div>
   );
 }
-

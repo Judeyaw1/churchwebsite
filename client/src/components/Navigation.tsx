@@ -82,7 +82,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
   ];
 
   const ministryItems = [
-    { label: 'Leviate', href: '/ministry/Leviate' },
+    { label: 'Levite', href: '/ministry/Leviste' },
     { label: 'Singing Band', href: '/ministry/Singing Band' },
   ];
 
