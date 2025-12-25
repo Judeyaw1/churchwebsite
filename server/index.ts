@@ -16,6 +16,9 @@ app.use(express.urlencoded({ extended: false }));
 // Register health check routes immediately to avoid Vite middleware interference
 app.get('/api/health', handleHealthRequest);
 app.get('/health', handleHealthRequest);
+app.get('/healthz', (_req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok' });
+});
 
 app.get('/api', (req: Request, res: Response) => {
   res.status(200).json({ 
