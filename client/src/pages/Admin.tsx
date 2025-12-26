@@ -23,7 +23,8 @@ import {
   Mail,
   Users,
   Crop,
-  BookOpen
+  BookOpen,
+  ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -549,6 +550,7 @@ export default function Admin() {
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [emailMessage, setEmailMessage] = useState('');
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [openGalleryCategories, setOpenGalleryCategories] = useState<Set<string>>(new Set());
 
   // OneDrive browse state
   const [oneDriveFiles, setOneDriveFiles] = useState<{ id: string; name: string; webUrl: string; size: number; mimeType?: string }[]>([]);
@@ -579,6 +581,24 @@ export default function Admin() {
     if (b === 'Uncategorized') return -1;
     return a.localeCompare(b);
   });
+
+  useEffect(() => {
+    if (orderedGalleryCategories.length > 0 && openGalleryCategories.size === 0) {
+      setOpenGalleryCategories(new Set(orderedGalleryCategories));
+    }
+  }, [orderedGalleryCategories, openGalleryCategories.size]);
+
+  const toggleGalleryCategory = (category: string) => {
+    setOpenGalleryCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -1425,79 +1445,93 @@ export default function Admin() {
                   <div className="space-y-8">
                     {orderedGalleryCategories.map((category) => (
                       <div key={category}>
-                        <div className="flex items-center justify-between mb-3">
-                          <h3 className="text-white text-lg font-semibold">{category}</h3>
+                        <button
+                          type="button"
+                          onClick={() => toggleGalleryCategory(category)}
+                          className="w-full flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-left text-white"
+                          aria-expanded={openGalleryCategories.has(category)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <ChevronDown
+                              className={`h-4 w-4 transition-transform ${
+                                openGalleryCategories.has(category) ? 'rotate-180' : ''
+                              }`}
+                            />
+                            <span className="text-lg font-semibold">{category}</span>
+                          </div>
                           <span className="text-white/60 text-sm">
                             {groupedGalleryImages[category].length} item{groupedGalleryImages[category].length === 1 ? '' : 's'}
                           </span>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {groupedGalleryImages[category].map((image) => (
-                            <Card key={image.id} className="bg-white/5 border-white/20 overflow-hidden relative">
-                              {/* Checkbox */}
-                              <div className="absolute top-2 left-2 z-10">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedItems.has(image.id)}
-                                  onChange={() => toggleItemSelection(image.id)}
-                                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                />
-                              </div>
-                              <div className="aspect-video bg-black/30 flex items-center justify-center p-2 relative overflow-hidden">
-                                <img 
-                                  src={image.url} 
-                                  alt={image.title}
-                                  className="w-full h-full object-cover rounded"
-                                  loading="lazy"
-                                  decoding="async"
-                                  onLoad={() => {
-                                    console.log('Image loaded successfully:', image.url);
-                                  }}
-                                  onError={(e) => {
-                                    console.error('Failed to load image:', image.url);
-                                    console.error('Image title:', image.title);
-                                    e.currentTarget.style.display = 'none';
-                                  }}
-                                />
-                                {/* Fallback placeholder */}
-                                <div className="absolute inset-0 flex items-center justify-center text-white/50 text-xs pointer-events-none opacity-50">
-                                  <FileImage className="h-6 w-6" />
-                                  <span className="ml-2 text-xs">{image.title}</span>
+                        </button>
+                        {openGalleryCategories.has(category) && (
+                          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {groupedGalleryImages[category].map((image) => (
+                              <Card key={image.id} className="bg-white/5 border-white/20 overflow-hidden relative">
+                                {/* Checkbox */}
+                                <div className="absolute top-2 left-2 z-10">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedItems.has(image.id)}
+                                    onChange={() => toggleItemSelection(image.id)}
+                                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                  />
                                 </div>
-                              </div>
-                              <CardContent className="p-4">
-                                <h3 className="text-white font-semibold mb-2">{image.title}</h3>
-                                <div className="flex justify-between items-center text-sm text-white/70 mb-3">
-                                  <span>📅 {image.date}</span>
-                                  <Badge className="bg-blue-100 text-blue-800">{image.category}</Badge>
-                                </div>
-                                <div className="flex gap-2">
-                                  <button 
-                                    onClick={(e) => {
-                                      console.log('Button clicked!', image.id);
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      alert('Edit button clicked for: ' + image.id);
-                                      handleEdit('gallery', image.id);
+                                <div className="aspect-video bg-black/30 flex items-center justify-center p-2 relative overflow-hidden">
+                                  <img 
+                                    src={image.url} 
+                                    alt={image.title}
+                                    className="w-full h-full object-cover rounded"
+                                    loading="lazy"
+                                    decoding="async"
+                                    onLoad={() => {
+                                      console.log('Image loaded successfully:', image.url);
                                     }}
-                                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium rounded-md px-3 py-1.5 text-xs border border-white/30 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/50 disabled:opacity-50 flex-1"
-                                  >
-                                    <Edit className="h-4 w-4 mr-1" />
-                                    Edit
-                                  </button>
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline" 
-                                    className="border-red-300 text-red-300 hover:bg-red-300/10"
-                                    onClick={() => handleDelete('gallery', image.id)}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
+                                    onError={(e) => {
+                                      console.error('Failed to load image:', image.url);
+                                      console.error('Image title:', image.title);
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                  />
+                                  {/* Fallback placeholder */}
+                                  <div className="absolute inset-0 flex items-center justify-center text-white/50 text-xs pointer-events-none opacity-50">
+                                    <FileImage className="h-6 w-6" />
+                                    <span className="ml-2 text-xs">{image.title}</span>
+                                  </div>
                                 </div>
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </div>
+                                <CardContent className="p-4">
+                                  <h3 className="text-white font-semibold mb-2">{image.title}</h3>
+                                  <div className="flex justify-between items-center text-sm text-white/70 mb-3">
+                                    <span>📅 {image.date}</span>
+                                    <Badge className="bg-blue-100 text-blue-800">{image.category}</Badge>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <button 
+                                      onClick={(e) => {
+                                        console.log('Button clicked!', image.id);
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        alert('Edit button clicked for: ' + image.id);
+                                        handleEdit('gallery', image.id);
+                                      }}
+                                      className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium rounded-md px-3 py-1.5 text-xs border border-white/30 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/50 disabled:opacity-50 flex-1"
+                                    >
+                                      <Edit className="h-4 w-4 mr-1" />
+                                      Edit
+                                    </button>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline" 
+                                      className="border-red-300 text-red-300 hover:bg-red-300/10"
+                                      onClick={() => handleDelete('gallery', image.id)}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

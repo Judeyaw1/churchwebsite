@@ -4,7 +4,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Camera, ExternalLink, Play } from "lucide-react";
+import { Camera, ExternalLink, Play, ChevronDown } from "lucide-react";
 import { fetchWithCache } from "@/lib/fetchWithCache";
 
 interface GalleryImage {
@@ -27,6 +27,7 @@ export default function Media() {
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [openGalleryCategory, setOpenGalleryCategory] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +49,27 @@ export default function Media() {
   }, []);
 
   const currentLive = liveStreams.find((s) => s.isLive) || liveStreams[0];
+  const groupedGalleryImages = galleryImages.reduce((acc, image) => {
+    const rawCategory = image.category?.trim();
+    const category = rawCategory && rawCategory.length > 0 ? rawCategory : "Uncategorized";
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(image);
+    return acc;
+  }, {} as Record<string, GalleryImage[]>);
+
+  const orderedGalleryCategories = Object.keys(groupedGalleryImages).sort((a, b) => {
+    if (a === "Uncategorized") return 1;
+    if (b === "Uncategorized") return -1;
+    return a.localeCompare(b);
+  });
+
+  useEffect(() => {
+    if (!openGalleryCategory && orderedGalleryCategories.length > 0) {
+      setOpenGalleryCategory(orderedGalleryCategories[0]);
+    }
+  }, [orderedGalleryCategories, openGalleryCategory]);
 
   return (
     <div className="min-h-screen bg-black">
@@ -129,44 +151,71 @@ export default function Media() {
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
               </div>
             ) : galleryImages.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {galleryImages.map((image) => (
-                  <Card key={image.id} className="bg-white/5 border-white/10 overflow-hidden">
-                    <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-2 overflow-hidden">
-                      <img
-                        src={image.url}
-                        alt={image.title}
-                        className="w-full h-full object-cover rounded"
-                        loading="lazy"
-                        decoding="async"
-                        onError={(e) => {
-                          console.error('Failed to load gallery image:', image.url, image.title);
-                          const target = e.currentTarget;
-                          target.style.display = 'none';
-                          // Show placeholder
-                          const parent = target.parentElement;
-                          if (parent) {
-                            parent.innerHTML = `
-                              <div class="flex flex-col items-center justify-center h-full text-white/50">
-                                <svg class="h-12 w-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <p class="text-xs">Image unavailable</p>
+              <div className="space-y-6">
+                {orderedGalleryCategories.map((category) => {
+                  const isOpen = openGalleryCategory === category;
+                  return (
+                    <div key={category} className="border border-white/10 rounded-xl bg-white/5">
+                      <button
+                        type="button"
+                        onClick={() => setOpenGalleryCategory(isOpen ? null : category)}
+                        className="w-full flex items-center justify-between px-4 sm:px-6 py-4 text-left text-white"
+                        aria-expanded={isOpen}
+                      >
+                        <div className="flex items-center gap-2">
+                          <ChevronDown
+                            className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                          />
+                          <span className="text-lg font-semibold">{category}</span>
+                        </div>
+                        <span className="text-sm text-white/60">
+                          {groupedGalleryImages[category].length} photo{groupedGalleryImages[category].length === 1 ? "" : "s"}
+                        </span>
+                      </button>
+
+                      {isOpen && (
+                        <div className="px-4 sm:px-6 pb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          {groupedGalleryImages[category].map((image) => (
+                            <Card key={image.id} className="bg-white/5 border-white/10 overflow-hidden">
+                              <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-2 overflow-hidden">
+                                <img
+                                  src={image.url}
+                                  alt={image.title}
+                                  className="w-full h-full object-cover rounded"
+                                  loading="lazy"
+                                  decoding="async"
+                                  onError={(e) => {
+                                    console.error('Failed to load gallery image:', image.url, image.title);
+                                    const target = e.currentTarget;
+                                    target.style.display = 'none';
+                                    const parent = target.parentElement;
+                                    if (parent) {
+                                      parent.innerHTML = `
+                                        <div class="flex flex-col items-center justify-center h-full text-white/50">
+                                          <svg class="h-12 w-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                          </svg>
+                                          <p class="text-xs">Image unavailable</p>
+                                        </div>
+                                      `;
+                                    }
+                                  }}
+                                />
                               </div>
-                            `;
-                          }
-                        }}
-                      />
+                              <CardContent className="p-3">
+                                <h3 className="text-white font-semibold text-sm mb-1">{image.title}</h3>
+                                <div className="flex justify-between text-xs text-white/60">
+                                  <span>{image.date}</span>
+                                  <span>{image.category}</span>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <CardContent className="p-3">
-                      <h3 className="text-white font-semibold text-sm mb-1">{image.title}</h3>
-                      <div className="flex justify-between text-xs text-white/60">
-                        <span>{image.date}</span>
-                        <span>{image.category}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="aspect-[4/3] bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
