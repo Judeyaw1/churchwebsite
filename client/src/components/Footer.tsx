@@ -59,7 +59,7 @@ export default function Footer({ className = '' }: FooterProps) {
         { icon: MapPin, text: '9045 Maier Road' },
         { text: 'Suite D,Laurel, MD 20723' },
         { icon: Phone, text: '(301)-339-3258' },
-        { icon: Mail, text: '', href: '' }
+        { icon: Mail, text: 'Pastor@unitedbethelpresby.com', href: 'mailto:Pastor@unitedbethelpresby.com' }
       ]
     },
     {
@@ -145,18 +145,18 @@ export default function Footer({ className = '' }: FooterProps) {
               <h4 className="font-semibold text-lg mb-4 text-white">{section.title}</h4>
               <ul className="space-y-2">
                 {section.items.map((item, index) => (
-                  <li key={index} className="flex items-center text-white/80">
+                  <li key={index} className="flex items-start gap-2 text-white/80">
                     {'icon' in item && item.icon && <item.icon className="h-4 w-4 mr-2 flex-shrink-0" />}
                     {'href' in item && item.href ? (
                       <a
                         href={item.href}
-                        className="hover:text-white transition-colors duration-200"
+                        className="hover:text-white transition-colors duration-200 break-all leading-relaxed"
                         data-testid={`link-footer-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
                       >
                         {item.text}
                       </a>
                     ) : (
-                      <span>{item.text}</span>
+                      <span className="break-words leading-relaxed">{item.text}</span>
                     )}
                   </li>
                 ))}

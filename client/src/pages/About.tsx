@@ -137,7 +137,7 @@ export default function About() {
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                   <div className="flex items-center mb-4">
                     <Target className="h-6 w-6 text-white mr-3" />
-                    <h3 className="text-xl font-semibold text-white">Our Mission</h3>
+                    <h3 className="text-xl font-serif font-semibold text-white">Our Mission</h3>
                   </div>
                   <p className="text-white/80 leading-relaxed">
                     To glorify God by making disciples of Jesus Christ through worship, 
@@ -149,7 +149,7 @@ export default function About() {
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                   <div className="flex items-center mb-4">
                     <Lightbulb className="h-6 w-6 text-white mr-3" />
-                    <h3 className="text-xl font-semibold text-white">Our Vision</h3>
+                    <h3 className="text-xl font-serif font-semibold text-white">Our Vision</h3>
                   </div>
                   <p className="text-white/80 leading-relaxed">
                     To be a thriving Presbyterian community where all people can grow in 
@@ -228,7 +228,7 @@ export default function About() {
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                   <div className="flex items-center mb-4">
                     <Calendar className="h-6 w-6 text-white mr-3" />
-                    <h3 className="text-xl font-semibold text-white">Founded in 1995</h3>
+                    <h3 className="text-xl font-serif font-semibold text-white">Founded in 1995</h3>
                   </div>
                   <p className="text-white/80 leading-relaxed">
                     United Bethel Presbyterian Church was established by a small group of 
@@ -240,7 +240,7 @@ export default function About() {
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                   <div className="flex items-center mb-4">
                     <Award className="h-6 w-6 text-white mr-3" />
-                    <h3 className="text-xl font-semibold text-white">30 Years of Service</h3>
+                    <h3 className="text-xl font-serif font-semibold text-white">30 Years of Service</h3>
                   </div>
                   <p className="text-white/80 leading-relaxed">
                     Over the past three decades, we have grown from a small congregation 
@@ -252,7 +252,7 @@ export default function About() {
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                   <div className="flex items-center mb-4">
                     <Users className="h-6 w-6 text-white mr-3" />
-                    <h3 className="text-xl font-semibold text-white">Growing Community</h3>
+                    <h3 className="text-xl font-serif font-semibold text-white">Growing Community</h3>
                   </div>
                   <p className="text-white/80 leading-relaxed">
                     Today, we are blessed with over 150 members and continue to welcome 
@@ -297,7 +297,7 @@ export default function About() {
                     <div className="bg-white/10 p-3 rounded-lg mr-4 group-hover:bg-white/20 transition-colors duration-300">
                       <value.icon className="h-6 w-6 text-white" />
                     </div>
-                    <h3 className="text-xl font-semibold text-white">{value.title}</h3>
+                    <h3 className="text-xl font-serif font-semibold text-white">{value.title}</h3>
                   </div>
                   <p className="text-white/80 leading-relaxed">
                     {value.description}
@@ -345,7 +345,7 @@ export default function About() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold text-white mb-2">{leader.name}</h3>
+                    <h3 className="text-xl font-serif font-semibold text-white mb-2">{leader.name}</h3>
                     <p className="text-white/70 font-medium mb-3">{leader.position}</p>
                     <p className="text-white/80 text-sm leading-relaxed mb-4">{leader.bio}</p>
                     <div className="space-y-2">
@@ -379,17 +379,17 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white/5 rounded-lg p-8 text-center border border-white/10">
               <Clock className="h-8 w-8 text-white mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">Sunday Services</h3>
+              <h3 className="text-xl font-serif font-semibold text-white mb-2">Sunday Services</h3>
               <p className="text-white/80">9:00 AM & 11:00 AM</p>
             </div>
             <div className="bg-white/5 rounded-lg p-8 text-center border border-white/10">
               <Calendar className="h-8 w-8 text-white mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">Bible Study</h3>
+              <h3 className="text-xl font-serif font-semibold text-white mb-2">Bible Study</h3>
               <p className="text-white/80">Wednesdays 7:00 PM</p>
             </div>
             <div className="bg-white/5 rounded-lg p-8 text-center border border-white/10">
               <MapPin className="h-8 w-8 text-white mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2">Location</h3>
+              <h3 className="text-xl font-serif font-semibold text-white mb-2">Location</h3>
               <p className="text-white/80">9045 Maier Rd<br />Laurel, MD 20723</p>
             </div>
           </div>
