@@ -33,6 +33,15 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
     }
   };
 
+  const handleGetInTouch = () => {
+    const target = document.getElementById('contact');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    window.location.href = '/#contact';
+  };
+
   return (
     <section className={`relative min-h-screen flex items-center justify-center overflow-hidden ${className}`}>
       {/* Background Video */}
@@ -147,7 +156,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
             size="lg"
             className="bg-white hover:bg-black/90 hover:text-white text-black font-semibold px-6 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto"
             data-testid="button-plan-visit"
-            onClick={() => console.log('Plan Your Visit clicked')}
+            onClick={handleGetInTouch}
           >
             Get In Touch
           </Button>

@@ -15,6 +15,7 @@ import Unsubscribe from "@/pages/Unsubscribe";
 import NotFound from "@/pages/not-found";
 import Maintenance from "@/pages/Maintenance";
 import Media from "@/pages/Media";
+import WomensFellowship from "@/pages/WomensFellowship";
 
 // Set to false when maintenance is complete
 const MAINTENANCE_MODE = false;
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={Admin} />
       <Route path="/unsubscribe" component={Unsubscribe} />
+      <Route path="/groups/womens-fellowship" component={WomensFellowship} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
