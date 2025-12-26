@@ -62,15 +62,20 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
   // Convert YouTube URL to embed format
   const convertYouTubeUrl = (url: string) => {
     try {
+      const withMute = (embedUrl: string) => {
+        const joiner = embedUrl.includes('?') ? '&' : '?';
+        return embedUrl.includes('mute=') ? embedUrl : `${embedUrl}${joiner}mute=1`;
+      };
+
       // If already in embed format, return as is
       if (url.includes('youtube.com/embed/')) {
-        return url;
+        return withMute(url);
       }
       
       // Handle youtu.be short URLs
       if (url.includes('youtu.be/')) {
         const videoId = url.split('youtu.be/')[1].split('?')[0];
-        return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        return withMute(`https://www.youtube.com/embed/${videoId}?autoplay=1`);
       }
       
       // Handle youtube.com/watch?v= format
@@ -81,16 +86,16 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
         } else if (url.includes('/')) {
           videoId = url.split('/').pop()?.split('?')[0] || '';
         }
-        return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        return withMute(`https://www.youtube.com/embed/${videoId}?autoplay=1`);
       }
       
       // If URL doesn't match any pattern, try to extract video ID from the end
       const possibleVideoId = url.split('/').pop()?.split('?')[0];
       if (possibleVideoId && possibleVideoId.length > 8) {
-        return `https://www.youtube.com/embed/${possibleVideoId}?autoplay=1`;
+        return withMute(`https://www.youtube.com/embed/${possibleVideoId}?autoplay=1`);
       }
       
-      return url;
+      return withMute(url);
     } catch (error) {
       console.error('Error converting YouTube URL:', error);
       return url;

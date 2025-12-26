@@ -564,6 +564,22 @@ export default function Admin() {
     { id: 'blog', label: 'Blog', icon: BookOpen }
   ];
 
+  const groupedGalleryImages = galleryImages.reduce((acc, image) => {
+    const rawCategory = image.category?.trim();
+    const category = rawCategory && rawCategory.length > 0 ? rawCategory : 'Uncategorized';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(image);
+    return acc;
+  }, {} as Record<string, GalleryImage[]>);
+
+  const orderedGalleryCategories = Object.keys(groupedGalleryImages).sort((a, b) => {
+    if (a === 'Uncategorized') return 1;
+    if (b === 'Uncategorized') return -1;
+    return a.localeCompare(b);
+  });
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high': return 'bg-red-100 text-red-800';
@@ -1403,73 +1419,89 @@ export default function Admin() {
                     )}
                   </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {galleryImages.map((image) => (
-                    <Card key={image.id} className="bg-white/5 border-white/20 overflow-hidden relative">
-                      {/* Checkbox */}
-                      <div className="absolute top-2 left-2 z-10">
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.has(image.id)}
-                          onChange={() => toggleItemSelection(image.id)}
-                          className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div className="aspect-video bg-black/30 flex items-center justify-center p-2 relative overflow-hidden">
-                        <img 
-                          src={image.url} 
-                          alt={image.title}
-                          className="w-full h-full object-cover rounded"
-                          loading="lazy"
-                          decoding="async"
-                          onLoad={() => {
-                            console.log('Image loaded successfully:', image.url);
-                          }}
-                          onError={(e) => {
-                            console.error('Failed to load image:', image.url);
-                            console.error('Image title:', image.title);
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                        {/* Fallback placeholder */}
-                        <div className="absolute inset-0 flex items-center justify-center text-white/50 text-xs pointer-events-none opacity-50">
-                          <FileImage className="h-6 w-6" />
-                          <span className="ml-2 text-xs">{image.title}</span>
+                {orderedGalleryCategories.length === 0 ? (
+                  <div className="text-white/70">No gallery images yet.</div>
+                ) : (
+                  <div className="space-y-8">
+                    {orderedGalleryCategories.map((category) => (
+                      <div key={category}>
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-white text-lg font-semibold">{category}</h3>
+                          <span className="text-white/60 text-sm">
+                            {groupedGalleryImages[category].length} item{groupedGalleryImages[category].length === 1 ? '' : 's'}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {groupedGalleryImages[category].map((image) => (
+                            <Card key={image.id} className="bg-white/5 border-white/20 overflow-hidden relative">
+                              {/* Checkbox */}
+                              <div className="absolute top-2 left-2 z-10">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedItems.has(image.id)}
+                                  onChange={() => toggleItemSelection(image.id)}
+                                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                              </div>
+                              <div className="aspect-video bg-black/30 flex items-center justify-center p-2 relative overflow-hidden">
+                                <img 
+                                  src={image.url} 
+                                  alt={image.title}
+                                  className="w-full h-full object-cover rounded"
+                                  loading="lazy"
+                                  decoding="async"
+                                  onLoad={() => {
+                                    console.log('Image loaded successfully:', image.url);
+                                  }}
+                                  onError={(e) => {
+                                    console.error('Failed to load image:', image.url);
+                                    console.error('Image title:', image.title);
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                                {/* Fallback placeholder */}
+                                <div className="absolute inset-0 flex items-center justify-center text-white/50 text-xs pointer-events-none opacity-50">
+                                  <FileImage className="h-6 w-6" />
+                                  <span className="ml-2 text-xs">{image.title}</span>
+                                </div>
+                              </div>
+                              <CardContent className="p-4">
+                                <h3 className="text-white font-semibold mb-2">{image.title}</h3>
+                                <div className="flex justify-between items-center text-sm text-white/70 mb-3">
+                                  <span>📅 {image.date}</span>
+                                  <Badge className="bg-blue-100 text-blue-800">{image.category}</Badge>
+                                </div>
+                                <div className="flex gap-2">
+                                  <button 
+                                    onClick={(e) => {
+                                      console.log('Button clicked!', image.id);
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      alert('Edit button clicked for: ' + image.id);
+                                      handleEdit('gallery', image.id);
+                                    }}
+                                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium rounded-md px-3 py-1.5 text-xs border border-white/30 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/50 disabled:opacity-50 flex-1"
+                                  >
+                                    <Edit className="h-4 w-4 mr-1" />
+                                    Edit
+                                  </button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline" 
+                                    className="border-red-300 text-red-300 hover:bg-red-300/10"
+                                    onClick={() => handleDelete('gallery', image.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
                         </div>
                       </div>
-                      <CardContent className="p-4">
-                        <h3 className="text-white font-semibold mb-2">{image.title}</h3>
-                        <div className="flex justify-between items-center text-sm text-white/70 mb-3">
-                          <span>📅 {image.date}</span>
-                          <Badge className="bg-blue-100 text-blue-800">{image.category}</Badge>
-                        </div>
-                        <div className="flex gap-2">
-                          <button 
-                            onClick={(e) => {
-                              console.log('Button clicked!', image.id);
-                              e.preventDefault();
-                              e.stopPropagation();
-                              alert('Edit button clicked for: ' + image.id);
-                              handleEdit('gallery', image.id);
-                            }}
-                            className="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium rounded-md px-3 py-1.5 text-xs border border-white/30 text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/50 disabled:opacity-50 flex-1"
-                          >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
-                          </button>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="border-red-300 text-red-300 hover:bg-red-300/10"
-                            onClick={() => handleDelete('gallery', image.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
                 </>
               )}
 
