@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send, MessageCircle, Calendar } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, MessageCircle, Calendar, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -293,6 +293,25 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                   </div>
 
                   {/* Submit Button */}
+                  {formStatus !== 'idle' && (
+                    <div
+                      className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm ${
+                        formStatus === 'success'
+                          ? 'bg-green-500/10 text-green-200 border border-green-500/30'
+                          : 'bg-red-500/10 text-red-200 border border-red-500/30'
+                      }`}
+                      role="status"
+                      aria-live="polite"
+                    >
+                      {formStatus === 'success' ? (
+                        <CheckCircle className="h-4 w-4" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4" />
+                      )}
+                      <span>{formMessage}</span>
+                    </div>
+                  )}
+
                   <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
                     <p className="text-sm text-white/80">
                       We typically respond within 24 hours.
@@ -309,11 +328,6 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                     </Button>
                   </div>
 
-                  {formStatus !== 'idle' && (
-                    <div className={`text-sm ${formStatus === 'success' ? 'text-green-300' : 'text-red-300'}`}>
-                      {formMessage}
-                    </div>
-                  )}
                 </form>
 
                 {/* Quick Actions */}
