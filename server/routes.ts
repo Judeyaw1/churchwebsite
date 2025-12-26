@@ -124,6 +124,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ===== PUBLIC API ROUTES (for website components) =====
 
+  // Contact form submission
+  app.post('/api/contact', async (req, res) => {
+    try {
+      const { name, email, phone, subject, message } = req.body || {};
+
+      if (!name || !email || !subject || !message) {
+        return res.status(400).json({ message: 'Name, email, subject, and message are required' });
+      }
+
+      if (!email.includes('@')) {
+        return res.status(400).json({ message: 'Valid email address is required' });
+      }
+
+      const { emailService } = await import('./emailService.js');
+      await emailService.sendContactFormEmail({
+        name,
+        email,
+        phone,
+        subject,
+        message
+      });
+
+      res.json({ message: 'Message sent successfully' });
+    } catch (error) {
+      console.error('Contact form error:', error);
+      res.status(500).json({ message: 'Failed to send message' });
+    }
+  });
+
   // Events - Public routes
   app.get('/api/events', async (req, res) => {
     try {

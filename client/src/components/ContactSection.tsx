@@ -24,6 +24,9 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
     subject: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStatus, setFormStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [formMessage, setFormMessage] = useState('');
 
   const contactInfo = [
     {
@@ -56,12 +59,35 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // TODO: Remove mock functionality - implement real form submission
-    alert('Thank you for your message! We\'ll get back to you soon.');
-    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+    setIsSubmitting(true);
+    setFormStatus('idle');
+    setFormMessage('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'Failed to send message');
+      }
+
+      setFormStatus('success');
+      setFormMessage('Thank you for your message! We\'ll get back to you soon.');
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+    } catch (error) {
+      setFormStatus('error');
+      setFormMessage('We could not send your message. Please try again.');
+      console.error('Contact form error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -276,11 +302,18 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
                       size="lg"
                       className="bg-black hover:bg-black/90 w-full sm:w-auto"
                       data-testid="button-send-message"
+                      disabled={isSubmitting}
                     >
                       <Send className="h-4 w-4 mr-2" />
-                      Send Message
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
                     </Button>
                   </div>
+
+                  {formStatus !== 'idle' && (
+                    <div className={`text-sm ${formStatus === 'success' ? 'text-green-300' : 'text-red-300'}`}>
+                      {formMessage}
+                    </div>
+                  )}
                 </form>
 
                 {/* Quick Actions */}

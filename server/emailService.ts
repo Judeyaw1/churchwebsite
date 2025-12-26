@@ -1,4 +1,5 @@
 import sgMail from '@sendgrid/mail';
+import nodemailer from 'nodemailer';
 import { type Subscriber, type Message } from '@shared/schema';
 
 // Initialize SendGrid
@@ -14,19 +15,46 @@ export interface EmailTemplate {
 
 export class EmailService {
   private fromEmail: string;
-  private adminEmail: string;
+  private adminEmails: string[];
+  private smtpTransporter: nodemailer.Transporter | null;
 
   constructor() {
-    this.fromEmail = process.env.FROM_EMAIL || 'noreply@gracecommunity.org';
-    this.adminEmail = process.env.ADMIN_EMAIL || 'admin@gracecommunity.org';
+    this.fromEmail = process.env.FROM_EMAIL || process.env.SMTP_FROM || 'noreply@gracecommunity.org';
+    const adminEmails = process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || 'admin@gracecommunity.org';
+    this.adminEmails = adminEmails
+      .split(',')
+      .map((email) => email.trim())
+      .filter((email) => email.length > 0);
+
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    const smtpPort = Number(process.env.SMTP_PORT || 465);
+    const smtpSecure = process.env.SMTP_SECURE
+      ? process.env.SMTP_SECURE === 'true'
+      : smtpPort === 465;
+
+    if (smtpHost && smtpUser && smtpPass) {
+      this.smtpTransporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpSecure,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      });
+    } else {
+      this.smtpTransporter = null;
+    }
   }
 
   /**
    * Send a message to all active subscribers
    */
   async sendMessageToSubscribers(message: Message, subscribers: Subscriber[]): Promise<{ success: number; failed: number }> {
-    if (!process.env.SENDGRID_API_KEY) {
-      throw new Error('SendGrid API key not configured');
+    if (!this.smtpTransporter && !process.env.SENDGRID_API_KEY) {
+      throw new Error('Email provider not configured');
     }
 
     const template = this.createMessageTemplate(message);
@@ -70,8 +98,8 @@ export class EmailService {
    * Send welcome email to new subscriber
    */
   async sendWelcomeEmail(subscriber: Subscriber): Promise<boolean> {
-    if (!process.env.SENDGRID_API_KEY) {
-      throw new Error('SendGrid API key not configured');
+    if (!this.smtpTransporter && !process.env.SENDGRID_API_KEY) {
+      throw new Error('Email provider not configured');
     }
 
     const template = this.createWelcomeTemplate(subscriber);
@@ -100,15 +128,15 @@ export class EmailService {
     subject: string;
     message: string;
   }): Promise<boolean> {
-    if (!process.env.SENDGRID_API_KEY) {
-      throw new Error('SendGrid API key not configured');
+    if (!this.smtpTransporter && !process.env.SENDGRID_API_KEY) {
+      throw new Error('Email provider not configured');
     }
 
     const template = this.createContactFormTemplate(formData);
 
     try {
       await this.sendEmail({
-        to: this.adminEmail,
+        to: this.adminEmails,
         subject: template.subject,
         html: template.html,
         text: template.text,
@@ -152,7 +180,7 @@ export class EmailService {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Grace Community Church</h1>
+            <h1>United Bethel Presbyterian Church</h1>
             <p>Important Announcement</p>
           </div>
           
@@ -171,9 +199,9 @@ export class EmailService {
           </div>
           
           <div class="footer">
-            <p>Grace Community Church<br>
-            123 Community Drive, Springfield, ST 12345<br>
-            Phone: (555) 123-4567</p>
+            <p>United Bethel Presbyterian Church<br>
+            9045 Maier Rd Suite D, Laurel, MD 20723<br>
+            Phone: (301) 339-3258</p>
             
             <div class="unsubscribe">
               <p><a href="${process.env.BASE_URL || 'http://localhost:5000'}/unsubscribe?email={{email}}">Unsubscribe from our newsletter</a></p>
@@ -185,7 +213,7 @@ export class EmailService {
     `;
 
     const text = `
-Grace Community Church - Important Announcement
+United Bethel Presbyterian Church - Important Announcement
 
 ${message.priority.toUpperCase()} PRIORITY: ${message.title}
 
@@ -194,15 +222,15 @@ ${message.content}
 Date: ${message.date}
 
 ---
-Grace Community Church
-123 Community Drive, Springfield, ST 12345
-Phone: (555) 123-4567
+United Bethel Presbyterian Church
+9045 Maier Rd Suite D, Laurel, MD 20723
+Phone: (301) 339-3258
 
 To unsubscribe, visit: ${process.env.BASE_URL || 'http://localhost:5000'}/unsubscribe?email={{email}}
     `;
 
     return {
-      subject: `[${message.priority.toUpperCase()}] ${message.title} - Grace Community Church`,
+      subject: `[${message.priority.toUpperCase()}] ${message.title} - United Bethel Presbyterian Church`,
       html,
       text
     };
@@ -218,7 +246,7 @@ To unsubscribe, visit: ${process.env.BASE_URL || 'http://localhost:5000'}/unsubs
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to Grace Community Church</title>
+        <title>Welcome to United Bethel Presbyterian Church</title>
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -230,7 +258,7 @@ To unsubscribe, visit: ${process.env.BASE_URL || 'http://localhost:5000'}/unsubs
       <body>
         <div class="container">
           <div class="header">
-            <h1>Welcome to Grace Community Church!</h1>
+            <h1>Welcome to United Bethel Presbyterian Church!</h1>
           </div>
           
           <div class="content">
@@ -238,7 +266,7 @@ To unsubscribe, visit: ${process.env.BASE_URL || 'http://localhost:5000'}/unsubs
             
             <p>Dear ${subscriber.name || 'Friend'},</p>
             
-            <p>Welcome to the Grace Community Church family! We're excited to have you join our community and stay connected with us.</p>
+            <p>Welcome to the United Bethel Presbyterian Church family! We're excited to have you join our community and stay connected with us.</p>
             
             <p>You'll now receive:</p>
             <ul>
@@ -251,13 +279,13 @@ To unsubscribe, visit: ${process.env.BASE_URL || 'http://localhost:5000'}/unsubs
             <p>We look forward to sharing our journey of faith with you!</p>
             
             <p>Blessings,<br>
-            The Grace Community Church Team</p>
+            The United Bethel Presbyterian Church Team</p>
           </div>
           
           <div class="footer">
-            <p>Grace Community Church<br>
-            123 Community Drive, Springfield, ST 12345<br>
-            Phone: (555) 123-4567</p>
+            <p>United Bethel Presbyterian Church<br>
+            9045 Maier Rd Suite D, Laurel, MD 20723<br>
+            Phone: (301) 339-3258</p>
           </div>
         </div>
       </body>
@@ -265,11 +293,11 @@ To unsubscribe, visit: ${process.env.BASE_URL || 'http://localhost:5000'}/unsubs
     `;
 
     const text = `
-Welcome to Grace Community Church!
+Welcome to United Bethel Presbyterian Church!
 
 Dear ${subscriber.name || 'Friend'},
 
-Welcome to the Grace Community Church family! We're excited to have you join our community and stay connected with us.
+Welcome to the United Bethel Presbyterian Church family! We're excited to have you join our community and stay connected with us.
 
 You'll now receive:
 - Weekly announcements and updates
@@ -280,16 +308,16 @@ You'll now receive:
 We look forward to sharing our journey of faith with you!
 
 Blessings,
-The Grace Community Church Team
+The United Bethel Presbyterian Church Team
 
 ---
-Grace Community Church
-123 Community Drive, Springfield, ST 12345
-Phone: (555) 123-4567
+United Bethel Presbyterian Church
+9045 Maier Rd Suite D, Laurel, MD 20723
+Phone: (301) 339-3258
     `;
 
     return {
-      subject: 'Welcome to Grace Community Church!',
+      subject: 'Welcome to United Bethel Presbyterian Church!',
       html,
       text
     };
@@ -398,7 +426,7 @@ ${formData.message}
   private getUnsubscribeFooter(email: string): string {
     return `
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; text-align: center;">
-        <p>You received this email because you subscribed to Grace Community Church updates.</p>
+        <p>You received this email because you subscribed to United Bethel Presbyterian Church updates.</p>
         <p><a href="${process.env.BASE_URL || 'http://localhost:5000'}/unsubscribe?email=${email}" style="color: #666;">Unsubscribe</a></p>
       </div>
     `;
@@ -408,20 +436,32 @@ ${formData.message}
    * Send email using SendGrid
    */
   private async sendEmail(emailData: {
-    to: string;
+    to: string | string[];
     subject: string;
     html: string;
     text: string;
     replyTo?: string;
     htmlContent?: string;
   }): Promise<void> {
+    if (this.smtpTransporter) {
+      await this.smtpTransporter.sendMail({
+        to: emailData.to,
+        from: this.fromEmail,
+        subject: emailData.subject,
+        text: emailData.text,
+        html: emailData.htmlContent || emailData.html,
+        replyTo: emailData.replyTo,
+      });
+      return;
+    }
+
     const msg = {
       to: emailData.to,
       from: this.fromEmail,
       subject: emailData.subject,
       text: emailData.text,
       html: emailData.htmlContent || emailData.html,
-      replyTo: emailData.replyTo
+      replyTo: emailData.replyTo,
     };
 
     await sgMail.send(msg);
