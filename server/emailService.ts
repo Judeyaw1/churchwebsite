@@ -39,6 +39,8 @@ export class EmailService {
         host: smtpHost,
         port: smtpPort,
         secure: smtpSecure,
+        logger: process.env.DEBUG_SMTP === 'true',
+        debug: process.env.DEBUG_SMTP === 'true',
         auth: {
           user: smtpUser,
           pass: smtpPass,
