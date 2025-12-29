@@ -550,6 +550,7 @@ export default function Admin() {
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [emailMessage, setEmailMessage] = useState('');
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [messageTarget, setMessageTarget] = useState<'announcements' | 'subscribers'>('announcements');
   const [openGalleryCategories, setOpenGalleryCategories] = useState<Set<string>>(new Set());
 
   // OneDrive browse state
@@ -743,6 +744,7 @@ export default function Admin() {
     setStreamForm({ title: '', url: '', schedule: '', isLive: false });
     setGalleryForm({ title: '', url: '', date: '', category: 'Worship' });
     setMessageForm({ title: '', content: '', date: '', priority: 'medium' });
+    setMessageTarget('announcements');
     setBlogForm({ title: '', content: '', author: '', image: '', excerpt: '', isPublished: true });
     // Reset file upload states
     setSelectedFiles([]);
@@ -783,7 +785,10 @@ export default function Admin() {
       case 'messages':
         const message = messages.find(m => m.id === id);
         console.log('Found message:', message);
-        if (message) setMessageForm(message);
+        if (message) {
+          setMessageForm(message);
+          setMessageTarget('announcements');
+        }
         break;
       case 'blog':
         const blogPost = blogPosts.find(b => b.id === id);
@@ -899,6 +904,19 @@ export default function Admin() {
             }
             break;
           case 'messages':
+            if (messageTarget === 'subscribers') {
+              if (!messageForm.title || !messageForm.content || !messageForm.date) {
+                alert('Please fill in all required fields: Title, Content, and Date');
+                setEditStatus('idle');
+                return;
+              }
+              await handleSendDirectMessage();
+              setShowForm(false);
+              setIsAddingNew(false);
+              setEditingItem(null);
+              setHasUnsavedChanges(false);
+              return;
+            }
             endpoint = '/api/admin/messages';
             data = messageForm;
             break;
@@ -1080,6 +1098,40 @@ export default function Admin() {
       if (response.ok) {
         setEmailStatus('success');
         setEmailMessage(`Message sent successfully! Sent to ${data.sent} subscribers. ${data.failed > 0 ? `${data.failed} failed.` : ''}`);
+      } else {
+        setEmailStatus('error');
+        setEmailMessage(data.message || 'Failed to send message');
+      }
+    } catch (error) {
+      setEmailStatus('error');
+      setEmailMessage('Network error. Please try again.');
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
+  const handleSendDirectMessage = async () => {
+    setIsSendingEmail(true);
+    setEmailStatus('sending');
+    setEmailMessage('');
+
+    try {
+      const token = localStorage.getItem('adminToken') || '';
+      const response = await fetch('/api/admin/send-message-direct', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(messageForm)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setEmailStatus('success');
+        setEmailMessage(`Message sent successfully! Sent to ${data.sent} subscribers. ${data.failed > 0 ? `${data.failed} failed.` : ''}`);
+        setMessageForm({ title: '', content: '', date: '', priority: 'medium' });
       } else {
         setEmailStatus('error');
         setEmailMessage(data.message || 'Failed to send message');
@@ -2140,6 +2192,21 @@ export default function Admin() {
               {/* Messages Form */}
               {activeTab === 'messages' && (
                 <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Send To</label>
+                    <select
+                      value={messageTarget}
+                      onChange={(e) => setMessageTarget(e.target.value as 'announcements' | 'subscribers')}
+                      className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      disabled={!!editingItem}
+                    >
+                      <option value="announcements">Announcements (Public)</option>
+                      <option value="subscribers">Subscribers (Email)</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Subscriber messages are emailed and will not appear on the announcements page.
+                    </p>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
                     <Input

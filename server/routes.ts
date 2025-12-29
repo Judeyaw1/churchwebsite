@@ -871,6 +871,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Send message directly to all subscribers without creating an announcement
+  app.post('/api/admin/send-message-direct', requireAuth, async (req, res) => {
+    try {
+      const parseResult = insertMessageSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ message: 'Invalid message data', issues: parseResult.error.flatten() });
+      }
+
+      const subscribers = await storage.getActiveSubscribers();
+      if (subscribers.length === 0) {
+        return res.status(400).json({ message: 'No active subscribers found' });
+      }
+
+      const messageData = parseResult.data;
+      const message = {
+        id: 'direct',
+        ...messageData,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const { emailService } = await import('./emailService.js');
+      const result = await emailService.sendMessageToSubscribers(message, subscribers);
+      res.json({ message: 'Message sent successfully', sent: result.success, failed: result.failed });
+    } catch (error) {
+      console.error('Send direct message error:', error);
+      res.status(500).json({ message: 'Failed to send message' });
+    }
+  });
+
   // Get subscribers (Admin only)
   app.get('/api/admin/subscribers', requireAuth, async (req, res) => {
     try {
