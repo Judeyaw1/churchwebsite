@@ -13,6 +13,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isGroupsOpen, setIsGroupsOpen] = useState(false);
   const [isMinistryOpen, setIsMinistryOpen] = useState(false);
+  const [isBlogOpen, setIsBlogOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,6 +45,14 @@ export default function Navigation({ className = '' }: NavigationProps) {
           setIsMinistryOpen(false);
         }
       }
+
+      if (isBlogOpen) {
+        const blogDropdown = target.closest('[data-blog-dropdown]');
+        const blogButton = target.closest('[data-blog-button]');
+        if (!blogDropdown && !blogButton) {
+          setIsBlogOpen(false);
+        }
+      }
       
       // Close mobile menu when clicking outside
       if (isMenuOpen) {
@@ -55,17 +64,17 @@ export default function Navigation({ className = '' }: NavigationProps) {
       }
     };
 
-    if (isGroupsOpen || isMinistryOpen || isMenuOpen) {
+    if (isGroupsOpen || isMinistryOpen || isBlogOpen || isMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [isGroupsOpen, isMinistryOpen, isMenuOpen]);
+  }, [isGroupsOpen, isMinistryOpen, isBlogOpen, isMenuOpen]);
 
   const navItems = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
     { label: 'Events', href: '/events' },
-    { label: 'Blog', href: '/blog' },
+    { label: 'Blog', href: '#', hasDropdown: true, dropdownKey: 'blog' },
     { label: 'Gallery/Live', href: '/gallery' },
     { label: 'Groups', href: '#', hasDropdown: true, dropdownKey: 'groups' },
     { label: 'Ministry', href: '#', hasDropdown: true, dropdownKey: 'ministry' },
@@ -84,6 +93,11 @@ export default function Navigation({ className = '' }: NavigationProps) {
   const ministryItems = [
     { label: 'Levite', href: '/ministry/Leviste' },
     { label: 'Singing Band', href: '/ministry/Singing Band' },
+  ];
+
+  const blogItems = [
+    { label: 'Blog', href: '/blog' },
+    { label: 'Announcements', href: '/announcements' },
   ];
 
   const handleVisitUs = () => {
@@ -158,26 +172,36 @@ export default function Navigation({ className = '' }: NavigationProps) {
                     className="relative"
                     data-groups-dropdown={item.dropdownKey === 'groups' ? true : undefined}
                     data-ministry-dropdown={item.dropdownKey === 'ministry' ? true : undefined}
+                    data-blog-dropdown={item.dropdownKey === 'blog' ? true : undefined}
                     onMouseEnter={() => {
                       if (item.dropdownKey === 'groups') {
                         setIsGroupsOpen(true);
                         setIsMinistryOpen(false);
-                      } else {
+                        setIsBlogOpen(false);
+                      } else if (item.dropdownKey === 'ministry') {
                         setIsMinistryOpen(true);
                         setIsGroupsOpen(false);
+                        setIsBlogOpen(false);
+                      } else {
+                        setIsBlogOpen(true);
+                        setIsGroupsOpen(false);
+                        setIsMinistryOpen(false);
                       }
                     }}
                     onMouseLeave={() => {
                       if (item.dropdownKey === 'groups') {
                         setIsGroupsOpen(false);
-                      } else {
+                      } else if (item.dropdownKey === 'ministry') {
                         setIsMinistryOpen(false);
+                      } else {
+                        setIsBlogOpen(false);
                       }
                     }}
                   >
                     <button
                       data-groups-button={item.dropdownKey === 'groups' ? true : undefined}
                       data-ministry-button={item.dropdownKey === 'ministry' ? true : undefined}
+                      data-blog-button={item.dropdownKey === 'blog' ? true : undefined}
                       className={`transition-all duration-300 font-medium text-sm flex items-center gap-2 px-3 py-2 rounded-lg ${
                         isScrolled 
                           ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
@@ -188,14 +212,18 @@ export default function Navigation({ className = '' }: NavigationProps) {
                       {item.label}
                       <ChevronDown
                         className={`h-4 w-4 transition-transform duration-200 ${
-                          item.dropdownKey === 'groups' ? (isGroupsOpen ? 'rotate-180' : '') : (isMinistryOpen ? 'rotate-180' : '')
+                          item.dropdownKey === 'groups'
+                            ? (isGroupsOpen ? 'rotate-180' : '')
+                            : item.dropdownKey === 'ministry'
+                              ? (isMinistryOpen ? 'rotate-180' : '')
+                              : (isBlogOpen ? 'rotate-180' : '')
                         }`}
                       />
                     </button>
                     
                     {/* Dropdown Menu */}
                     <AnimatePresence>
-                      {(item.dropdownKey === 'groups' ? isGroupsOpen : isMinistryOpen) && (
+                      {(item.dropdownKey === 'groups' ? isGroupsOpen : item.dropdownKey === 'ministry' ? isMinistryOpen : isBlogOpen) && (
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -204,16 +232,19 @@ export default function Navigation({ className = '' }: NavigationProps) {
                           className="absolute top-full left-0 mt-2 w-48 bg-black/80 backdrop-blur-xl rounded-lg shadow-xl border border-white/20 py-2 z-50"
                           data-groups-dropdown={item.dropdownKey === 'groups' ? true : undefined}
                           data-ministry-dropdown={item.dropdownKey === 'ministry' ? true : undefined}
+                          data-blog-dropdown={item.dropdownKey === 'blog' ? true : undefined}
                         >
-                          {(item.dropdownKey === 'groups' ? groupsItems : ministryItems).map((groupItem) => (
+                          {(item.dropdownKey === 'groups' ? groupsItems : item.dropdownKey === 'ministry' ? ministryItems : blogItems).map((groupItem) => (
                             <Link key={groupItem.label} href={groupItem.href}>
                               <a
                                 className="block px-4 py-2 text-white hover:bg-white/10 transition-colors duration-200"
                                 onClick={() => {
                                   if (item.dropdownKey === 'groups') {
                                     setIsGroupsOpen(false);
-                                  } else {
+                                  } else if (item.dropdownKey === 'ministry') {
                                     setIsMinistryOpen(false);
+                                  } else {
+                                    setIsBlogOpen(false);
                                   }
                                 }}
                               >
@@ -340,23 +371,33 @@ export default function Navigation({ className = '' }: NavigationProps) {
                             if (item.dropdownKey === 'groups') {
                               setIsGroupsOpen(!isGroupsOpen);
                               setIsMinistryOpen(false);
-                            } else {
+                              setIsBlogOpen(false);
+                            } else if (item.dropdownKey === 'ministry') {
                               setIsMinistryOpen(!isMinistryOpen);
                               setIsGroupsOpen(false);
+                              setIsBlogOpen(false);
+                            } else {
+                              setIsBlogOpen(!isBlogOpen);
+                              setIsGroupsOpen(false);
+                              setIsMinistryOpen(false);
                             }
                           }}
                         >
                           <span className="text-base">{item.label}</span>
                           <ChevronDown
                             className={`h-4 w-4 transition-transform duration-200 ${
-                              item.dropdownKey === 'groups' ? (isGroupsOpen ? 'rotate-180' : '') : (isMinistryOpen ? 'rotate-180' : '')
+                              item.dropdownKey === 'groups'
+                                ? (isGroupsOpen ? 'rotate-180' : '')
+                                : item.dropdownKey === 'ministry'
+                                  ? (isMinistryOpen ? 'rotate-180' : '')
+                                  : (isBlogOpen ? 'rotate-180' : '')
                             }`}
                           />
                         </button>
                         
                         {/* Mobile Dropdown */}
                         <AnimatePresence>
-                          {(item.dropdownKey === 'groups' ? isGroupsOpen : isMinistryOpen) && (
+                          {(item.dropdownKey === 'groups' ? isGroupsOpen : item.dropdownKey === 'ministry' ? isMinistryOpen : isBlogOpen) && (
                             <motion.div
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
@@ -364,7 +405,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                               transition={{ duration: 0.2 }}
                               className="ml-4 mt-2 space-y-2 bg-black/60 backdrop-blur-sm rounded-lg p-2"
                             >
-                              {(item.dropdownKey === 'groups' ? groupsItems : ministryItems).map((groupItem) => (
+                              {(item.dropdownKey === 'groups' ? groupsItems : item.dropdownKey === 'ministry' ? ministryItems : blogItems).map((groupItem) => (
                                 <Link key={groupItem.label} href={groupItem.href}>
                                   <a
                                     className="block py-2 px-3 text-white hover:text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
@@ -372,8 +413,10 @@ export default function Navigation({ className = '' }: NavigationProps) {
                                       setIsMenuOpen(false);
                                       if (item.dropdownKey === 'groups') {
                                         setIsGroupsOpen(false);
-                                      } else {
+                                      } else if (item.dropdownKey === 'ministry') {
                                         setIsMinistryOpen(false);
+                                      } else {
+                                        setIsBlogOpen(false);
                                       }
                                     }}
                                   >
