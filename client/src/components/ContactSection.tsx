@@ -44,7 +44,7 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
     {
       icon: Mail,
       title: 'Email Us',
-      details: ['unitedbethelpresbyterian', '@gmail.com'],
+      details: ['Pastor@unitedbethelpresby.com'],
       action: 'Send Email'
     },
     {
