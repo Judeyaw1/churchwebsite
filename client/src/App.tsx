@@ -17,6 +17,9 @@ import Maintenance from "@/pages/Maintenance";
 import Media from "@/pages/Media";
 import WomensFellowship from "@/pages/WomensFellowship";
 import Announcements from "@/pages/Announcements";
+import YafFellowship from "@/pages/YafFellowship";
+import MensFellowship from "@/pages/MensFellowship";
+import YpgFellowship from "@/pages/YpgFellowship";
 
 // Set to false when maintenance is complete
 const MAINTENANCE_MODE = false;
@@ -42,7 +45,10 @@ function Router() {
       <Route path="/admin" component={Admin} />
       <Route path="/unsubscribe" component={Unsubscribe} />
       <Route path="/announcements" component={Announcements} />
+      <Route path="/groups/mens-fellowship" component={MensFellowship} />
       <Route path="/groups/womens-fellowship" component={WomensFellowship} />
+      <Route path="/groups/yaf" component={YafFellowship} />
+      <Route path="/groups/ypg" component={YpgFellowship} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
