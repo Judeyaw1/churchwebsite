@@ -27,8 +27,23 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
   const isInView = useInView(ref, { once: true, amount: 0.2 });
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [newYearTimeLeft, setNewYearTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+  const confettiPieces = Array.from({ length: 24 }, (_, index) => index);
+
+  // Jan 1, 2026 00:00 America/New_York = 2026-01-01T05:00:00Z (EST is UTC-5).
+  const NEW_YEAR_TARGET_UTC = Date.UTC(2026, 0, 1, 5, 0, 0);
+  const shouldShowNewYear = Date.now() < NEW_YEAR_TARGET_UTC;
 
   useEffect(() => {
+    if (shouldShowNewYear) {
+      setIsLoading(false);
+      return;
+    }
     const fetchEvents = async () => {
       try {
         const eventsData = await fetchWithCache<Event[]>('/api/events', {
@@ -44,7 +59,149 @@ export default function CountdownSection({ className = '' }: CountdownSectionPro
     };
 
     fetchEvents();
-  }, []);
+  }, [shouldShowNewYear]);
+
+  useEffect(() => {
+    if (!shouldShowNewYear) return;
+
+    const updateCountdown = () => {
+      const now = Date.now();
+      const diff = NEW_YEAR_TARGET_UTC - now;
+      if (diff <= 0) {
+        setNewYearTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setNewYearTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
+    return () => clearInterval(timer);
+  }, [shouldShowNewYear, NEW_YEAR_TARGET_UTC]);
+
+  if (shouldShowNewYear) {
+    return (
+      <section ref={ref} className={`py-16 bg-gradient-to-b from-black/95 to-black/90 ${className}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-10"
+          >
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-4">
+              New Year <span className="text-white">Countdown</span>
+            </h2>
+            <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
+              Ring in the new year with us. Countdown to Jan 1, 2026 (America/New_York).
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-black/70 via-black/60 to-black/80 p-8 sm:p-12"
+          >
+            <div className="absolute inset-0 pointer-events-none">
+              <motion.div
+                className="absolute -top-16 -left-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"
+                animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <motion.div
+                className="absolute -bottom-20 -right-10 h-48 w-48 rounded-full bg-white/10 blur-3xl"
+                animate={{ scale: [1, 1.25, 1], opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <div className="absolute inset-0 overflow-hidden">
+                {confettiPieces.map((piece) => (
+                  <motion.span
+                    key={piece}
+                    className="absolute h-2.5 w-2.5 rounded-sm bg-white/70"
+                    style={{
+                      left: `${(piece * 13) % 100}%`,
+                      top: `${(piece * 7) % 100}%`,
+                    }}
+                    animate={{
+                      y: [0, 180, 360],
+                      x: [0, (piece % 2 === 0 ? 20 : -20), 0],
+                      rotate: [0, 180, 360],
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 6 + (piece % 5),
+                      repeat: Infinity,
+                      delay: piece * 0.2,
+                      ease: 'easeInOut',
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="absolute inset-0">
+                {['10%', '35%', '70%'].map((left, index) => (
+                  <motion.div
+                    key={left}
+                    className="absolute top-10 h-2 w-2 rounded-full bg-white/80 shadow-[0_0_24px_rgba(255,255,255,0.6)]"
+                    style={{ left }}
+                    animate={{ scale: [1, 6, 1], opacity: [0.6, 0, 0.6] }}
+                    transition={{
+                      duration: 3.5,
+                      repeat: Infinity,
+                      delay: index * 1.2,
+                      ease: 'easeOut',
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="relative z-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-x-12">
+              <div className="text-center">
+                <div className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-2">
+                  {newYearTimeLeft.days.toString().padStart(2, '0')}
+                </div>
+                <div className="text-sm sm:text-base text-white/70 uppercase tracking-wide">
+                  Days
+                </div>
+              </div>
+              <div className="hidden sm:block w-px h-10 sm:h-16 bg-white/10"></div>
+              <div className="text-center">
+                <div className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-2">
+                  {newYearTimeLeft.hours.toString().padStart(2, '0')}
+                </div>
+                <div className="text-sm sm:text-base text-white/70 uppercase tracking-wide">
+                  Hours
+                </div>
+              </div>
+              <div className="hidden sm:block w-px h-10 sm:h-16 bg-white/10"></div>
+              <div className="text-center">
+                <div className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-2">
+                  {newYearTimeLeft.minutes.toString().padStart(2, '0')}
+                </div>
+                <div className="text-sm sm:text-base text-white/70 uppercase tracking-wide">
+                  Minutes
+                </div>
+              </div>
+              <div className="hidden sm:block w-px h-10 sm:h-16 bg-white/10"></div>
+              <div className="text-center">
+                <div className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-2">
+                  {newYearTimeLeft.seconds.toString().padStart(2, '0')}
+                </div>
+                <div className="text-sm sm:text-base text-white/70 uppercase tracking-wide">
+                  Seconds
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
 
   // Get the next upcoming event (the one happening soonest)
   const nextEvent = events.filter(event => {

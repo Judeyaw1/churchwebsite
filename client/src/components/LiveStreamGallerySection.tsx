@@ -34,6 +34,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isStreamUnlocked, setIsStreamUnlocked] = useState(false);
   const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Fetch live streams and gallery data
@@ -107,6 +108,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
 
   // Get current live stream
   const currentLiveStream = liveStreams.find(stream => stream.isLive) || liveStreams[0];
+  const channelUrl = 'http://www.youtube.com/@ubpcmedia6480';
 
   // Debug logging
   useEffect(() => {
@@ -180,15 +182,46 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                 ) : currentLiveStream ? (
                   <div className="relative aspect-video bg-black">
                     {currentLiveStream.url ? (
-                      <iframe
-                        key={currentLiveStream.id}
-                        src={convertYouTubeUrl(currentLiveStream.url)}
-                        title={currentLiveStream.title}
-                        className="w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        frameBorder="0"
-                      />
+                      <>
+                        {isStreamUnlocked ? (
+                          <iframe
+                            key={currentLiveStream.id}
+                            src={convertYouTubeUrl(currentLiveStream.url)}
+                            title={currentLiveStream.title}
+                            className="w-full h-full border-0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            frameBorder="0"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+                            <div className="text-center px-6">
+                              <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-4 inline-block">
+                                SUBSCRIBE REQUIRED
+                              </div>
+                              <h3 className="text-xl font-semibold text-white mb-2">Subscribe to Watch</h3>
+                              <p className="text-white/70 mb-5">
+                                Please subscribe to our YouTube channel before watching the live stream.
+                              </p>
+                              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                <Button
+                                  variant="outline"
+                                  className="border-white/30 text-white hover:bg-white/10"
+                                  onClick={() => window.open(channelUrl, '_blank')}
+                                >
+                                  Subscribe on YouTube
+                                </Button>
+                                <Button
+                                  className="bg-white text-black hover:bg-white/90"
+                                  onClick={() => setIsStreamUnlocked(true)}
+                                >
+                                  I&apos;ve Subscribed
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <div className="relative aspect-video bg-gradient-to-br from-primary/30 to-primary/50">
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -248,7 +281,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                 variant="outline"
                 size="lg"
                 className="border-white/70 text-white hover:bg-white/10 hover:text-white px-8 py-3"
-                onClick={() => window.open('http://www.youtube.com/@ubpcmedia6480', '_blank')}
+                onClick={() => window.open(channelUrl, '_blank')}
               >
                 <ExternalLink className="h-5 w-5 mr-2" />
                 Visit Our Channel
