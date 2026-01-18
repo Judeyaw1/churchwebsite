@@ -31,13 +31,23 @@ import {
   blogPosts
 } from "@shared/schema";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required");
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  console.error("DATABASE_URL environment variable is required");
 }
 
 // Database connection
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const db = drizzle(pool);
+const pool = databaseUrl ? new Pool({ connectionString: databaseUrl }) : null;
+const db = databaseUrl
+  ? drizzle(pool)
+  : (new Proxy(
+      {},
+      {
+        get() {
+          throw new Error("DATABASE_URL environment variable is required");
+        },
+      },
+    ) as ReturnType<typeof drizzle>);
 
 export type DatabaseHealthStatus = {
   status: "healthy" | "unhealthy";
@@ -46,6 +56,13 @@ export type DatabaseHealthStatus = {
 };
 
 export async function checkDatabaseHealth(): Promise<DatabaseHealthStatus> {
+  if (!pool) {
+    return {
+      status: "unhealthy",
+      latencyMs: 0,
+      error: "DATABASE_URL environment variable is required",
+    };
+  }
   const start = process.hrtime.bigint();
   try {
     await pool.query("SELECT 1");

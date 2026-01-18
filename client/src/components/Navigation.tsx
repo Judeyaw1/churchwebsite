@@ -435,7 +435,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                           setIsMenuOpen(false);
                           handleHomeClick(event);
                         }}
-                        className={`block transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
+                        className={`transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
                           isScrolled 
                             ? 'text-white hover:text-white/80' 
                             : 'text-white hover:text-white/80'
@@ -448,7 +448,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                     ) : (
                       <Link href={item.href}>
                         <a
-                          className={`block transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
+                          className={`transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
                             isScrolled 
                               ? 'text-white hover:text-white/80' 
                               : 'text-white hover:text-white/80'
