@@ -1,5 +1,4 @@
 import React, { lazy, Suspense } from 'react';
-import Snowfall from 'react-snowfall';
 import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
 import Footer from '@/components/Footer';
@@ -20,16 +19,6 @@ const SectionFallback = ({ label }: { label: string }) => (
 export default function Home() {
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Snowfall Effect */}
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 50, pointerEvents: 'none' }}>
-        <Snowfall
-          snowflakeCount={60}
-          speed={[0.5, 3]}
-          wind={[-0.5, 3]}
-          radius={[0.4, 2]}
-        />
-      </div>
-
       {/* Navigation with Theme Toggle */}
       <Navigation />
       
