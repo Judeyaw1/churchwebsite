@@ -4,7 +4,6 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Snowfall from "react-snowfall";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
 import Events from "@/pages/Events";
@@ -59,20 +58,6 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Snowfall
-          snowflakeCount={60}
-          speed={[0.2, 1]}
-          color="rgba(255,255,255,0.95)"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            pointerEvents: "none",
-            zIndex: 9999,
-          }}
-        />
         <Toaster />
         <Router />
       </TooltipProvider>
