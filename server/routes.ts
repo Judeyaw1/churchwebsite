@@ -124,6 +124,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ===== PUBLIC API ROUTES (for website components) =====
 
+  // CPC attendance (public read, admin write)
+  app.get('/api/cpc-attendance', async (req, res) => {
+    try {
+      const dateParam = (req.query.date as string) || new Date().toISOString().slice(0, 10);
+      const records = await storage.getCpcAttendanceByDate(dateParam);
+      res.json(records);
+    } catch (error) {
+      console.error('Failed to fetch CPC attendance:', error);
+      res.status(500).json({ message: 'Failed to fetch attendance' });
+    }
+  });
+
+  app.post('/api/cpc-attendance', requireAuth, async (req, res) => {
+    try {
+      const { date, entries } = req.body || {};
+      if (!date || !Array.isArray(entries)) {
+        return res.status(400).json({ message: 'Date and entries are required' });
+      }
+
+      const sanitized = entries
+        .map((entry: any) => ({
+          date,
+          childName: String(entry.childName || '').trim(),
+          guardianName: String(entry.guardianName || '').trim(),
+          checkIn: String(entry.checkIn || '').trim(),
+          checkOut: entry.checkOut ? String(entry.checkOut).trim() : null,
+        }))
+        .filter((entry: any) => entry.childName && entry.guardianName && entry.checkIn);
+
+      await storage.setCpcAttendanceForDate(date, sanitized);
+      res.json({ success: true, count: sanitized.length });
+    } catch (error) {
+      console.error('Failed to save CPC attendance:', error);
+      res.status(500).json({ message: 'Failed to save attendance' });
+    }
+  });
+
   // Contact form submission
   app.post('/api/contact', async (req, res) => {
     try {

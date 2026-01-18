@@ -20,6 +20,8 @@ import {
   type EventRsvp,
   type BlogPost,
   type InsertBlogPost,
+  type CpcAttendance,
+  type InsertCpcAttendance,
   users,
   events,
   liveStreams,
@@ -28,7 +30,8 @@ import {
   subscribers,
   registrations,
   eventRsvps,
-  blogPosts
+  blogPosts,
+  cpcAttendance
 } from "@shared/schema";
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -146,6 +149,10 @@ export interface IStorage {
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
   updateBlogPost(id: string, post: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
   deleteBlogPost(id: string): Promise<boolean>;
+
+  // CPC attendance methods
+  getCpcAttendanceByDate(date: string): Promise<CpcAttendance[]>;
+  setCpcAttendanceForDate(date: string, entries: InsertCpcAttendance[]): Promise<void>;
 }
 
 export class PostgresStorage implements IStorage {
@@ -477,6 +484,24 @@ export class PostgresStorage implements IStorage {
   async deleteBlogPost(id: string): Promise<boolean> {
     const result = await db.delete(blogPosts).where(eq(blogPosts.id, id));
     return result.rowCount > 0;
+  }
+
+  // CPC attendance methods
+  async getCpcAttendanceByDate(date: string): Promise<CpcAttendance[]> {
+    return await db
+      .select()
+      .from(cpcAttendance)
+      .where(eq(cpcAttendance.date, date))
+      .orderBy(desc(cpcAttendance.createdAt));
+  }
+
+  async setCpcAttendanceForDate(
+    date: string,
+    entries: InsertCpcAttendance[],
+  ): Promise<void> {
+    await db.delete(cpcAttendance).where(eq(cpcAttendance.date, date));
+    if (entries.length === 0) return;
+    await db.insert(cpcAttendance).values(entries);
   }
 }
 

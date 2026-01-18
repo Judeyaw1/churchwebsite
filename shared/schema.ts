@@ -119,6 +119,18 @@ export const subscribers = pgTable("subscribers", {
   unsubscribedAt: timestamp("unsubscribed_at"),
 });
 
+// CPC attendance records
+export const cpcAttendance = pgTable("cpc_attendance", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  date: text("date").notNull(), // YYYY-MM-DD
+  childName: text("child_name").notNull(),
+  guardianName: text("guardian_name").notNull(),
+  checkIn: text("check_in").notNull(),
+  checkOut: text("check_out"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Blog posts table
 export const blogPosts = pgTable("blog_posts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -202,6 +214,14 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts).pick({
   isPublished: true,
 });
 
+export const insertCpcAttendanceSchema = createInsertSchema(cpcAttendance).pick({
+  date: true,
+  childName: true,
+  guardianName: true,
+  checkIn: true,
+  checkOut: true,
+});
+
 // Type exports
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -229,3 +249,6 @@ export type EventRsvp = typeof eventRsvps.$inferSelect;
 
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BlogPost = typeof blogPosts.$inferSelect;
+
+export type InsertCpcAttendance = z.infer<typeof insertCpcAttendanceSchema>;
+export type CpcAttendance = typeof cpcAttendance.$inferSelect;

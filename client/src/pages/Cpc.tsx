@@ -21,6 +21,13 @@ interface Slide {
   description: string;
 }
 
+interface AttendanceRow {
+  childName: string;
+  guardianName: string;
+  checkIn: string;
+  checkOut: string;
+}
+
 const imageModules = import.meta.glob<{ default: string }>(
   '@assets/generated_images/image*.JPG',
   { eager: true }
@@ -48,6 +55,14 @@ const slides: Slide[] = slideImages.slice(0, 5).map((image, index) => ({
 export default function Cpc() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [attendanceDate, setAttendanceDate] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
+  const [attendanceRows, setAttendanceRows] = useState<AttendanceRow[]>([
+    { childName: '', guardianName: '', checkIn: '', checkOut: '' },
+  ]);
+  const [isSavingAttendance, setIsSavingAttendance] = useState(false);
+  const [attendanceMessage, setAttendanceMessage] = useState('');
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -67,6 +82,85 @@ export default function Cpc() {
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
+  };
+
+  useEffect(() => {
+    const fetchAttendance = async () => {
+      try {
+        const response = await fetch(`/api/cpc-attendance?date=${attendanceDate}`);
+        if (!response.ok) throw new Error('Failed to load attendance');
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const rows = data.map((entry: any) => ({
+            childName: entry.childName || '',
+            guardianName: entry.guardianName || '',
+            checkIn: entry.checkIn || '',
+            checkOut: entry.checkOut || '',
+          }));
+          setAttendanceRows(rows);
+        } else {
+          setAttendanceRows([{ childName: '', guardianName: '', checkIn: '', checkOut: '' }]);
+        }
+      } catch (error) {
+        console.error('Failed to load CPC attendance:', error);
+      }
+    };
+
+    fetchAttendance();
+  }, [attendanceDate]);
+
+  const updateAttendanceRow = (index: number, field: keyof AttendanceRow, value: string) => {
+    setAttendanceRows((prev) =>
+      prev.map((row, rowIndex) =>
+        rowIndex === index ? { ...row, [field]: value } : row
+      )
+    );
+  };
+
+  const addAttendanceRow = () => {
+    setAttendanceRows((prev) => [
+      ...prev,
+      { childName: '', guardianName: '', checkIn: '', checkOut: '' },
+    ]);
+  };
+
+  const removeAttendanceRow = (index: number) => {
+    setAttendanceRows((prev) => prev.filter((_, rowIndex) => rowIndex !== index));
+  };
+
+  const saveAttendance = async () => {
+    const token = localStorage.getItem('adminToken') || '';
+    if (!token) {
+      setAttendanceMessage('Admin login required to save attendance.');
+      return;
+    }
+
+    setIsSavingAttendance(true);
+    setAttendanceMessage('');
+    try {
+      const response = await fetch('/api/cpc-attendance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          date: attendanceDate,
+          entries: attendanceRows,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save attendance');
+      }
+
+      setAttendanceMessage('Attendance saved.');
+    } catch (error) {
+      console.error('Failed to save attendance:', error);
+      setAttendanceMessage('Failed to save attendance.');
+    } finally {
+      setIsSavingAttendance(false);
+    }
   };
 
   return (
@@ -236,6 +330,34 @@ export default function Cpc() {
             <h2 className="text-2xl sm:text-3xl font-serif text-white mb-6">
               CPC Attendance List
             </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <label className="text-white/70 text-sm">
+                Attendance Date
+                <input
+                  type="date"
+                  value={attendanceDate}
+                  onChange={(event) => setAttendanceDate(event.target.value)}
+                  className="mt-2 block w-full sm:w-auto bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white"
+                />
+              </label>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={addAttendanceRow}
+                  className="inline-flex items-center justify-center rounded-lg bg-white/10 text-white px-4 py-2 text-sm font-semibold hover:bg-white/20 transition-colors"
+                >
+                  Add Row
+                </button>
+                <button
+                  type="button"
+                  onClick={saveAttendance}
+                  disabled={isSavingAttendance}
+                  className="inline-flex items-center justify-center rounded-lg bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-black/90 hover:text-white transition-colors disabled:opacity-60"
+                >
+                  {isSavingAttendance ? 'Saving...' : 'Save to Database'}
+                </button>
+              </div>
+            </div>
             <div className="overflow-hidden rounded-xl border border-white/10">
               <table className="w-full text-left text-white/80">
                 <thead className="bg-white/10 text-white">
@@ -244,33 +366,74 @@ export default function Cpc() {
                     <th className="px-4 py-3 text-sm font-semibold">Guardian</th>
                     <th className="px-4 py-3 text-sm font-semibold">Check-In</th>
                     <th className="px-4 py-3 text-sm font-semibold">Check-Out</th>
+                    <th className="px-4 py-3 text-sm font-semibold">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
-                  <tr>
-                    <td className="px-4 py-4">Add name</td>
-                    <td className="px-4 py-4">Add guardian</td>
-                    <td className="px-4 py-4">--:--</td>
-                    <td className="px-4 py-4">--:--</td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-4">Add name</td>
-                    <td className="px-4 py-4">Add guardian</td>
-                    <td className="px-4 py-4">--:--</td>
-                    <td className="px-4 py-4">--:--</td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-4">Add name</td>
-                    <td className="px-4 py-4">Add guardian</td>
-                    <td className="px-4 py-4">--:--</td>
-                    <td className="px-4 py-4">--:--</td>
-                  </tr>
+                  {attendanceRows.map((row, index) => (
+                    <tr key={`${row.childName}-${index}`}>
+                      <td className="px-4 py-3">
+                        <input
+                          type="text"
+                          value={row.childName}
+                          onChange={(event) =>
+                            updateAttendanceRow(index, 'childName', event.target.value)
+                          }
+                          placeholder="Child name"
+                          className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-white"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <input
+                          type="text"
+                          value={row.guardianName}
+                          onChange={(event) =>
+                            updateAttendanceRow(index, 'guardianName', event.target.value)
+                          }
+                          placeholder="Guardian"
+                          className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-white"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <input
+                          type="time"
+                          value={row.checkIn}
+                          onChange={(event) =>
+                            updateAttendanceRow(index, 'checkIn', event.target.value)
+                          }
+                          className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-white"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <input
+                          type="time"
+                          value={row.checkOut}
+                          onChange={(event) =>
+                            updateAttendanceRow(index, 'checkOut', event.target.value)
+                          }
+                          className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-white"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => removeAttendanceRow(index)}
+                          className="text-white/70 hover:text-white text-sm"
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
             <p className="text-white/60 text-sm mt-4">
-              Update this list each Sunday with names and times.
+              Update this list each Sunday with names and times, then save to the database.
             </p>
+            {attendanceMessage ? (
+              <p className="text-white/80 text-sm mt-2">{attendanceMessage}</p>
+            ) : null}
           </motion.div>
         </div>
       </section>
