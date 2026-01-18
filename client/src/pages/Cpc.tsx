@@ -23,9 +23,8 @@ interface Slide {
 
 interface AttendanceRow {
   childName: string;
-  guardianName: string;
-  checkIn: string;
-  checkOut: string;
+  checkIn: boolean;
+  checkOut: boolean;
 }
 
 const imageModules = import.meta.glob<{ default: string }>(
@@ -59,7 +58,7 @@ export default function Cpc() {
     new Date().toISOString().slice(0, 10)
   );
   const [attendanceRows, setAttendanceRows] = useState<AttendanceRow[]>([
-    { childName: '', guardianName: '', checkIn: '', checkOut: '' },
+    { childName: '', checkIn: false, checkOut: false },
   ]);
   const [isSavingAttendance, setIsSavingAttendance] = useState(false);
   const [attendanceMessage, setAttendanceMessage] = useState('');
@@ -93,13 +92,12 @@ export default function Cpc() {
         if (Array.isArray(data) && data.length > 0) {
           const rows = data.map((entry: any) => ({
             childName: entry.childName || '',
-            guardianName: entry.guardianName || '',
-            checkIn: entry.checkIn || '',
-            checkOut: entry.checkOut || '',
+            checkIn: Boolean(entry.checkIn),
+            checkOut: Boolean(entry.checkOut),
           }));
           setAttendanceRows(rows);
         } else {
-          setAttendanceRows([{ childName: '', guardianName: '', checkIn: '', checkOut: '' }]);
+          setAttendanceRows([{ childName: '', checkIn: false, checkOut: false }]);
         }
       } catch (error) {
         console.error('Failed to load CPC attendance:', error);
@@ -109,7 +107,11 @@ export default function Cpc() {
     fetchAttendance();
   }, [attendanceDate]);
 
-  const updateAttendanceRow = (index: number, field: keyof AttendanceRow, value: string) => {
+  const updateAttendanceRow = (
+    index: number,
+    field: keyof AttendanceRow,
+    value: string | boolean,
+  ) => {
     setAttendanceRows((prev) =>
       prev.map((row, rowIndex) =>
         rowIndex === index ? { ...row, [field]: value } : row
@@ -120,7 +122,7 @@ export default function Cpc() {
   const addAttendanceRow = () => {
     setAttendanceRows((prev) => [
       ...prev,
-      { childName: '', guardianName: '', checkIn: '', checkOut: '' },
+      { childName: '', checkIn: false, checkOut: false },
     ]);
   };
 
@@ -146,7 +148,12 @@ export default function Cpc() {
         },
         body: JSON.stringify({
           date: attendanceDate,
-          entries: attendanceRows,
+          entries: attendanceRows.map((row) => ({
+            childName: row.childName,
+            guardianName: 'N/A',
+            checkIn: row.checkIn ? 'checked' : '',
+            checkOut: row.checkOut ? 'checked' : '',
+          })),
         }),
       });
 
@@ -295,21 +302,21 @@ export default function Cpc() {
             <div className="flex items-center gap-3 mb-6">
               <ClipboardCheck className="h-6 w-6 text-white" />
               <h2 className="text-2xl sm:text-3xl font-serif text-white">
-                Attendance: Check-In & Check-Out
+                Kids Check-In & Pick-Up
               </h2>
             </div>
             <div className="grid gap-6 md:grid-cols-2">
               <div className="bg-black/40 rounded-xl p-5 border border-white/10">
-                <h3 className="text-white font-semibold mb-2">Check-In</h3>
+                <h3 className="text-white font-semibold mb-2">Kids Check-In</h3>
                 <p className="text-white/75 leading-relaxed">
-                  Parents or guardians sign children in before class begins. Each child receives
-                  a name tag so our team can provide a safe, welcoming experience.
+                  A parent or guardian signs each child in before class starts. Every child gets
+                  a name tag so our team can care for them well.
                 </p>
               </div>
               <div className="bg-black/40 rounded-xl p-5 border border-white/10">
-                <h3 className="text-white font-semibold mb-2">Check-Out</h3>
+                <h3 className="text-white font-semibold mb-2">Kid Pick-Up</h3>
                 <p className="text-white/75 leading-relaxed">
-                  Only a parent or authorized guardian may pick up a child. Please return to the
+                  Only a parent or approved guardian can pick up a child. Please return to the
                   CPC area after service to sign out your child.
                 </p>
               </div>
@@ -358,75 +365,62 @@ export default function Cpc() {
                 </button>
               </div>
             </div>
-            <div className="overflow-hidden rounded-xl border border-white/10">
-              <table className="w-full text-left text-white/80">
-                <thead className="bg-white/10 text-white">
-                  <tr>
-                    <th className="px-4 py-3 text-sm font-semibold">Child Name</th>
-                    <th className="px-4 py-3 text-sm font-semibold">Guardian</th>
-                    <th className="px-4 py-3 text-sm font-semibold">Check-In</th>
-                    <th className="px-4 py-3 text-sm font-semibold">Check-Out</th>
-                    <th className="px-4 py-3 text-sm font-semibold">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/10">
-                  {attendanceRows.map((row, index) => (
-                    <tr key={`${row.childName}-${index}`}>
-                      <td className="px-4 py-3">
+            <p className="text-white/70 text-sm mb-4">
+              Kids: type your name and tap the checkboxes when you arrive and leave.
+            </p>
+            <div className="space-y-4">
+              {attendanceRows.map((row, index) => (
+                <div
+                  key={`${row.childName}-${index}`}
+                  className="rounded-2xl border border-white/10 bg-black/40 p-4 sm:p-6"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="flex-1">
+                      <label className="text-white/70 text-sm">Child Name</label>
+                      <input
+                        type="text"
+                        value={row.childName}
+                        onChange={(event) =>
+                          updateAttendanceRow(index, 'childName', event.target.value)
+                        }
+                        placeholder="Type name"
+                        className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-lg text-white"
+                      />
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 text-white/80">
                         <input
-                          type="text"
-                          value={row.childName}
+                          type="checkbox"
+                          checked={row.checkIn}
                           onChange={(event) =>
-                            updateAttendanceRow(index, 'childName', event.target.value)
+                            updateAttendanceRow(index, 'checkIn', event.target.checked)
                           }
-                          placeholder="Child name"
-                          className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-white"
+                          className="h-6 w-6 rounded border-white/30 bg-black/30"
                         />
-                      </td>
-                      <td className="px-4 py-3">
+                        Checked In
+                      </label>
+                      <label className="flex items-center gap-2 text-white/80">
                         <input
-                          type="text"
-                          value={row.guardianName}
+                          type="checkbox"
+                          checked={row.checkOut}
                           onChange={(event) =>
-                            updateAttendanceRow(index, 'guardianName', event.target.value)
+                            updateAttendanceRow(index, 'checkOut', event.target.checked)
                           }
-                          placeholder="Guardian"
-                          className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-white"
+                          className="h-6 w-6 rounded border-white/30 bg-black/30"
                         />
-                      </td>
-                      <td className="px-4 py-3">
-                        <input
-                          type="time"
-                          value={row.checkIn}
-                          onChange={(event) =>
-                            updateAttendanceRow(index, 'checkIn', event.target.value)
-                          }
-                          className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-white"
-                        />
-                      </td>
-                      <td className="px-4 py-3">
-                        <input
-                          type="time"
-                          value={row.checkOut}
-                          onChange={(event) =>
-                            updateAttendanceRow(index, 'checkOut', event.target.value)
-                          }
-                          className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-white"
-                        />
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          type="button"
-                          onClick={() => removeAttendanceRow(index)}
-                          className="text-white/70 hover:text-white text-sm"
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        Picked Up
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeAttendanceRow(index)}
+                      className="text-white/70 hover:text-white text-sm"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
             <p className="text-white/60 text-sm mt-4">
               Update this list each Sunday with names and times, then save to the database.
