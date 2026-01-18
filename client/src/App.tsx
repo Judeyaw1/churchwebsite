@@ -19,6 +19,7 @@ import Announcements from "@/pages/Announcements";
 import YafFellowship from "@/pages/YafFellowship";
 import MensFellowship from "@/pages/MensFellowship";
 import YpgFellowship from "@/pages/YpgFellowship";
+import Cpc from "@/pages/Cpc";
 
 // Set to false when maintenance is complete
 const MAINTENANCE_MODE = false;
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/groups/womens-fellowship" component={WomensFellowship} />
       <Route path="/groups/yaf" component={YafFellowship} />
       <Route path="/groups/ypg" component={YpgFellowship} />
+      <Route path="/groups/CPC" component={Cpc} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

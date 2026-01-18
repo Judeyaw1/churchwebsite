@@ -2,17 +2,27 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Calendar, MapPin, Clock, Play, Pause, Volume2, VolumeX } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import heroVideoMp4 from '@assets/generated_images/UBPC.mp4';
 import heroVideoMov from '@assets/generated_images/UBPC.MOV';
+import { fetchWithCache } from '@/lib/fetchWithCache';
 
 interface HeroSectionProps {
   className?: string;
 }
 
+interface WeeklyEvent {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+}
+
 export default function HeroSection({ className = '' }: HeroSectionProps) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+  const [weeklyEvents, setWeeklyEvents] = useState<WeeklyEvent[]>([]);
+  const [weeklyEventsLoading, setWeeklyEventsLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const togglePlayPause = () => {
@@ -41,6 +51,58 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
     }
     window.location.href = '/#contact';
   };
+
+  useEffect(() => {
+    let isActive = true;
+
+    const fetchWeeklyEvents = async () => {
+      try {
+        const eventsData = await fetchWithCache<WeeklyEvent[]>('/api/events', {
+          ttl: 1000 * 60,
+        });
+        if (isActive) {
+          setWeeklyEvents(eventsData);
+        }
+      } catch (error) {
+        console.error('Failed to fetch weekly events:', error);
+      } finally {
+        if (isActive) {
+          setWeeklyEventsLoading(false);
+        }
+      }
+    };
+
+    fetchWeeklyEvents();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const eventsThisWeek = useMemo(() => {
+    const now = new Date();
+    const endOfWeek = new Date(now);
+    endOfWeek.setDate(now.getDate() + 7);
+
+    return weeklyEvents
+      .map((event) => {
+        const dateTime = new Date(`${event.date} ${event.time}`);
+        return Number.isNaN(dateTime.getTime())
+          ? null
+          : { ...event, dateTime };
+      })
+      .filter((event): event is WeeklyEvent & { dateTime: Date } => {
+        if (!event) return false;
+        return event.dateTime >= now && event.dateTime <= endOfWeek;
+      })
+      .sort((a, b) => a.dateTime.getTime() - b.dateTime.getTime())
+      .slice(0, 2);
+  }, [weeklyEvents]);
+
+  const weeklyEventLines = eventsThisWeek.map((event) => {
+    const day = event.dateTime.toLocaleDateString('en-US', { weekday: 'short' });
+    return `${day} ${event.title} ${event.time}`;
+  });
 
   return (
     <section className={`relative min-h-screen flex items-center justify-center overflow-hidden ${className}`}>
@@ -140,7 +202,20 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
               <span className="font-semibold">This Week</span>
             </div>
             <p className="text-white/90">
-              Wed Bible Study 7:00 PM<br />Fri Youth Group 6:30 PM
+              {weeklyEventsLoading
+                ? 'Loading weekly activities...'
+                : weeklyEventLines.length > 0
+                  ? weeklyEventLines.map((line, index) => (
+                      <span key={line}>
+                        {line}
+                        {index < weeklyEventLines.length - 1 ? <br /> : null}
+                      </span>
+                    ))
+                  : (
+                      <>
+                        Wed Bible Study 7:00 PM<br />Fri Youth Group 6:30 PM
+                      </>
+                    )}
             </p>
           </div>
         </motion.div>

@@ -4,12 +4,9 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import {
   Sparkles,
-  Target,
-  Lightbulb,
-  Heart,
-  Users,
-  Book,
-  Globe,
+  HeartHandshake,
+  BookOpen,
+  ClipboardCheck,
   ChevronLeft,
   ChevronRight,
   Play,
@@ -41,31 +38,14 @@ const sortedImages = Object.entries(imageModules)
 
 const slideImages = sortedImages.length > 0 ? sortedImages : [fallbackImage];
 
-const slides: Slide[] = slideImages.slice(0, 5).map((image, index) => {
-  const titles = [
-    'Worship Together',
-    'Faith in Community',
-    'Serving with Love',
-    'Growing in Christ',
-    'Welcoming All',
-  ];
-  const descriptions = [
-    'Gathering each week to worship and pray as one church family.',
-    'Building relationships that strengthen our walk with Christ.',
-    'Living out the gospel through service and compassion.',
-    'Encouraging spiritual growth through discipleship.',
-    'A home where every person is known and cared for.',
-  ];
+const slides: Slide[] = slideImages.slice(0, 5).map((image, index) => ({
+  id: index + 1,
+  image,
+  title: '',
+  description: '',
+}));
 
-  return {
-    id: index + 1,
-    image,
-    title: titles[index % titles.length],
-    description: descriptions[index % descriptions.length],
-  };
-});
-
-export default function About() {
+export default function Cpc() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
 
@@ -105,10 +85,11 @@ export default function About() {
               United Bethel Presbyterian Church
             </p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-white mb-6">
-              About Our Church
+              Cool Presbyterian Class (CPC)
             </h1>
             <p className="text-lg sm:text-xl text-white/85 max-w-3xl leading-relaxed">
-              Discover the story, mission, and community behind United Bethel Presbyterian.
+              UBPC CPC Sunday School is a Christ-centered learning environment for children ages
+              4–11, nurturing Christian values and helping them grow in faith in Jesus.
             </p>
           </motion.div>
         </div>
@@ -124,13 +105,12 @@ export default function About() {
             className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8"
           >
             <div className="flex items-center gap-3 mb-4">
-              <Target className="h-6 w-6 text-white" />
-              <h2 className="text-2xl font-serif text-white">Our Mission</h2>
+              <HeartHandshake className="h-6 w-6 text-white" />
+              <h2 className="text-2xl font-serif text-white">Name</h2>
             </div>
             <p className="text-white/80 leading-relaxed">
-              To glorify God by making disciples of Jesus Christ through worship, fellowship,
-              discipleship, ministry, and evangelism. We seek to be a beacon of hope and faith in
-              our community.
+              <span className="font-semibold text-white">CPC</span> stands for{' '}
+              <span className="font-semibold text-white">Cool Presbyterian Class</span>.
             </p>
           </motion.div>
 
@@ -142,12 +122,18 @@ export default function About() {
             className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8"
           >
             <div className="flex items-center gap-3 mb-4">
-              <Lightbulb className="h-6 w-6 text-white" />
-              <h2 className="text-2xl font-serif text-white">Our Vision</h2>
+              <BookOpen className="h-6 w-6 text-white" />
+              <h2 className="text-2xl font-serif text-white">Motto</h2>
             </div>
             <p className="text-white/80 leading-relaxed">
-              To be a thriving Presbyterian community where all people can grow in faith, serve
-              others, and experience the transforming love of Christ in everyday life.
+              Call: <span className="font-semibold text-white">“CPC - WW”</span>
+              <br />
+              Response: <span className="font-semibold text-white">“JD”</span>
+              <br />
+              Call: What does that mean?
+              <br />
+              Response:{' '}
+              <span className="font-semibold text-white">“What Will Jesus Do”</span>
             </p>
           </motion.div>
         </div>
@@ -164,43 +150,38 @@ export default function About() {
           >
             <div className="flex items-center gap-3 mb-6">
               <Sparkles className="h-6 w-6 text-white" />
-              <h2 className="text-2xl sm:text-3xl font-serif text-white">Our Core Values</h2>
+              <h2 className="text-2xl sm:text-3xl font-serif text-white">
+                Vision & Core Values
+              </h2>
             </div>
-            <div className="grid gap-6 md:grid-cols-4">
+            <p className="text-white/80 leading-relaxed mb-6">
+              Proverbs 22:6: “Train up a child in the way he should go, and when he is old, he will
+              not depart from it.”
+            </p>
+            <div className="grid gap-6 md:grid-cols-3">
               <div className="bg-black/40 rounded-xl p-5 border border-white/10">
-                <div className="flex items-center gap-2 mb-2">
-                  <Heart className="h-5 w-5 text-white" />
-                  <h3 className="text-white font-semibold">Faith & Worship</h3>
-                </div>
+                <h3 className="text-white font-semibold mb-2">Vision</h3>
                 <p className="text-white/75">
-                  We gather to worship God with reverence, prayer, and gratitude.
+                  Helping children learn God’s Word and grow strong in Jesus.
                 </p>
               </div>
               <div className="bg-black/40 rounded-xl p-5 border border-white/10">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="h-5 w-5 text-white" />
-                  <h3 className="text-white font-semibold">Fellowship</h3>
-                </div>
+                <h3 className="text-white font-semibold mb-2">God’s Word First</h3>
                 <p className="text-white/75">
-                  We build relationships that strengthen our church family.
+                  We love the Bible and learn from it every day.
                 </p>
               </div>
               <div className="bg-black/40 rounded-xl p-5 border border-white/10">
-                <div className="flex items-center gap-2 mb-2">
-                  <Book className="h-5 w-5 text-white" />
-                  <h3 className="text-white font-semibold">Scripture</h3>
-                </div>
+                <h3 className="text-white font-semibold mb-2">Growing in Jesus</h3>
                 <p className="text-white/75">
-                  We are grounded in the Word to guide our daily lives.
+                  We plant seeds of faith that help children walk with Jesus for life with happy
+                  and willing hearts.
                 </p>
               </div>
               <div className="bg-black/40 rounded-xl p-5 border border-white/10">
-                <div className="flex items-center gap-2 mb-2">
-                  <Globe className="h-5 w-5 text-white" />
-                  <h3 className="text-white font-semibold">Service</h3>
-                </div>
+                <h3 className="text-white font-semibold mb-2">Safe & Caring Community</h3>
                 <p className="text-white/75">
-                  We serve our neighbors with compassion and humility.
+                  We create a place where every child feels loved, welcomed, and valued.
                 </p>
               </div>
             </div>
@@ -215,9 +196,95 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6 }}
+            className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <ClipboardCheck className="h-6 w-6 text-white" />
+              <h2 className="text-2xl sm:text-3xl font-serif text-white">
+                Attendance: Check-In & Check-Out
+              </h2>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="bg-black/40 rounded-xl p-5 border border-white/10">
+                <h3 className="text-white font-semibold mb-2">Check-In</h3>
+                <p className="text-white/75 leading-relaxed">
+                  Parents or guardians sign children in before class begins. Each child receives
+                  a name tag so our team can provide a safe, welcoming experience.
+                </p>
+              </div>
+              <div className="bg-black/40 rounded-xl p-5 border border-white/10">
+                <h3 className="text-white font-semibold mb-2">Check-Out</h3>
+                <p className="text-white/75 leading-relaxed">
+                  Only a parent or authorized guardian may pick up a child. Please return to the
+                  CPC area after service to sign out your child.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="py-16 sm:py-20 bg-black/90">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+            className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8"
+          >
+            <h2 className="text-2xl sm:text-3xl font-serif text-white mb-6">
+              CPC Attendance List
+            </h2>
+            <div className="overflow-hidden rounded-xl border border-white/10">
+              <table className="w-full text-left text-white/80">
+                <thead className="bg-white/10 text-white">
+                  <tr>
+                    <th className="px-4 py-3 text-sm font-semibold">Child Name</th>
+                    <th className="px-4 py-3 text-sm font-semibold">Guardian</th>
+                    <th className="px-4 py-3 text-sm font-semibold">Check-In</th>
+                    <th className="px-4 py-3 text-sm font-semibold">Check-Out</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  <tr>
+                    <td className="px-4 py-4">Add name</td>
+                    <td className="px-4 py-4">Add guardian</td>
+                    <td className="px-4 py-4">--:--</td>
+                    <td className="px-4 py-4">--:--</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-4">Add name</td>
+                    <td className="px-4 py-4">Add guardian</td>
+                    <td className="px-4 py-4">--:--</td>
+                    <td className="px-4 py-4">--:--</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-4">Add name</td>
+                    <td className="px-4 py-4">Add guardian</td>
+                    <td className="px-4 py-4">--:--</td>
+                    <td className="px-4 py-4">--:--</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="text-white/60 text-sm mt-4">
+              Update this list each Sunday with names and times.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="py-16 sm:py-20 bg-black/95">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
             className="mb-6"
           >
-            <h2 className="text-2xl sm:text-3xl font-serif text-white">Moments of Community</h2>
+            <h2 className="text-2xl sm:text-3xl font-serif text-white">See Photos</h2>
           </motion.div>
 
           <div className="relative w-full h-[520px] sm:h-[600px] overflow-hidden rounded-3xl bg-gradient-to-br from-black/80 via-black/60 to-black/80 border border-white/10">
@@ -250,7 +317,7 @@ export default function About() {
                       <div className="relative w-[320px] sm:w-[420px] h-[420px] sm:h-[520px] rounded-3xl overflow-hidden shadow-2xl">
                         <img
                           src={slide.image}
-                          alt={slide.title}
+                          alt={slide.title || 'CPC moments'}
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
@@ -265,7 +332,7 @@ export default function About() {
                               {slide.title}
                             </h3>
                             <AnimatePresence>
-                              {isActive && (
+                              {isActive && slide.description && (
                                 <motion.p
                                   initial={{ opacity: 0, height: 0 }}
                                   animate={{ opacity: 1, height: 'auto' }}
@@ -347,10 +414,10 @@ export default function About() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-2xl sm:text-3xl font-serif text-white mb-4">
-              Join Our Church Family
+              Join UBPC Children Service
             </h2>
             <p className="text-white/80 mb-6">
-              We would love to worship and grow with you. Come as you are.
+              We are excited to welcome every child into a loving, Christ-centered community.
             </p>
             <a
               href="/#contact"
