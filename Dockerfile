@@ -25,8 +25,8 @@ RUN npm prune --production
 # Create uploads directory
 RUN mkdir -p uploads
 
-# Expose port
-EXPOSE 3000
+# Expose port (Railway defaults to 8080)
+EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
