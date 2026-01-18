@@ -33,12 +33,12 @@ export async function handleHealthRequest(
   try {
     const payload = await buildHealthPayload();
     res.set("Cache-Control", "no-store");
-    res
-      .status(payload.status === "healthy" ? 200 : 503)
-      .json(payload);
+    // Always return 200 so platform health checks don't recycle the container
+    // when the database is temporarily unavailable.
+    res.status(200).json(payload);
   } catch (error: any) {
     res
-      .status(500)
+      .status(200)
       .json({
         status: "unhealthy",
         timestamp: new Date().toISOString(),
