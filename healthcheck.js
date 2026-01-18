@@ -2,9 +2,10 @@
 
 import http from 'http';
 
+const port = Number(process.env.PORT || 8080);
 const options = {
   hostname: 'localhost',
-  port: process.env.PORT || 3000,
+  port,
   path: '/healthz',
   method: 'GET',
   timeout: 5000

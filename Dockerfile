@@ -26,6 +26,7 @@ RUN npm prune --production
 RUN mkdir -p uploads
 
 # Expose port (Railway defaults to 8080)
+ENV PORT=8080
 EXPOSE 8080
 
 # Health check

@@ -85,7 +85,6 @@ app.use((req, res, next) => {
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
-    throw err;
   });
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
