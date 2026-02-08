@@ -24,7 +24,8 @@ import {
   Users,
   Crop,
   BookOpen,
-  ChevronDown
+  ChevronDown,
+  ClipboardCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -83,9 +84,19 @@ interface BlogPost {
   updatedAt: string;
 }
 
+interface CpcAttendanceEntry {
+  id: string;
+  date: string;
+  childName: string;
+  guardianName: string;
+  checkIn?: string;
+  checkOut?: string;
+  createdAt?: string;
+}
+
 export default function Admin() {
   const [location, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<'events' | 'livestream' | 'gallery' | 'messages' | 'subscribers' | 'blog'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'livestream' | 'gallery' | 'messages' | 'subscribers' | 'blog' | 'cpc'>('events');
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -552,6 +563,11 @@ export default function Admin() {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [messageTarget, setMessageTarget] = useState<'announcements' | 'subscribers'>('announcements');
   const [openGalleryCategories, setOpenGalleryCategories] = useState<Set<string>>(new Set());
+  const [cpcAttendanceDate, setCpcAttendanceDate] = useState(
+    new Date().toISOString().slice(0, 10)
+  );
+  const [cpcAttendance, setCpcAttendance] = useState<CpcAttendanceEntry[]>([]);
+  const [cpcAttendanceLoading, setCpcAttendanceLoading] = useState(false);
 
   // OneDrive browse state
   const [oneDriveFiles, setOneDriveFiles] = useState<{ id: string; name: string; webUrl: string; size: number; mimeType?: string }[]>([]);
@@ -563,6 +579,7 @@ export default function Admin() {
     { id: 'livestream', label: 'Live Streams', icon: Video },
     { id: 'gallery', label: 'Gallery', icon: Camera },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
+    { id: 'cpc', label: 'CPC', icon: ClipboardCheck },
     { id: 'subscribers', label: 'Subscribers', icon: Users },
     { id: 'blog', label: 'Blog', icon: BookOpen }
   ];
@@ -588,6 +605,28 @@ export default function Admin() {
       setOpenGalleryCategories(new Set(orderedGalleryCategories));
     }
   }, [orderedGalleryCategories, openGalleryCategories.size]);
+
+  const fetchCpcAttendance = async (date: string) => {
+    setCpcAttendanceLoading(true);
+    try {
+      const response = await fetch(`/api/cpc-attendance?date=${date}`);
+      if (!response.ok) {
+        throw new Error('Failed to load CPC attendance');
+      }
+      const data = await response.json();
+      setCpcAttendance(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to load CPC attendance:', error);
+      setCpcAttendance([]);
+    } finally {
+      setCpcAttendanceLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab !== 'cpc') return;
+    fetchCpcAttendance(cpcAttendanceDate);
+  }, [activeTab, cpcAttendanceDate]);
 
   const toggleGalleryCategory = (category: string) => {
     setOpenGalleryCategories((prev) => {
@@ -726,6 +765,9 @@ export default function Admin() {
       case 'blog':
         allIds = blogPosts.map(b => b.id);
         break;
+      case 'cpc':
+        allIds = [];
+        break;
     }
     setSelectedItems(new Set(allIds));
   };
@@ -755,6 +797,22 @@ export default function Admin() {
     setEventUploadProgress(0);
     setEventUploadStatus('idle');
   };
+
+  const cpcCheckIns = cpcAttendance.filter((entry) => entry.checkIn && entry.checkIn !== '').length;
+  const cpcCheckOuts = cpcAttendance.filter((entry) => entry.checkOut && entry.checkOut !== '').length;
+  const cpcStillInClass = Math.max(0, cpcCheckIns - cpcCheckOuts);
+  const cpcUniqueChildren = new Set(
+    cpcAttendance
+      .map((entry) => entry.childName?.trim().toLowerCase())
+      .filter((name) => name && name.length > 0)
+  ).size;
+  const cpcRecentEntries = [...cpcAttendance]
+    .sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime;
+    })
+    .slice(0, 6);
 
   const handleEdit = (type: string, id: string) => {
     console.log('handleEdit called:', { type, id, activeTab, galleryImagesCount: galleryImages.length });
@@ -1256,7 +1314,7 @@ export default function Admin() {
             </div>
 
             {/* Add New Button */}
-            {activeTab !== 'subscribers' && (
+            {activeTab !== 'subscribers' && activeTab !== 'cpc' && (
             <div className="mb-8 text-center">
               <Button
                 onClick={handleAddNew}
@@ -1379,6 +1437,118 @@ export default function Admin() {
                       </CardContent>
                     </Card>
                   ))}
+                </div>
+              )}
+
+              {/* CPC Attendance Analytics */}
+              {activeTab === 'cpc' && (
+                <div className="space-y-6">
+                  <Card className="bg-white/5 border-white/20">
+                    <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <CardTitle className="text-white">CPC Attendance Analytics</CardTitle>
+                        <p className="text-white/60 text-sm">
+                          Track today&apos;s sign-in/sign-out activity.
+                        </p>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                        <label className="text-white/70 text-sm">
+                          Attendance Date
+                          <input
+                            type="date"
+                            value={cpcAttendanceDate}
+                            onChange={(event) => setCpcAttendanceDate(event.target.value)}
+                            className="mt-2 block w-full sm:w-auto bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white"
+                          />
+                        </label>
+                        <Button
+                          variant="outline"
+                          className="border-white/30 text-white hover:bg-white/10"
+                          onClick={() => fetchCpcAttendance(cpcAttendanceDate)}
+                        >
+                          Refresh
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {cpcAttendanceLoading ? (
+                        <div className="text-center py-8">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+                          <p className="text-white/70">Loading attendance...</p>
+                        </div>
+                      ) : (
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                          <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+                            <p className="text-white/60 text-sm">Check-ins</p>
+                            <p className="text-2xl font-semibold text-white">{cpcCheckIns}</p>
+                          </div>
+                          <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+                            <p className="text-white/60 text-sm">Check-outs</p>
+                            <p className="text-2xl font-semibold text-white">{cpcCheckOuts}</p>
+                          </div>
+                          <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+                            <p className="text-white/60 text-sm">Still in Class</p>
+                            <p className="text-2xl font-semibold text-white">{cpcStillInClass}</p>
+                          </div>
+                          <div className="rounded-xl border border-white/10 bg-black/40 p-4">
+                            <p className="text-white/60 text-sm">Unique Children</p>
+                            <p className="text-2xl font-semibold text-white">{cpcUniqueChildren}</p>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white/5 border-white/20">
+                    <CardHeader>
+                      <CardTitle className="text-white">Recent Activity</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {cpcAttendanceLoading ? (
+                        <div className="text-center py-6">
+                          <p className="text-white/70">Loading activity...</p>
+                        </div>
+                      ) : cpcRecentEntries.length > 0 ? (
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full text-left text-sm text-white/80">
+                            <thead className="text-white/60 border-b border-white/10">
+                              <tr>
+                                <th className="py-2 pr-4">Child</th>
+                                <th className="py-2 pr-4">Guardian</th>
+                                <th className="py-2 pr-4">Status</th>
+                                <th className="py-2 pr-4">Time</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {cpcRecentEntries.map((entry) => {
+                                const status = entry.checkOut ? 'Checked Out' : entry.checkIn ? 'Checked In' : '—';
+                                const time = entry.checkOut || entry.checkIn || '—';
+                                const badgeClass =
+                                  status === 'Checked Out'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : status === 'Checked In'
+                                      ? 'bg-green-100 text-green-800'
+                                      : 'bg-gray-200 text-gray-800';
+
+                                return (
+                                  <tr key={entry.id} className="border-b border-white/5">
+                                    <td className="py-2 pr-4">{entry.childName || '—'}</td>
+                                    <td className="py-2 pr-4">{entry.guardianName || '—'}</td>
+                                    <td className="py-2 pr-4">
+                                      <Badge className={badgeClass}>{status}</Badge>
+                                    </td>
+                                    <td className="py-2 pr-4">{time}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <p className="text-white/60 text-sm">No attendance records for this date.</p>
+                      )}
+                    </CardContent>
+                  </Card>
                 </div>
               )}
 

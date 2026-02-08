@@ -65,9 +65,18 @@ export default function Cpc() {
     return `${hours}:${minutes}`;
   };
 
-  const [attendanceRows, setAttendanceRows] = useState<AttendanceRow[]>([
-    { childName: '', guardianName: '', action: 'check-in', time: getCurrentTime() },
-  ]);
+  const [signInForm, setSignInForm] = useState<AttendanceRow>({
+    childName: '',
+    guardianName: '',
+    action: 'check-in',
+    time: getCurrentTime(),
+  });
+  const [signOutForm, setSignOutForm] = useState<AttendanceRow>({
+    childName: '',
+    guardianName: '',
+    action: 'check-out',
+    time: getCurrentTime(),
+  });
   const [isSavingAttendance, setIsSavingAttendance] = useState(false);
   const [attendanceMessage, setAttendanceMessage] = useState('');
 
@@ -91,61 +100,7 @@ export default function Cpc() {
     setCurrentIndex(index);
   };
 
-  useEffect(() => {
-    const fetchAttendance = async () => {
-      try {
-        const response = await fetch(`/api/cpc-attendance?date=${attendanceDate}`);
-        if (!response.ok) throw new Error('Failed to load attendance');
-        const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          const rows = data.map((entry: any) => {
-            const hasCheckIn = Boolean(entry.checkIn);
-            const hasCheckOut = Boolean(entry.checkOut);
-            return {
-              childName: entry.childName || '',
-              guardianName: entry.guardianName || '',
-              action: hasCheckOut ? 'check-out' : 'check-in',
-              time: hasCheckOut ? entry.checkOut : entry.checkIn || getCurrentTime(),
-            } as AttendanceRow;
-          });
-          setAttendanceRows(rows);
-        } else {
-          setAttendanceRows([
-            { childName: '', guardianName: '', action: 'check-in', time: getCurrentTime() },
-          ]);
-        }
-      } catch (error) {
-        console.error('Failed to load CPC attendance:', error);
-      }
-    };
-
-    fetchAttendance();
-  }, [attendanceDate]);
-
-  const updateAttendanceRow = (
-    index: number,
-    field: keyof AttendanceRow,
-    value: string | boolean,
-  ) => {
-    setAttendanceRows((prev) =>
-      prev.map((row, rowIndex) =>
-        rowIndex === index ? { ...row, [field]: value } : row
-      )
-    );
-  };
-
-  const addAttendanceRow = () => {
-    setAttendanceRows((prev) => [
-      ...prev,
-      { childName: '', guardianName: '', action: 'check-in', time: getCurrentTime() },
-    ]);
-  };
-
-  const removeAttendanceRow = (index: number) => {
-    setAttendanceRows((prev) => prev.filter((_, rowIndex) => rowIndex !== index));
-  };
-
-  const saveAttendance = async () => {
+  const submitAttendance = async (form: AttendanceRow, reset: () => void) => {
     const token = localStorage.getItem('adminToken') || '';
     if (!token) {
       setAttendanceMessage('Admin login required to save attendance.');
@@ -163,12 +118,14 @@ export default function Cpc() {
         },
         body: JSON.stringify({
           date: attendanceDate,
-          entries: attendanceRows.map((row) => ({
-            childName: row.childName,
-            guardianName: row.guardianName || 'N/A',
-            checkIn: row.action === 'check-in' ? row.time : '',
-            checkOut: row.action === 'check-out' ? row.time : '',
-          })),
+          entries: [
+            {
+              childName: form.childName,
+              guardianName: form.guardianName || 'N/A',
+              checkIn: form.action === 'check-in' ? form.time : '',
+              checkOut: form.action === 'check-out' ? form.time : '',
+            },
+          ],
         }),
       });
 
@@ -177,6 +134,7 @@ export default function Cpc() {
       }
 
       setAttendanceMessage('Attendance saved.');
+      reset();
     } catch (error) {
       console.error('Failed to save attendance:', error);
       setAttendanceMessage('Failed to save attendance.');
@@ -255,7 +213,7 @@ export default function Cpc() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 bg-black/90">
+      <section className="py-16 sm:py-20 bg-[#f2edff]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -347,119 +305,220 @@ export default function Cpc() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6 }}
-            className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8"
+            className="rounded-2xl p-4 sm:p-6 bg-[#f6f1ff] border border-purple-200/80"
           >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
-              <div>
-                <p className="text-white/70 uppercase tracking-[0.2em] text-xs sm:text-sm">
-                  CPC Weekly Attendance
-                </p>
-                <h2 className="text-2xl sm:text-3xl font-serif text-white mt-2">
-                  Sign-In / Sign-Out
-                </h2>
-              </div>
-              <label className="text-white/70 text-sm">
-                Attendance Date
-                <input
-                  type="date"
-                  value={attendanceDate}
-                  onChange={(event) => setAttendanceDate(event.target.value)}
-                  className="mt-2 block w-full sm:w-auto bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white"
-                />
-              </label>
+            <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6 mb-6">
+              <h2 className="text-2xl sm:text-3xl font-serif text-gray-900">
+                CPC Weekly Attendance Form: Sign-in/out
+              </h2>
+              <p className="text-gray-700 mt-4 leading-relaxed">
+                For the safety of our children, UBPC requires weekly attendance sign-in/sign-out.
+                Please sign your child in upon arrival and out at pick-up. If you are signing in
+                multiple children, submit a separate response for each child after pressing Submit.
+              </p>
             </div>
 
-            <div className="space-y-5">
-              {attendanceRows.map((row, index) => (
-                <div
-                  key={`${row.childName}-${index}`}
-                  className="rounded-2xl border border-white/10 bg-black/40 p-5 sm:p-6"
-                >
-                  <div className="grid gap-4 md:grid-cols-3">
-                    <label className="text-white/70 text-sm">
-                      Child Name
-                      <input
-                        type="text"
-                        value={row.childName}
-                        onChange={(event) =>
-                          updateAttendanceRow(index, 'childName', event.target.value)
-                        }
-                        placeholder="Full name"
-                        className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white"
-                      />
-                    </label>
-                    <label className="text-white/70 text-sm">
-                      Parent/Guardian
-                      <input
-                        type="text"
-                        value={row.guardianName}
-                        onChange={(event) =>
-                          updateAttendanceRow(index, 'guardianName', event.target.value)
-                        }
-                        placeholder="Full name"
-                        className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white"
-                      />
-                    </label>
-                    <label className="text-white/70 text-sm">
-                      Action
-                      <select
-                        value={row.action}
-                        onChange={(event) =>
-                          updateAttendanceRow(
-                            index,
-                            'action',
-                            event.target.value as AttendanceRow['action']
-                          )
-                        }
-                        className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white"
-                      >
-                        <option value="check-in">Check In</option>
-                        <option value="check-out">Check Out</option>
-                      </select>
-                    </label>
-                    <label className="text-white/70 text-sm">
-                      Time
-                      <input
-                        type="time"
-                        value={row.time}
-                        onChange={(event) => updateAttendanceRow(index, 'time', event.target.value)}
-                        className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white"
-                      />
-                    </label>
-                    <div className="flex items-end justify-end md:col-span-2">
-                      <button
-                        type="button"
-                        onClick={() => removeAttendanceRow(index)}
-                        className="text-white/70 hover:text-white text-sm"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="space-y-6">
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <h3 className="text-xl font-semibold text-gray-900">SIGN-IN</h3>
+                <p className="text-gray-700 mt-1">Kindly sign your child in to class</p>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <label className="text-gray-700 text-sm">
+                  Today&apos;s Date (Sign-In)
+                  <input
+                    type="date"
+                    value={attendanceDate}
+                    onChange={(event) => setAttendanceDate(event.target.value)}
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  />
+                </label>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <label className="text-gray-700 text-sm">
+                  Weekly Sign-in
+                  <select
+                    value={signInForm.action}
+                    onChange={(event) =>
+                      setSignInForm((prev) => ({
+                        ...prev,
+                        action: event.target.value as AttendanceRow['action'],
+                      }))
+                    }
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  >
+                    <option value="check-in">Check In</option>
+                    <option value="check-out">Check Out</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <label className="text-gray-700 text-sm">
+                  If child&apos;s name is not listed, please enter full name here (Sign-in)
+                  <input
+                    type="text"
+                    value={signInForm.childName}
+                    onChange={(event) =>
+                      setSignInForm((prev) => ({ ...prev, childName: event.target.value }))
+                    }
+                    placeholder="Your answer"
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  />
+                </label>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <label className="text-gray-700 text-sm">
+                  Parent/Guardian Name (Sign-in)
+                  <input
+                    type="text"
+                    value={signInForm.guardianName}
+                    onChange={(event) =>
+                      setSignInForm((prev) => ({ ...prev, guardianName: event.target.value }))
+                    }
+                    placeholder="Your answer"
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  />
+                </label>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <label className="text-gray-700 text-sm">
+                  Time (Sign-in)
+                  <input
+                    type="time"
+                    value={signInForm.time}
+                    onChange={(event) =>
+                      setSignInForm((prev) => ({ ...prev, time: event.target.value }))
+                    }
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  />
+                </label>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <h3 className="text-xl font-semibold text-gray-900">SIGN OUT</h3>
+                <p className="text-gray-700 mt-1">Kindly sign your child out of class</p>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <label className="text-gray-700 text-sm">
+                  Today&apos;s Date (Sign-Out)
+                  <input
+                    type="date"
+                    value={attendanceDate}
+                    onChange={(event) => setAttendanceDate(event.target.value)}
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  />
+                </label>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <label className="text-gray-700 text-sm">
+                  Weekly Sign-out
+                  <select
+                    value={signOutForm.action}
+                    onChange={(event) =>
+                      setSignOutForm((prev) => ({
+                        ...prev,
+                        action: event.target.value as AttendanceRow['action'],
+                      }))
+                    }
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  >
+                    <option value="check-out">Check Out</option>
+                    <option value="check-in">Check In</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <label className="text-gray-700 text-sm">
+                  If child&apos;s name is not listed, please enter full name here (Sign-out)
+                  <input
+                    type="text"
+                    value={signOutForm.childName}
+                    onChange={(event) =>
+                      setSignOutForm((prev) => ({ ...prev, childName: event.target.value }))
+                    }
+                    placeholder="Your answer"
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  />
+                </label>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <label className="text-gray-700 text-sm">
+                  Parent/Guardian Name (Sign-out)
+                  <input
+                    type="text"
+                    value={signOutForm.guardianName}
+                    onChange={(event) =>
+                      setSignOutForm((prev) => ({ ...prev, guardianName: event.target.value }))
+                    }
+                    placeholder="Your answer"
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  />
+                </label>
+              </div>
+
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
+                <label className="text-gray-700 text-sm">
+                  Time (Sign-out)
+                  <input
+                    type="time"
+                    value={signOutForm.time}
+                    onChange={(event) =>
+                      setSignOutForm((prev) => ({ ...prev, time: event.target.value }))
+                    }
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  />
+                </label>
+              </div>
             </div>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
               <button
                 type="button"
-                onClick={addAttendanceRow}
-                className="inline-flex items-center justify-center rounded-lg bg-white/10 text-white px-4 py-2 text-sm font-semibold hover:bg-white/20 transition-colors"
+                onClick={() =>
+                  submitAttendance(signInForm, () =>
+                    setSignInForm({
+                      childName: '',
+                      guardianName: '',
+                      action: 'check-in',
+                      time: getCurrentTime(),
+                    })
+                  )
+                }
+                disabled={isSavingAttendance}
+                className="inline-flex items-center justify-center rounded-lg bg-[#6d48c7] text-white px-5 py-2 text-sm font-semibold hover:bg-[#5d3db3] transition-colors disabled:opacity-60"
               >
-                Add Child
+                {isSavingAttendance ? 'Saving...' : 'Submit Sign-In'}
               </button>
               <button
                 type="button"
-                onClick={saveAttendance}
+                onClick={() =>
+                  submitAttendance(signOutForm, () =>
+                    setSignOutForm({
+                      childName: '',
+                      guardianName: '',
+                      action: 'check-out',
+                      time: getCurrentTime(),
+                    })
+                  )
+                }
                 disabled={isSavingAttendance}
-                className="inline-flex items-center justify-center rounded-lg bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-black/90 hover:text-white transition-colors disabled:opacity-60"
+                className="inline-flex items-center justify-center rounded-lg bg-white text-[#6d48c7] border border-[#6d48c7] px-5 py-2 text-sm font-semibold hover:bg-[#efe9ff] transition-colors disabled:opacity-60"
               >
-                {isSavingAttendance ? 'Saving...' : 'Submit Attendance'}
+                {isSavingAttendance ? 'Saving...' : 'Submit Sign-Out'}
               </button>
             </div>
 
             {attendanceMessage ? (
-              <p className="text-white/80 text-sm mt-2">{attendanceMessage}</p>
+              <p className="text-gray-700 text-sm mt-2">{attendanceMessage}</p>
             ) : null}
           </motion.div>
         </div>
