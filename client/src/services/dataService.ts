@@ -141,14 +141,14 @@ const defaultLiveStreams: LiveStream[] = [
   {
     id: '1',
     title: 'Sunday Worship Service',
-    url: 'https://youtube.com/watch?v=example',
+    url: 'https://zoom.us/j/00000000000?pwd=placeholder',
     schedule: 'Sundays 9:00 AM & 11:00 AM',
     isLive: false
   },
   {
     id: '2',
     title: 'Midweek Bible Study',
-    url: 'https://youtube.com/watch?v=bible',
+    url: 'https://zoom.us/j/00000000000?pwd=placeholder',
     schedule: 'Wednesdays 7:00 PM',
     isLive: false
   }

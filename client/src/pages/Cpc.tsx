@@ -23,8 +23,9 @@ interface Slide {
 
 interface AttendanceRow {
   childName: string;
-  checkIn: boolean;
-  checkOut: boolean;
+  guardianName: string;
+  action: 'check-in' | 'check-out';
+  time: string;
 }
 
 const imageModules = import.meta.glob<{ default: string }>(
@@ -57,8 +58,15 @@ export default function Cpc() {
   const [attendanceDate, setAttendanceDate] = useState(
     new Date().toISOString().slice(0, 10)
   );
+  const getCurrentTime = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
   const [attendanceRows, setAttendanceRows] = useState<AttendanceRow[]>([
-    { childName: '', checkIn: false, checkOut: false },
+    { childName: '', guardianName: '', action: 'check-in', time: getCurrentTime() },
   ]);
   const [isSavingAttendance, setIsSavingAttendance] = useState(false);
   const [attendanceMessage, setAttendanceMessage] = useState('');
@@ -90,14 +98,21 @@ export default function Cpc() {
         if (!response.ok) throw new Error('Failed to load attendance');
         const data = await response.json();
         if (Array.isArray(data) && data.length > 0) {
-          const rows = data.map((entry: any) => ({
-            childName: entry.childName || '',
-            checkIn: Boolean(entry.checkIn),
-            checkOut: Boolean(entry.checkOut),
-          }));
+          const rows = data.map((entry: any) => {
+            const hasCheckIn = Boolean(entry.checkIn);
+            const hasCheckOut = Boolean(entry.checkOut);
+            return {
+              childName: entry.childName || '',
+              guardianName: entry.guardianName || '',
+              action: hasCheckOut ? 'check-out' : 'check-in',
+              time: hasCheckOut ? entry.checkOut : entry.checkIn || getCurrentTime(),
+            } as AttendanceRow;
+          });
           setAttendanceRows(rows);
         } else {
-          setAttendanceRows([{ childName: '', checkIn: false, checkOut: false }]);
+          setAttendanceRows([
+            { childName: '', guardianName: '', action: 'check-in', time: getCurrentTime() },
+          ]);
         }
       } catch (error) {
         console.error('Failed to load CPC attendance:', error);
@@ -122,7 +137,7 @@ export default function Cpc() {
   const addAttendanceRow = () => {
     setAttendanceRows((prev) => [
       ...prev,
-      { childName: '', checkIn: false, checkOut: false },
+      { childName: '', guardianName: '', action: 'check-in', time: getCurrentTime() },
     ]);
   };
 
@@ -150,9 +165,9 @@ export default function Cpc() {
           date: attendanceDate,
           entries: attendanceRows.map((row) => ({
             childName: row.childName,
-            guardianName: 'N/A',
-            checkIn: row.checkIn ? 'checked' : '',
-            checkOut: row.checkOut ? 'checked' : '',
+            guardianName: row.guardianName || 'N/A',
+            checkIn: row.action === 'check-in' ? row.time : '',
+            checkOut: row.action === 'check-out' ? row.time : '',
           })),
         }),
       });
@@ -334,10 +349,15 @@ export default function Cpc() {
             transition={{ duration: 0.6 }}
             className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8"
           >
-            <h2 className="text-2xl sm:text-3xl font-serif text-white mb-6">
-              CPC Attendance List
-            </h2>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+              <div>
+                <p className="text-white/70 uppercase tracking-[0.2em] text-xs sm:text-sm">
+                  CPC Weekly Attendance
+                </p>
+                <h2 className="text-2xl sm:text-3xl font-serif text-white mt-2">
+                  Sign-In / Sign-Out
+                </h2>
+              </div>
               <label className="text-white/70 text-sm">
                 Attendance Date
                 <input
@@ -347,84 +367,97 @@ export default function Cpc() {
                   className="mt-2 block w-full sm:w-auto bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-white"
                 />
               </label>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={addAttendanceRow}
-                  className="inline-flex items-center justify-center rounded-lg bg-white/10 text-white px-4 py-2 text-sm font-semibold hover:bg-white/20 transition-colors"
-                >
-                  Add Row
-                </button>
-                <button
-                  type="button"
-                  onClick={saveAttendance}
-                  disabled={isSavingAttendance}
-                  className="inline-flex items-center justify-center rounded-lg bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-black/90 hover:text-white transition-colors disabled:opacity-60"
-                >
-                  {isSavingAttendance ? 'Saving...' : 'Save to Database'}
-                </button>
-              </div>
             </div>
-            <p className="text-white/70 text-sm mb-4">
-              Kids: type your name and tap the checkboxes when you arrive and leave.
-            </p>
-            <div className="space-y-4">
+
+            <div className="space-y-5">
               {attendanceRows.map((row, index) => (
                 <div
                   key={`${row.childName}-${index}`}
-                  className="rounded-2xl border border-white/10 bg-black/40 p-4 sm:p-6"
+                  className="rounded-2xl border border-white/10 bg-black/40 p-5 sm:p-6"
                 >
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                    <div className="flex-1">
-                      <label className="text-white/70 text-sm">Child Name</label>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <label className="text-white/70 text-sm">
+                      Child Name
                       <input
                         type="text"
                         value={row.childName}
                         onChange={(event) =>
                           updateAttendanceRow(index, 'childName', event.target.value)
                         }
-                        placeholder="Type name"
-                        className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-lg text-white"
+                        placeholder="Full name"
+                        className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white"
                       />
+                    </label>
+                    <label className="text-white/70 text-sm">
+                      Parent/Guardian
+                      <input
+                        type="text"
+                        value={row.guardianName}
+                        onChange={(event) =>
+                          updateAttendanceRow(index, 'guardianName', event.target.value)
+                        }
+                        placeholder="Full name"
+                        className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white"
+                      />
+                    </label>
+                    <label className="text-white/70 text-sm">
+                      Action
+                      <select
+                        value={row.action}
+                        onChange={(event) =>
+                          updateAttendanceRow(
+                            index,
+                            'action',
+                            event.target.value as AttendanceRow['action']
+                          )
+                        }
+                        className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white"
+                      >
+                        <option value="check-in">Check In</option>
+                        <option value="check-out">Check Out</option>
+                      </select>
+                    </label>
+                    <label className="text-white/70 text-sm">
+                      Time
+                      <input
+                        type="time"
+                        value={row.time}
+                        onChange={(event) => updateAttendanceRow(index, 'time', event.target.value)}
+                        className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white"
+                      />
+                    </label>
+                    <div className="flex items-end justify-end md:col-span-2">
+                      <button
+                        type="button"
+                        onClick={() => removeAttendanceRow(index)}
+                        className="text-white/70 hover:text-white text-sm"
+                      >
+                        Remove
+                      </button>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 text-white/80">
-                        <input
-                          type="checkbox"
-                          checked={row.checkIn}
-                          onChange={(event) =>
-                            updateAttendanceRow(index, 'checkIn', event.target.checked)
-                          }
-                          className="h-6 w-6 rounded border-white/30 bg-black/30"
-                        />
-                        Checked In
-                      </label>
-                      <label className="flex items-center gap-2 text-white/80">
-                        <input
-                          type="checkbox"
-                          checked={row.checkOut}
-                          onChange={(event) =>
-                            updateAttendanceRow(index, 'checkOut', event.target.checked)
-                          }
-                          className="h-6 w-6 rounded border-white/30 bg-black/30"
-                        />
-                        Picked Up
-                      </label>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeAttendanceRow(index)}
-                      className="text-white/70 hover:text-white text-sm"
-                    >
-                      Remove
-                    </button>
                   </div>
                 </div>
               ))}
             </div>
-            <p className="text-white/60 text-sm mt-4">
-              Update this list each Sunday with names and times, then save to the database.
-            </p>
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <button
+                type="button"
+                onClick={addAttendanceRow}
+                className="inline-flex items-center justify-center rounded-lg bg-white/10 text-white px-4 py-2 text-sm font-semibold hover:bg-white/20 transition-colors"
+              >
+                Add Child
+              </button>
+              <button
+                type="button"
+                onClick={saveAttendance}
+                disabled={isSavingAttendance}
+                className="inline-flex items-center justify-center rounded-lg bg-white text-black px-4 py-2 text-sm font-semibold hover:bg-black/90 hover:text-white transition-colors disabled:opacity-60"
+              >
+                {isSavingAttendance ? 'Saving...' : 'Submit Attendance'}
+              </button>
+            </div>
+
             {attendanceMessage ? (
               <p className="text-white/80 text-sm mt-2">{attendanceMessage}</p>
             ) : null}

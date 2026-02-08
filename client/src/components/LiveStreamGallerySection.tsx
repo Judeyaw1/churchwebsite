@@ -34,7 +34,6 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isStreamUnlocked, setIsStreamUnlocked] = useState(false);
   const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Fetch live streams and gallery data
@@ -60,55 +59,23 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
     fetchData();
   }, []);
 
-  // Convert YouTube URL to embed format
-  const convertYouTubeUrl = (url: string) => {
+  // Normalize Zoom URL for embedding or direct join
+  const normalizeZoomUrl = (url: string) => {
     try {
-      const withMute = (embedUrl: string) => {
-        const joiner = embedUrl.includes('?') ? '&' : '?';
-        return embedUrl.includes('mute=') ? embedUrl : `${embedUrl}${joiner}mute=1`;
-      };
-      const withNoAutoplay = (embedUrl: string) => {
-        return embedUrl.replace('autoplay=1', 'autoplay=0');
-      };
-
-      // If already in embed format, return as is
-      if (url.includes('youtube.com/embed/')) {
-        return withNoAutoplay(withMute(url));
+      if (!url) return url;
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
       }
-      
-      // Handle youtu.be short URLs
-      if (url.includes('youtu.be/')) {
-        const videoId = url.split('youtu.be/')[1].split('?')[0];
-        return withNoAutoplay(withMute(`https://www.youtube.com/embed/${videoId}?autoplay=1`));
-      }
-      
-      // Handle youtube.com/watch?v= format
-      if (url.includes('youtube.com/watch?v=') || url.includes('youtube.com/')) {
-        let videoId = '';
-        if (url.includes('v=')) {
-          videoId = url.split('v=')[1].split('&')[0];
-        } else if (url.includes('/')) {
-          videoId = url.split('/').pop()?.split('?')[0] || '';
-        }
-        return withNoAutoplay(withMute(`https://www.youtube.com/embed/${videoId}?autoplay=1`));
-      }
-      
-      // If URL doesn't match any pattern, try to extract video ID from the end
-      const possibleVideoId = url.split('/').pop()?.split('?')[0];
-      if (possibleVideoId && possibleVideoId.length > 8) {
-        return withNoAutoplay(withMute(`https://www.youtube.com/embed/${possibleVideoId}?autoplay=1`));
-      }
-      
-      return withNoAutoplay(withMute(url));
+      return `https://${url}`;
     } catch (error) {
-      console.error('Error converting YouTube URL:', error);
+      console.error('Error normalizing Zoom URL:', error);
       return url;
     }
   };
 
   // Get current live stream
   const currentLiveStream = liveStreams.find(stream => stream.isLive) || liveStreams[0];
-  const channelUrl = 'http://www.youtube.com/@ubpcmedia6480';
+  const zoomUrl = 'https://zoom.us/j/00000000000?pwd=placeholder';
 
   // Debug logging
   useEffect(() => {
@@ -117,7 +84,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
         title: currentLiveStream.title,
         url: currentLiveStream.url,
         isLive: currentLiveStream.isLive,
-        convertedUrl: currentLiveStream.url ? convertYouTubeUrl(currentLiveStream.url) : 'No URL'
+        normalizedUrl: currentLiveStream.url ? normalizeZoomUrl(currentLiveStream.url) : 'No URL'
       });
     } else {
       console.log('No live stream found');
@@ -183,44 +150,15 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                   <div className="relative aspect-video bg-black">
                     {currentLiveStream.url ? (
                       <>
-                        {isStreamUnlocked ? (
-                          <iframe
-                            key={currentLiveStream.id}
-                            src={convertYouTubeUrl(currentLiveStream.url)}
-                            title={currentLiveStream.title}
-                            className="w-full h-full border-0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            frameBorder="0"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/70">
-                            <div className="text-center px-6">
-                              <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-4 inline-block">
-                                SUBSCRIBE REQUIRED
-                              </div>
-                              <h3 className="text-xl font-semibold text-white mb-2">Subscribe to Watch</h3>
-                              <p className="text-white/70 mb-5">
-                                Please subscribe to our YouTube channel before watching the live stream.
-                              </p>
-                              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                                <Button
-                                  variant="outline"
-                                  className="border-white/30 text-white hover:bg-white/10"
-                                  onClick={() => window.open(channelUrl, '_blank')}
-                                >
-                                  Subscribe on YouTube
-                                </Button>
-                                <Button
-                                  className="bg-white text-black hover:bg-white/90"
-                                  onClick={() => setIsStreamUnlocked(true)}
-                                >
-                                  I&apos;ve Subscribed
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
+                        <iframe
+                          key={currentLiveStream.id}
+                          src={normalizeZoomUrl(currentLiveStream.url)}
+                          title={currentLiveStream.title}
+                          className="w-full h-full border-0"
+                          allow="camera; microphone; autoplay; fullscreen; clipboard-write"
+                          allowFullScreen
+                          frameBorder="0"
+                        />
                       </>
                     ) : (
                       <div className="relative aspect-video bg-gradient-to-br from-primary/30 to-primary/50">
@@ -256,10 +194,10 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                           variant="outline"
                           size="sm"
                           className="border-white/30 text-white hover:bg-white/10"
-                          onClick={() => window.open(currentLiveStream.url, '_blank')}
+                          onClick={() => window.open(normalizeZoomUrl(currentLiveStream.url), '_blank')}
                         >
                           <ExternalLink className="h-4 w-4 mr-2" />
-                          Watch Live
+                          Join on Zoom
                         </Button>
                       )}
                     </div>
@@ -281,10 +219,10 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                 variant="outline"
                 size="lg"
                 className="border-white/70 text-white hover:bg-white/10 hover:text-white px-8 py-3"
-                onClick={() => window.open(channelUrl, '_blank')}
+                onClick={() => window.open(zoomUrl, '_blank')}
               >
                 <ExternalLink className="h-5 w-5 mr-2" />
-                Visit Our Channel
+                Open Zoom Room
               </Button>
             </div>
           </motion.div>

@@ -1990,7 +1990,7 @@ export default function Admin() {
                     <Input
                       value={streamForm.url}
                       onChange={(e) => setStreamForm(prev => ({ ...prev, url: e.target.value }))}
-                      placeholder="https://youtube.com/watch?v=..."
+                      placeholder="https://zoom.us/j/..."
                       className="bg-gray-50"
                     />
                   </div>
