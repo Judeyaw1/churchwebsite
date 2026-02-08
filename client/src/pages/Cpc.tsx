@@ -208,7 +208,7 @@ export default function Cpc() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 bg-[#f2edff]">
+      <section className="py-16 sm:py-20 bg-black/95">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -300,7 +300,7 @@ export default function Cpc() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6 }}
-            className="rounded-2xl p-4 sm:p-6 bg-[#f6f1ff] border border-purple-200/80"
+            className="rounded-2xl p-4 sm:p-6 bg-black/95 border border-white/10"
           >
             <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6 mb-6">
               <h2 className="text-2xl sm:text-3xl font-serif text-gray-900">
