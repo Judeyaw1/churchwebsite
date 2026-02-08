@@ -801,6 +801,7 @@ export default function Admin() {
   const cpcCheckIns = cpcAttendance.filter((entry) => entry.checkIn && entry.checkIn !== '').length;
   const cpcCheckOuts = cpcAttendance.filter((entry) => entry.checkOut && entry.checkOut !== '').length;
   const cpcStillInClass = Math.max(0, cpcCheckIns - cpcCheckOuts);
+  const cpcAuditMismatch = cpcCheckIns !== cpcCheckOuts;
   const cpcUniqueChildren = new Set(
     cpcAttendance
       .map((entry) => entry.childName?.trim().toLowerCase())
@@ -1443,6 +1444,14 @@ export default function Admin() {
               {/* CPC Attendance Analytics */}
               {activeTab === 'cpc' && (
                 <div className="space-y-6">
+                  {cpcAuditMismatch && !cpcAttendanceLoading && (
+                    <div className="rounded-xl border border-amber-400/50 bg-amber-500/10 p-4 text-amber-100">
+                      <p className="text-sm font-semibold">Audit Alert: Check-ins and check-outs do not match.</p>
+                      <p className="text-sm text-amber-100/90">
+                        {cpcStillInClass} child{cpcStillInClass === 1 ? '' : 'ren'} still marked in class.
+                      </p>
+                    </div>
+                  )}
                   <Card className="bg-white/5 border-white/20">
                     <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div>
