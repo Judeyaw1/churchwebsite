@@ -9,6 +9,9 @@ import { insertEventSchema, insertLiveStreamSchema, insertGalleryImageSchema, in
 import fetch from "node-fetch";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  const cpcRateLimit = new Map<string, { count: number; resetAt: number }>();
+  const CPC_RATE_WINDOW_MS = 10 * 60 * 1000;
+  const CPC_RATE_MAX = 15;
   // In-memory OneDrive tokens (for demo; consider persistent storage for production)
   let onedriveTokens: {
     accessToken: string;
@@ -124,7 +127,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ===== PUBLIC API ROUTES (for website components) =====
 
-  // CPC attendance (public read, admin write)
+  // CPC attendance (public read/write)
   app.get('/api/cpc-attendance', async (req, res) => {
     try {
       const dateParam = (req.query.date as string) || new Date().toISOString().slice(0, 10);
@@ -136,9 +139,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/cpc-attendance', requireAuth, async (req, res) => {
+  app.post('/api/cpc-attendance', async (req, res) => {
     try {
+      const clientIp = req.ip || 'unknown';
+      const now = Date.now();
+      const current = cpcRateLimit.get(clientIp);
+      if (!current || current.resetAt <= now) {
+        cpcRateLimit.set(clientIp, { count: 1, resetAt: now + CPC_RATE_WINDOW_MS });
+      } else if (current.count >= CPC_RATE_MAX) {
+        return res.status(429).json({ message: 'Too many submissions. Please wait and try again.' });
+      } else {
+        current.count += 1;
+      }
+
       const { date, entries } = req.body || {};
+      const honeypot = String((req.body || {}).honeypot || '').trim();
+      if (honeypot) {
+        return res.status(400).json({ message: 'Invalid submission' });
+      }
       if (!date || !Array.isArray(entries)) {
         return res.status(400).json({ message: 'Date and entries are required' });
       }
@@ -151,7 +169,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           checkIn: String(entry.checkIn || '').trim(),
           checkOut: entry.checkOut ? String(entry.checkOut).trim() : null,
         }))
-        .filter((entry: any) => entry.childName && entry.guardianName && entry.checkIn);
+        .filter(
+          (entry: any) =>
+            entry.childName && entry.guardianName && (entry.checkIn || entry.checkOut)
+        );
 
       await storage.setCpcAttendanceForDate(date, sanitized);
       res.json({ success: true, count: sanitized.length });

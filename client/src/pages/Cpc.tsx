@@ -77,6 +77,7 @@ export default function Cpc() {
     action: 'check-out',
     time: getCurrentTime(),
   });
+  const [cpcHoneypot, setCpcHoneypot] = useState('');
   const [isSavingAttendance, setIsSavingAttendance] = useState(false);
   const [attendanceMessage, setAttendanceMessage] = useState('');
 
@@ -101,12 +102,6 @@ export default function Cpc() {
   };
 
   const submitAttendance = async (form: AttendanceRow, reset: () => void) => {
-    const token = localStorage.getItem('adminToken') || '';
-    if (!token) {
-      setAttendanceMessage('Admin login required to save attendance.');
-      return;
-    }
-
     setIsSavingAttendance(true);
     setAttendanceMessage('');
     try {
@@ -114,10 +109,10 @@ export default function Cpc() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           date: attendanceDate,
+          honeypot: cpcHoneypot,
           entries: [
             {
               childName: form.childName,
@@ -316,6 +311,18 @@ export default function Cpc() {
                 Please sign your child in upon arrival and out at pick-up. If you are signing in
                 multiple children, submit a separate response for each child after pressing Submit.
               </p>
+            </div>
+            <div className="hidden" aria-hidden="true">
+              <label className="text-gray-700 text-sm">
+                Leave this field empty
+                <input
+                  type="text"
+                  value={cpcHoneypot}
+                  onChange={(event) => setCpcHoneypot(event.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </label>
             </div>
 
             <div className="space-y-6">
