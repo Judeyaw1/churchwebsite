@@ -802,11 +802,6 @@ export default function Admin() {
   const cpcCheckOuts = cpcAttendance.filter((entry) => entry.checkOut && entry.checkOut !== '').length;
   const cpcStillInClass = Math.max(0, cpcCheckIns - cpcCheckOuts);
   const cpcAuditMismatch = cpcCheckIns !== cpcCheckOuts;
-  const cpcUniqueChildren = new Set(
-    cpcAttendance
-      .map((entry) => entry.childName?.trim().toLowerCase())
-      .filter((name) => name && name.length > 0)
-  ).size;
   const cpcRecentEntries = [...cpcAttendance]
     .sort((a, b) => {
       const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -1486,22 +1481,14 @@ export default function Admin() {
                           <p className="text-white/70">Loading attendance...</p>
                         </div>
                       ) : (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid gap-4 sm:grid-cols-2">
                           <div className="rounded-xl border border-white/10 bg-black/40 p-4">
-                            <p className="text-white/60 text-sm">Check-ins</p>
+                            <p className="text-white/60 text-sm">Total Check-ins</p>
                             <p className="text-2xl font-semibold text-white">{cpcCheckIns}</p>
                           </div>
                           <div className="rounded-xl border border-white/10 bg-black/40 p-4">
-                            <p className="text-white/60 text-sm">Check-outs</p>
+                            <p className="text-white/60 text-sm">Total Check-outs</p>
                             <p className="text-2xl font-semibold text-white">{cpcCheckOuts}</p>
-                          </div>
-                          <div className="rounded-xl border border-white/10 bg-black/40 p-4">
-                            <p className="text-white/60 text-sm">Still in Class</p>
-                            <p className="text-2xl font-semibold text-white">{cpcStillInClass}</p>
-                          </div>
-                          <div className="rounded-xl border border-white/10 bg-black/40 p-4">
-                            <p className="text-white/60 text-sm">Unique Children</p>
-                            <p className="text-2xl font-semibold text-white">{cpcUniqueChildren}</p>
                           </div>
                         </div>
                       )}
