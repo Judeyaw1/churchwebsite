@@ -495,11 +495,9 @@ export class PostgresStorage implements IStorage {
       .orderBy(desc(cpcAttendance.createdAt));
   }
 
-  async setCpcAttendanceForDate(
-    date: string,
+  async addCpcAttendanceEntries(
     entries: InsertCpcAttendance[],
   ): Promise<void> {
-    await db.delete(cpcAttendance).where(eq(cpcAttendance.date, date));
     if (entries.length === 0) return;
     await db.insert(cpcAttendance).values(entries);
   }

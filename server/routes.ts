@@ -174,7 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             entry.childName && entry.guardianName && (entry.checkIn || entry.checkOut)
         );
 
-      await storage.setCpcAttendanceForDate(date, sanitized);
+      await storage.addCpcAttendanceEntries(sanitized);
       res.json({ success: true, count: sanitized.length });
     } catch (error) {
       console.error('Failed to save CPC attendance:', error);
