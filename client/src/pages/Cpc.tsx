@@ -125,14 +125,18 @@ export default function Cpc() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save attendance');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData?.message || 'Failed to save attendance';
+        throw new Error(errorMessage);
       }
 
       setAttendanceMessage('Attendance saved.');
       reset();
     } catch (error) {
       console.error('Failed to save attendance:', error);
-      setAttendanceMessage('Failed to save attendance.');
+      setAttendanceMessage(
+        error instanceof Error ? error.message : 'Failed to save attendance.'
+      );
     } finally {
       setIsSavingAttendance(false);
     }

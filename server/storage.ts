@@ -152,7 +152,8 @@ export interface IStorage {
 
   // CPC attendance methods
   getCpcAttendanceByDate(date: string): Promise<CpcAttendance[]>;
-  setCpcAttendanceForDate(date: string, entries: InsertCpcAttendance[]): Promise<void>;
+  addCpcAttendanceEntries(entries: InsertCpcAttendance[]): Promise<void>;
+  hasCpcCheckInForChild(date: string, childName: string): Promise<boolean>;
 }
 
 export class PostgresStorage implements IStorage {
@@ -500,6 +501,21 @@ export class PostgresStorage implements IStorage {
   ): Promise<void> {
     if (entries.length === 0) return;
     await db.insert(cpcAttendance).values(entries);
+  }
+
+  async hasCpcCheckInForChild(date: string, childName: string): Promise<boolean> {
+    const normalizedName = childName.trim().toLowerCase();
+    if (!normalizedName) return false;
+    const rows = await db
+      .select({ childName: cpcAttendance.childName, checkIn: cpcAttendance.checkIn })
+      .from(cpcAttendance)
+      .where(eq(cpcAttendance.date, date));
+
+    return rows.some(
+      (row) =>
+        row.childName?.trim().toLowerCase() === normalizedName &&
+        Boolean(row.checkIn && row.checkIn.trim().length > 0)
+    );
   }
 }
 

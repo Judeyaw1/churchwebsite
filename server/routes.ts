@@ -174,6 +174,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
             entry.childName && entry.guardianName && (entry.checkIn || entry.checkOut)
         );
 
+      for (const entry of sanitized) {
+        if (entry.checkOut && !entry.checkIn) {
+          const hasCheckIn = await storage.hasCpcCheckInForChild(date, entry.childName);
+          if (!hasCheckIn) {
+            return res.status(400).json({
+              message: `Cannot check out before check in for ${entry.childName}`,
+            });
+          }
+        }
+      }
+
       await storage.addCpcAttendanceEntries(sanitized);
       res.json({ success: true, count: sanitized.length });
     } catch (error) {
