@@ -59,8 +59,8 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
     fetchData();
   }, []);
 
-  // Normalize Zoom URL for embedding or direct join
-  const normalizeZoomUrl = (url: string) => {
+  // Normalize URL for embedding or direct join
+  const normalizeUrl = (url: string) => {
     try {
       if (!url) return url;
       if (url.startsWith('http://') || url.startsWith('https://')) {
@@ -73,9 +73,18 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
     }
   };
 
+  const zoomUrl = 'https://us06web.zoom.us/j/83673620030?pwd=wTkJbWmleCKz1ka6qS3UZQfwUwVKa0.1';
+
+  const isZoomUrl = (url?: string) => {
+    if (!url) return false;
+    return /(?:^https?:\/\/)?(?:[\w-]+\.)?zoom\.us\//i.test(url);
+  };
+
   // Get current live stream
   const currentLiveStream = liveStreams.find(stream => stream.isLive) || liveStreams[0];
-  const zoomUrl = 'https://us06web.zoom.us/j/83673620030?pwd=wTkJbWmleCKz1ka6qS3UZQfwUwVKa0.1';
+  const currentStreamUrl = isZoomUrl(currentLiveStream?.url)
+    ? normalizeUrl(currentLiveStream.url)
+    : zoomUrl;
 
   // Debug logging
   useEffect(() => {
@@ -84,12 +93,12 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
         title: currentLiveStream.title,
         url: currentLiveStream.url,
         isLive: currentLiveStream.isLive,
-        normalizedUrl: currentLiveStream.url ? normalizeZoomUrl(currentLiveStream.url) : 'No URL'
+        normalizedUrl: currentStreamUrl
       });
     } else {
       console.log('No live stream found');
     }
-  }, [currentLiveStream]);
+  }, [currentLiveStream, currentStreamUrl]);
 
   const nextImage = () => {
     setCurrentImageIndex((prevIndex) => 
@@ -148,11 +157,11 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                   </div>
                 ) : currentLiveStream ? (
                   <div className="relative aspect-video bg-black">
-                    {currentLiveStream.url ? (
+                    {currentStreamUrl ? (
                       <>
                         <iframe
                           key={currentLiveStream.id}
-                          src={normalizeZoomUrl(currentLiveStream.url)}
+                          src={currentStreamUrl}
                           title={currentLiveStream.title}
                           className="w-full h-full border-0"
                           allow="camera; microphone; autoplay; fullscreen; clipboard-write"
@@ -189,12 +198,12 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-xl font-semibold text-white">{currentLiveStream.title}</h3>
-                      {currentLiveStream.url && (
+                      {currentStreamUrl && (
                         <Button
                           variant="outline"
                           size="sm"
                           className="border-white/30 text-white hover:bg-white/10"
-                          onClick={() => window.open(normalizeZoomUrl(currentLiveStream.url), '_blank')}
+                          onClick={() => window.open(currentStreamUrl, '_blank')}
                         >
                           <ExternalLink className="h-4 w-4 mr-2" />
                           Join on Zoom
