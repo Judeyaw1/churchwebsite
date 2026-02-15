@@ -147,6 +147,9 @@ export default function Cpc() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData?.message || 'Failed to save attendance';
+        if (errorMessage.includes('Cannot check out before check in')) {
+          window.alert(errorMessage);
+        }
         throw new Error(errorMessage);
       }
 

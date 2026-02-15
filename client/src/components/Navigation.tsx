@@ -151,14 +151,14 @@ export default function Navigation({ className = '' }: NavigationProps) {
               <span className={`font-serif text-base sm:text-lg lg:text-xl font-bold transition-colors duration-300 ${
                 isScrolled ? 'text-white' : 'text-white'
               }`}>
-                <span className="hidden sm:inline">United Bethel Presbyterian</span>
-                <span className="sm:hidden">UBPC</span>
+                <span className="hidden lg:inline">United Bethel Presbyterian</span>
+                <span className="lg:hidden">UBPC</span>
               </span>
             </motion.div>
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-8">
             {navItems.map((item, index) => (
               <motion.div
                 key={item.label}
@@ -304,7 +304,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <Button
               variant="ghost"
               size="icon"
@@ -349,7 +349,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="md:hidden bg-white/10 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 mt-2 mb-4 mx-2"
+              className="lg:hidden bg-white/10 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 mt-2 mb-4 mx-2"
             >
               <div className="px-4 py-6 space-y-4">
                 {navItems.map((item, index) => (
