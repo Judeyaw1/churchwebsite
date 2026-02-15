@@ -127,6 +127,7 @@ export const cpcAttendance = pgTable("cpc_attendance", {
   guardianName: text("guardian_name").notNull(),
   checkIn: text("check_in").notNull(),
   checkOut: text("check_out"),
+  teacherApprovedBy: text("teacher_approved_by"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -220,6 +221,7 @@ export const insertCpcAttendanceSchema = createInsertSchema(cpcAttendance).pick(
   guardianName: true,
   checkIn: true,
   checkOut: true,
+  teacherApprovedBy: true,
 });
 
 // Type exports

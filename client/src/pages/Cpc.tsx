@@ -24,7 +24,6 @@ interface Slide {
 interface AttendanceRow {
   childName: string;
   guardianName: string;
-  action: 'check-in' | 'check-out';
   time: string;
 }
 
@@ -52,6 +51,17 @@ const slides: Slide[] = slideImages.slice(0, 5).map((image, index) => ({
   description: '',
 }));
 
+const cpcTeacherApprovers = [
+  'Patience Harris',
+  'Beryl Lartey',
+  'Georgina Fosua',
+  'Hazel Frempong',
+  'Dr. Akua Ohene',
+  'Afia-Grace Harris',
+  'Pearl Mensah',
+  'Constance Beneman',
+];
+
 export default function Cpc() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -68,15 +78,14 @@ export default function Cpc() {
   const [signInForm, setSignInForm] = useState<AttendanceRow>({
     childName: '',
     guardianName: '',
-    action: 'check-in',
     time: getCurrentTime(),
   });
   const [signOutForm, setSignOutForm] = useState<AttendanceRow>({
     childName: '',
     guardianName: '',
-    action: 'check-out',
     time: getCurrentTime(),
   });
+  const [signOutTeacherApprovedBy, setSignOutTeacherApprovedBy] = useState('');
   const [cpcHoneypot, setCpcHoneypot] = useState('');
   const [isSavingAttendance, setIsSavingAttendance] = useState(false);
   const [attendanceMessage, setAttendanceMessage] = useState('');
@@ -101,7 +110,17 @@ export default function Cpc() {
     setCurrentIndex(index);
   };
 
-  const submitAttendance = async (form: AttendanceRow, reset: () => void) => {
+  const submitAttendance = async (
+    form: AttendanceRow,
+    action: 'check-in' | 'check-out',
+    teacherApprovedBy: string | null,
+    reset: () => void
+  ) => {
+    if (action === 'check-out' && !teacherApprovedBy) {
+      setAttendanceMessage('Please select the teacher who approved this sign-out.');
+      return;
+    }
+
     setIsSavingAttendance(true);
     setAttendanceMessage('');
     try {
@@ -117,8 +136,9 @@ export default function Cpc() {
             {
               childName: form.childName,
               guardianName: form.guardianName || 'N/A',
-              checkIn: form.action === 'check-in' ? form.time : '',
-              checkOut: form.action === 'check-out' ? form.time : '',
+              checkIn: action === 'check-in' ? form.time : '',
+              checkOut: action === 'check-out' ? form.time : '',
+              teacherApprovedBy: action === 'check-out' ? teacherApprovedBy : null,
             },
           ],
         }),
@@ -329,15 +349,14 @@ export default function Cpc() {
               </label>
             </div>
 
-            <div className="space-y-6">
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <h3 className="text-xl font-semibold text-gray-900">SIGN-IN</h3>
-                <p className="text-gray-700 mt-1">Kindly sign your child in to class</p>
-              </div>
-
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <label className="text-gray-700 text-sm">
-                  Today&apos;s Date (Sign-In)
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6 space-y-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">SIGN-IN</h3>
+                  <p className="text-gray-700 mt-1">Kindly sign your child in to class</p>
+                </div>
+                <label className="text-gray-700 text-sm block">
+                  Today&apos;s Date
                   <input
                     type="date"
                     value={attendanceDate}
@@ -345,60 +364,32 @@ export default function Cpc() {
                     className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
                   />
                 </label>
-              </div>
-
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <label className="text-gray-700 text-sm">
-                  Weekly Sign-in
-                  <select
-                    value={signInForm.action}
-                    onChange={(event) =>
-                      setSignInForm((prev) => ({
-                        ...prev,
-                        action: event.target.value as AttendanceRow['action'],
-                      }))
-                    }
-                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
-                  >
-                    <option value="check-in">Check In</option>
-                    <option value="check-out">Check Out</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <label className="text-gray-700 text-sm">
-                  If child&apos;s name is not listed, please enter full name here (Sign-in)
+                <label className="text-gray-700 text-sm block">
+                  If child&apos;s name is not listed, please enter full name here
                   <input
                     type="text"
                     value={signInForm.childName}
                     onChange={(event) =>
                       setSignInForm((prev) => ({ ...prev, childName: event.target.value }))
                     }
-                    placeholder="Your answer"
+                    placeholder="Name of child"
                     className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
                   />
                 </label>
-              </div>
-
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <label className="text-gray-700 text-sm">
-                  Parent/Guardian Name (Sign-in)
+                <label className="text-gray-700 text-sm block">
+                  Parent/Guardian Name
                   <input
                     type="text"
                     value={signInForm.guardianName}
                     onChange={(event) =>
                       setSignInForm((prev) => ({ ...prev, guardianName: event.target.value }))
                     }
-                    placeholder="Your answer"
+                    placeholder="Name of parent/guardian"
                     className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
                   />
                 </label>
-              </div>
-
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <label className="text-gray-700 text-sm">
-                  Time (Sign-in)
+                <label className="text-gray-700 text-sm block">
+                  Time
                   <input
                     type="time"
                     value={signInForm.time}
@@ -408,16 +399,31 @@ export default function Cpc() {
                     className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
                   />
                 </label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    submitAttendance(signInForm, 'check-in', null, () =>
+                      setSignInForm({
+                        childName: '',
+                        guardianName: '',
+                        time: getCurrentTime(),
+                      })
+                    )
+                  }
+                  disabled={isSavingAttendance}
+                  className="inline-flex items-center justify-center rounded-lg bg-[#6d48c7] text-white px-5 py-2 text-sm font-semibold hover:bg-[#5d3db3] transition-colors disabled:opacity-60"
+                >
+                  {isSavingAttendance ? 'Saving...' : 'Submit Sign-In'}
+                </button>
               </div>
 
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <h3 className="text-xl font-semibold text-gray-900">SIGN OUT</h3>
-                <p className="text-gray-700 mt-1">Kindly sign your child out of class</p>
-              </div>
-
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <label className="text-gray-700 text-sm">
-                  Today&apos;s Date (Sign-Out)
+              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6 space-y-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">SIGN OUT</h3>
+                  <p className="text-gray-700 mt-1">Kindly sign your child out of class</p>
+                </div>
+                <label className="text-gray-700 text-sm block">
+                  Today&apos;s Date
                   <input
                     type="date"
                     value={attendanceDate}
@@ -425,60 +431,32 @@ export default function Cpc() {
                     className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
                   />
                 </label>
-              </div>
-
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <label className="text-gray-700 text-sm">
-                  Weekly Sign-out
-                  <select
-                    value={signOutForm.action}
-                    onChange={(event) =>
-                      setSignOutForm((prev) => ({
-                        ...prev,
-                        action: event.target.value as AttendanceRow['action'],
-                      }))
-                    }
-                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
-                  >
-                    <option value="check-out">Check Out</option>
-                    <option value="check-in">Check In</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <label className="text-gray-700 text-sm">
-                  If child&apos;s name is not listed, please enter full name here (Sign-out)
+                <label className="text-gray-700 text-sm block">
+                  If child&apos;s name is not listed, please enter full name here
                   <input
                     type="text"
                     value={signOutForm.childName}
                     onChange={(event) =>
                       setSignOutForm((prev) => ({ ...prev, childName: event.target.value }))
                     }
-                    placeholder="Your answer"
+                    placeholder="Name of child"
                     className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
                   />
                 </label>
-              </div>
-
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <label className="text-gray-700 text-sm">
-                  Parent/Guardian Name (Sign-out)
+                <label className="text-gray-700 text-sm block">
+                  Parent/Guardian Name
                   <input
                     type="text"
                     value={signOutForm.guardianName}
                     onChange={(event) =>
                       setSignOutForm((prev) => ({ ...prev, guardianName: event.target.value }))
                     }
-                    placeholder="Your answer"
+                    placeholder="Name of parent/guardian"
                     className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
                   />
                 </label>
-              </div>
-
-              <div className="bg-white border border-purple-200 rounded-2xl p-5 sm:p-6">
-                <label className="text-gray-700 text-sm">
-                  Time (Sign-out)
+                <label className="text-gray-700 text-sm block">
+                  Time
                   <input
                     type="time"
                     value={signOutForm.time}
@@ -488,44 +466,39 @@ export default function Cpc() {
                     className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
                   />
                 </label>
+                <label className="text-gray-700 text-sm block">
+                  Teacher Who Approved Sign-Out
+                  <select
+                    value={signOutTeacherApprovedBy}
+                    onChange={(event) => setSignOutTeacherApprovedBy(event.target.value)}
+                    className="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
+                  >
+                    <option value="">Select a teacher</option>
+                    {cpcTeacherApprovers.map((teacher) => (
+                      <option key={teacher} value={teacher}>
+                        {teacher}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    submitAttendance(signOutForm, 'check-out', signOutTeacherApprovedBy, () => {
+                      setSignOutForm({
+                        childName: '',
+                        guardianName: '',
+                        time: getCurrentTime(),
+                      });
+                      setSignOutTeacherApprovedBy('');
+                    })
+                  }
+                  disabled={isSavingAttendance}
+                  className="inline-flex items-center justify-center rounded-lg bg-white text-[#6d48c7] border border-[#6d48c7] px-5 py-2 text-sm font-semibold hover:bg-[#efe9ff] transition-colors disabled:opacity-60"
+                >
+                  {isSavingAttendance ? 'Saving...' : 'Submit Sign-Out'}
+                </button>
               </div>
-            </div>
-
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <button
-                type="button"
-                onClick={() =>
-                  submitAttendance(signInForm, () =>
-                    setSignInForm({
-                      childName: '',
-                      guardianName: '',
-                      action: 'check-in',
-                      time: getCurrentTime(),
-                    })
-                  )
-                }
-                disabled={isSavingAttendance}
-                className="inline-flex items-center justify-center rounded-lg bg-[#6d48c7] text-white px-5 py-2 text-sm font-semibold hover:bg-[#5d3db3] transition-colors disabled:opacity-60"
-              >
-                {isSavingAttendance ? 'Saving...' : 'Submit Sign-In'}
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  submitAttendance(signOutForm, () =>
-                    setSignOutForm({
-                      childName: '',
-                      guardianName: '',
-                      action: 'check-out',
-                      time: getCurrentTime(),
-                    })
-                  )
-                }
-                disabled={isSavingAttendance}
-                className="inline-flex items-center justify-center rounded-lg bg-white text-[#6d48c7] border border-[#6d48c7] px-5 py-2 text-sm font-semibold hover:bg-[#efe9ff] transition-colors disabled:opacity-60"
-              >
-                {isSavingAttendance ? 'Saving...' : 'Submit Sign-Out'}
-              </button>
             </div>
 
             {attendanceMessage ? (

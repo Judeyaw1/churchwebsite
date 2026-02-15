@@ -91,6 +91,7 @@ interface CpcAttendanceEntry {
   guardianName: string;
   checkIn?: string;
   checkOut?: string;
+  teacherApprovedBy?: string;
   createdAt?: string;
 }
 
@@ -1513,6 +1514,7 @@ export default function Admin() {
                                 <th className="py-2 pr-4">Guardian</th>
                                 <th className="py-2 pr-4">Status</th>
                                 <th className="py-2 pr-4">Time</th>
+                                <th className="py-2 pr-4">Approved By</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -1534,6 +1536,9 @@ export default function Admin() {
                                       <Badge className={badgeClass}>{status}</Badge>
                                     </td>
                                     <td className="py-2 pr-4">{time}</td>
+                                    <td className="py-2 pr-4">
+                                      {entry.checkOut ? entry.teacherApprovedBy || '—' : '—'}
+                                    </td>
                                   </tr>
                                 );
                               })}

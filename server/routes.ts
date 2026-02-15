@@ -168,6 +168,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           guardianName: String(entry.guardianName || '').trim(),
           checkIn: String(entry.checkIn || '').trim(),
           checkOut: entry.checkOut ? String(entry.checkOut).trim() : null,
+          teacherApprovedBy: entry.teacherApprovedBy
+            ? String(entry.teacherApprovedBy).trim()
+            : null,
         }))
         .filter(
           (entry: any) =>
@@ -180,6 +183,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (!hasCheckIn) {
             return res.status(400).json({
               message: `Cannot check out before check in for ${entry.childName}`,
+            });
+          }
+          if (!entry.teacherApprovedBy) {
+            return res.status(400).json({
+              message: `Teacher approval is required for signing out ${entry.childName}`,
             });
           }
         }
