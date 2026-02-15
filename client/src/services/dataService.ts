@@ -141,14 +141,14 @@ const defaultLiveStreams: LiveStream[] = [
   {
     id: '1',
     title: 'Sunday Worship Service',
-    url: 'https://zoom.us/j/00000000000?pwd=placeholder',
+    url: 'https://us06web.zoom.us/j/83673620030?pwd=wTkJbWmleCKz1ka6qS3UZQfwUwVKa0.1',
     schedule: 'Sundays 9:00 AM & 11:00 AM',
     isLive: false
   },
   {
     id: '2',
     title: 'Midweek Bible Study',
-    url: 'https://zoom.us/j/00000000000?pwd=placeholder',
+    url: 'https://us06web.zoom.us/j/83673620030?pwd=wTkJbWmleCKz1ka6qS3UZQfwUwVKa0.1',
     schedule: 'Wednesdays 7:00 PM',
     isLive: false
   }

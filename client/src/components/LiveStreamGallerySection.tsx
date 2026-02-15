@@ -75,7 +75,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
 
   // Get current live stream
   const currentLiveStream = liveStreams.find(stream => stream.isLive) || liveStreams[0];
-  const zoomUrl = 'https://zoom.us/j/00000000000?pwd=placeholder';
+  const zoomUrl = 'https://us06web.zoom.us/j/83673620030?pwd=wTkJbWmleCKz1ka6qS3UZQfwUwVKa0.1';
 
   // Debug logging
   useEffect(() => {
