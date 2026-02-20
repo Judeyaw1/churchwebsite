@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Sparkles,
   HeartHandshake,
@@ -63,8 +64,12 @@ const cpcTeacherApprovers = [
 ];
 
 export default function Cpc() {
+  const isMobile = useIsMobile();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window === 'undefined' ? 1200 : window.innerWidth
+  );
   const [attendanceDate, setAttendanceDate] = useState(
     new Date().toISOString().slice(0, 10)
   );
@@ -97,6 +102,16 @@ export default function Cpc() {
     }, 4000);
     return () => clearInterval(interval);
   }, [isPlaying]);
+
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const slideSpacing = Math.min(360, Math.max(150, viewportWidth * (isMobile ? 0.45 : 0.3)));
+  const slideCardWidth = Math.min(420, Math.max(210, viewportWidth * (isMobile ? 0.62 : 0.35)));
+  const slideCardHeight = Math.min(520, Math.max(280, viewportWidth * (isMobile ? 0.95 : 0.48)));
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % slides.length);
@@ -166,7 +181,7 @@ export default function Cpc() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Navigation />
 
       <section className="relative pt-24 pb-16 bg-gradient-to-b from-black/95 via-black/90 to-black/85">
@@ -534,8 +549,8 @@ export default function Cpc() {
                   const isActive = offset === 0;
                   const absOffset = Math.abs(offset);
 
-                  const x = offset * 360;
-                  const rotateY = offset * -45;
+                  const x = offset * slideSpacing;
+                  const rotateY = offset * (isMobile ? -28 : -45);
                   const z = isActive ? 200 : -absOffset * 180;
                   const scale = isActive ? 1.05 : 0.8;
                   const opacity = absOffset > 2 ? 0 : 1 - absOffset * 0.25;
@@ -550,7 +565,10 @@ export default function Cpc() {
                       style={{ transformStyle: 'preserve-3d' }}
                       onClick={() => !isActive && goToSlide(index)}
                     >
-                      <div className="relative w-[320px] sm:w-[420px] h-[420px] sm:h-[520px] rounded-3xl overflow-hidden shadow-2xl">
+                      <div
+                        className="relative rounded-3xl overflow-hidden shadow-2xl"
+                        style={{ width: `${slideCardWidth}px`, height: `${slideCardHeight}px` }}
+                      >
                         <img
                           src={slide.image}
                           alt={slide.title || 'CPC moments'}
@@ -623,7 +641,7 @@ export default function Cpc() {
               <span className="opacity-70">Slide</span> {currentIndex + 1} / {slides.length}
             </div>
 
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-3">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2 sm:gap-3">
               {slides.map((_, index) => (
                 <button
                   key={index}

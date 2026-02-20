@@ -70,6 +70,18 @@ export default function Navigation({ className = '' }: NavigationProps) {
     }
   }, [isGroupsOpen, isMinistryOpen, isBlogOpen, isMenuOpen]);
 
+  useEffect(() => {
+    if (!isMenuOpen) {
+      document.body.style.overflow = '';
+      return;
+    }
+
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
   const navItems = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
@@ -344,145 +356,157 @@ export default function Navigation({ className = '' }: NavigationProps) {
         {/* Mobile Navigation */}
         <AnimatePresence>
           {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="lg:hidden bg-white/10 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 mt-2 mb-4 mx-2"
-            >
-              <div className="px-4 py-6 space-y-4">
-                {navItems.map((item, index) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1, duration: 0.3 }}
-                  >
-                    {item.hasDropdown ? (
-                      <div>
-                        <button
-                          className={`w-full text-left transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center justify-between hover:bg-white/10 ${
-                            isScrolled 
-                              ? 'text-white hover:text-white/80' 
-                              : 'text-white hover:text-white/80'
-                          }`}
-                          onClick={() => {
-                            if (item.dropdownKey === 'groups') {
-                              setIsGroupsOpen(!isGroupsOpen);
-                              setIsMinistryOpen(false);
-                              setIsBlogOpen(false);
-                            } else if (item.dropdownKey === 'ministry') {
-                              setIsMinistryOpen(!isMinistryOpen);
-                              setIsGroupsOpen(false);
-                              setIsBlogOpen(false);
-                            } else {
-                              setIsBlogOpen(!isBlogOpen);
-                              setIsGroupsOpen(false);
-                              setIsMinistryOpen(false);
-                            }
-                          }}
-                        >
-                          <span className="text-base">{item.label}</span>
-                          <ChevronDown
-                            className={`h-4 w-4 transition-transform duration-200 ${
-                              item.dropdownKey === 'groups'
-                                ? (isGroupsOpen ? 'rotate-180' : '')
-                                : item.dropdownKey === 'ministry'
-                                  ? (isMinistryOpen ? 'rotate-180' : '')
-                                  : (isBlogOpen ? 'rotate-180' : '')
+            <>
+              <motion.button
+                type="button"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => setIsMenuOpen(false)}
+                className="lg:hidden fixed inset-0 top-16 bg-black/50 backdrop-blur-[2px]"
+                aria-label="Close mobile navigation"
+              />
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="lg:hidden fixed right-0 top-16 h-[calc(100dvh-4rem)] w-[85vw] max-w-sm bg-black/85 backdrop-blur-xl border-l border-white/20 shadow-2xl overflow-y-auto"
+              >
+                <div className="px-4 py-6 space-y-4">
+                  {navItems.map((item, index) => (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, x: 24 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.06, duration: 0.25 }}
+                    >
+                      {item.hasDropdown ? (
+                        <div>
+                          <button
+                            className={`w-full text-left transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center justify-between hover:bg-white/10 ${
+                              isScrolled 
+                                ? 'text-white hover:text-white/80' 
+                                : 'text-white hover:text-white/80'
                             }`}
-                          />
-                        </button>
-                        
-                        {/* Mobile Dropdown */}
-                        <AnimatePresence>
-                          {(item.dropdownKey === 'groups' ? isGroupsOpen : item.dropdownKey === 'ministry' ? isMinistryOpen : isBlogOpen) && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.2 }}
-                              className="ml-4 mt-2 space-y-2 bg-black/60 backdrop-blur-sm rounded-lg p-2"
-                            >
-                              {(item.dropdownKey === 'groups' ? groupsItems : item.dropdownKey === 'ministry' ? ministryItems : blogItems).map((groupItem) => (
-                                <Link key={groupItem.label} href={groupItem.href}>
-                                  <a
-                                    className="block py-2 px-3 text-white hover:text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
-                                    onClick={() => {
-                                      setIsMenuOpen(false);
-                                      if (item.dropdownKey === 'groups') {
-                                        setIsGroupsOpen(false);
-                                      } else if (item.dropdownKey === 'ministry') {
-                                        setIsMinistryOpen(false);
-                                      } else {
-                                        setIsBlogOpen(false);
-                                      }
-                                    }}
-                                  >
-                                    {groupItem.label}
-                                  </a>
-                                </Link>
-                              ))}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    ) : item.label === 'Home' ? (
-                      <a
-                        href="/"
-                        onClick={(event) => {
-                          setIsMenuOpen(false);
-                          handleHomeClick(event);
-                        }}
-                        className={`transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
-                          isScrolled 
-                            ? 'text-white hover:text-white/80' 
-                            : 'text-white hover:text-white/80'
-                        }`}
-                        data-testid={`link-mobile-${item.label.toLowerCase()}`}
-                      >
-                        {item.icon && <item.icon className="h-5 w-5 flex-shrink-0" />}
-                        <span className="text-base">{item.label}</span>
-                      </a>
-                    ) : (
-                      <Link href={item.href}>
+                            onClick={() => {
+                              if (item.dropdownKey === 'groups') {
+                                setIsGroupsOpen(!isGroupsOpen);
+                                setIsMinistryOpen(false);
+                                setIsBlogOpen(false);
+                              } else if (item.dropdownKey === 'ministry') {
+                                setIsMinistryOpen(!isMinistryOpen);
+                                setIsGroupsOpen(false);
+                                setIsBlogOpen(false);
+                              } else {
+                                setIsBlogOpen(!isBlogOpen);
+                                setIsGroupsOpen(false);
+                                setIsMinistryOpen(false);
+                              }
+                            }}
+                          >
+                            <span className="text-base">{item.label}</span>
+                            <ChevronDown
+                              className={`h-4 w-4 transition-transform duration-200 ${
+                                item.dropdownKey === 'groups'
+                                  ? (isGroupsOpen ? 'rotate-180' : '')
+                                  : item.dropdownKey === 'ministry'
+                                    ? (isMinistryOpen ? 'rotate-180' : '')
+                                    : (isBlogOpen ? 'rotate-180' : '')
+                              }`}
+                            />
+                          </button>
+                          
+                          {/* Mobile Dropdown */}
+                          <AnimatePresence>
+                            {(item.dropdownKey === 'groups' ? isGroupsOpen : item.dropdownKey === 'ministry' ? isMinistryOpen : isBlogOpen) && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="ml-4 mt-2 space-y-2 bg-black/60 backdrop-blur-sm rounded-lg p-2"
+                              >
+                                {(item.dropdownKey === 'groups' ? groupsItems : item.dropdownKey === 'ministry' ? ministryItems : blogItems).map((groupItem) => (
+                                  <Link key={groupItem.label} href={groupItem.href}>
+                                    <a
+                                      className="block py-2 px-3 text-white hover:text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
+                                      onClick={() => {
+                                        setIsMenuOpen(false);
+                                        if (item.dropdownKey === 'groups') {
+                                          setIsGroupsOpen(false);
+                                        } else if (item.dropdownKey === 'ministry') {
+                                          setIsMinistryOpen(false);
+                                        } else {
+                                          setIsBlogOpen(false);
+                                        }
+                                      }}
+                                    >
+                                      {groupItem.label}
+                                    </a>
+                                  </Link>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      ) : item.label === 'Home' ? (
                         <a
+                          href="/"
+                          onClick={(event) => {
+                            setIsMenuOpen(false);
+                            handleHomeClick(event);
+                          }}
                           className={`transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
                             isScrolled 
                               ? 'text-white hover:text-white/80' 
                               : 'text-white hover:text-white/80'
                           }`}
                           data-testid={`link-mobile-${item.label.toLowerCase()}`}
-                          onClick={() => setIsMenuOpen(false)}
                         >
                           {item.icon && <item.icon className="h-5 w-5 flex-shrink-0" />}
                           <span className="text-base">{item.label}</span>
                         </a>
-                      </Link>
-                    )}
-                  </motion.div>
-                ))}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6, duration: 0.3 }}
-                  className="pt-2"
-                >
-                  <Button 
-                    variant="default" 
-                    className="w-full bg-black hover:bg-black/90 text-white border border-white/20 py-3 text-base font-semibold"
-                    data-testid="button-mobile-visit-us"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      handleVisitUs();
-                    }}
+                      ) : (
+                        <Link href={item.href}>
+                          <a
+                            className={`transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
+                              isScrolled 
+                                ? 'text-white hover:text-white/80' 
+                                : 'text-white hover:text-white/80'
+                            }`}
+                            data-testid={`link-mobile-${item.label.toLowerCase()}`}
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            {item.icon && <item.icon className="h-5 w-5 flex-shrink-0" />}
+                            <span className="text-base">{item.label}</span>
+                          </a>
+                        </Link>
+                      )}
+                    </motion.div>
+                  ))}
+                  <motion.div
+                    initial={{ opacity: 0, x: 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5, duration: 0.25 }}
+                    className="pt-2"
                   >
-                    Visit Us
-                  </Button>
-                </motion.div>
-              </div>
-            </motion.div>
+                    <Button 
+                      variant="default" 
+                      className="w-full bg-black hover:bg-black/90 text-white border border-white/20 py-3 text-base font-semibold"
+                      data-testid="button-mobile-visit-us"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        handleVisitUs();
+                      }}
+                    >
+                      Visit Us
+                    </Button>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </div>

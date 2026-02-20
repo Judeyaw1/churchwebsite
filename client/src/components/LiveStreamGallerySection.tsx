@@ -82,9 +82,9 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
 
   // Get current live stream
   const currentLiveStream = liveStreams.find(stream => stream.isLive) || liveStreams[0];
-  const currentStreamUrl = isZoomUrl(currentLiveStream?.url)
-    ? normalizeUrl(currentLiveStream.url)
-    : zoomUrl;
+  const currentStreamUrl = currentLiveStream?.url ? normalizeUrl(currentLiveStream.url) : '';
+  const isCurrentStreamZoom = isZoomUrl(currentStreamUrl);
+  const joinUrl = currentStreamUrl || zoomUrl;
 
   // Debug logging
   useEffect(() => {
@@ -157,18 +157,41 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                   </div>
                 ) : currentLiveStream ? (
                   <div className="relative aspect-video bg-black">
-                    {currentStreamUrl ? (
-                      <>
-                        <iframe
-                          key={currentLiveStream.id}
-                          src={currentStreamUrl}
-                          title={currentLiveStream.title}
-                          className="w-full h-full border-0"
-                          allow="camera; microphone; autoplay; fullscreen; clipboard-write"
-                          allowFullScreen
-                          frameBorder="0"
-                        />
-                      </>
+                    {isCurrentStreamZoom ? (
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/35 to-primary/55">
+                        <div className="absolute inset-0 flex items-center justify-center p-6">
+                          <div className="text-center">
+                            <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-4 inline-block animate-pulse">
+                              LIVE
+                            </div>
+                            <Play className="h-14 w-14 text-white/85 mx-auto mb-4" />
+                            <h3 className="text-xl font-semibold text-white mb-2">
+                              {currentLiveStream.title}
+                            </h3>
+                            <p className="text-white/80 mb-5">
+                              Tap below to join on Zoom.
+                            </p>
+                            <Button
+                              variant="outline"
+                              className="border-white/40 text-white hover:bg-white/10"
+                              onClick={() => window.open(joinUrl, '_blank')}
+                            >
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Join on Zoom
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : currentStreamUrl ? (
+                      <iframe
+                        key={currentLiveStream.id}
+                        src={currentStreamUrl}
+                        title={currentLiveStream.title}
+                        className="w-full h-full border-0"
+                        allow="camera; microphone; autoplay; fullscreen; clipboard-write"
+                        allowFullScreen
+                        frameBorder="0"
+                      />
                     ) : (
                       <div className="relative aspect-video bg-gradient-to-br from-primary/30 to-primary/50">
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -198,15 +221,15 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-xl font-semibold text-white">{currentLiveStream.title}</h3>
-                      {currentStreamUrl && (
+                      {joinUrl && (
                         <Button
                           variant="outline"
                           size="sm"
                           className="border-white/30 text-white hover:bg-white/10"
-                          onClick={() => window.open(currentStreamUrl, '_blank')}
+                          onClick={() => window.open(joinUrl, '_blank')}
                         >
                           <ExternalLink className="h-4 w-4 mr-2" />
-                          Join on Zoom
+                          {isCurrentStreamZoom ? 'Join on Zoom' : 'Open Stream'}
                         </Button>
                       )}
                     </div>
