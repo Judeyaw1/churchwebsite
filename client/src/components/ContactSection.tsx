@@ -79,11 +79,13 @@ export default function ContactSection({ className = '' }: ContactSectionProps) 
       }
 
       setFormStatus('success');
-      setFormMessage('Thank you for your message! We\'ll get back to you soon.');
+      setFormMessage(data?.message || 'Thank you for your message! We\'ll get back to you soon.');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     } catch (error) {
       setFormStatus('error');
-      setFormMessage('We could not send your message. Please try again.');
+      setFormMessage(
+        error instanceof Error ? error.message : 'We could not send your message. Please try again.'
+      );
       console.error('Contact form error:', error);
     } finally {
       setIsSubmitting(false);

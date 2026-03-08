@@ -429,7 +429,7 @@ export default function Cpc() {
                     )
                   }
                   disabled={isSavingAttendance}
-                  className="inline-flex items-center justify-center rounded-lg bg-[#6d48c7] text-white px-5 py-2 text-sm font-semibold hover:bg-[#5d3db3] transition-colors disabled:opacity-60"
+                  className="inline-flex items-center justify-center rounded-lg bg-[#000000] text-white px-5 py-2 text-sm font-semibold hover:bg-[#5d3db3] transition-colors disabled:opacity-60"
                 >
                   {isSavingAttendance ? 'Saving...' : 'Submit Sign-In'}
                 </button>
@@ -512,7 +512,7 @@ export default function Cpc() {
                     })
                   }
                   disabled={isSavingAttendance}
-                  className="inline-flex items-center justify-center rounded-lg bg-white text-[#6d48c7] border border-[#6d48c7] px-5 py-2 text-sm font-semibold hover:bg-[#efe9ff] transition-colors disabled:opacity-60"
+                  className="inline-flex items-center justify-center rounded-lg bg-white text-[#000000] border border-[#6d48c7] px-5 py-2 text-sm font-semibold hover:bg-[#efe9ff] transition-colors disabled:opacity-60"
                 >
                   {isSavingAttendance ? 'Saving...' : 'Submit Sign-Out'}
                 </button>

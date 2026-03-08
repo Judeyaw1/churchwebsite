@@ -215,13 +215,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { emailService } = await import('./emailService.js');
-      await emailService.sendContactFormEmail({
+      const wasSent = await emailService.sendContactFormEmail({
         name,
         email,
         phone,
         subject,
         message
       });
+
+      if (!wasSent) {
+        return res.status(500).json({ message: 'Message could not be sent. Please try again shortly.' });
+      }
 
       res.json({ message: 'Message sent successfully' });
     } catch (error) {
