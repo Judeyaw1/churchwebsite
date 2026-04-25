@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
+import type { Server } from "http";
 import compression from "compression";
 import { registerRoutes } from "./routes";
 import { log } from "./vite";
@@ -61,6 +62,7 @@ app.use((req, res, next) => {
 (async () => {
   // Register API routes first, before any other middleware
   const server = await registerRoutes(app);
+  let isShuttingDown = false;
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
@@ -105,4 +107,30 @@ app.use((req, res, next) => {
       log(`[express] Port ${port} is already in use`);
     }
   });
+
+  const shutdown = (signal: string, exitCode = 0) => {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    log(`[express] Received ${signal}, shutting down gracefully`);
+
+    const forceExitTimer = setTimeout(() => {
+      log('[express] Forced shutdown after timeout');
+      process.exit(1);
+    }, 10_000);
+
+    server.close((error) => {
+      clearTimeout(forceExitTimer);
+      if (error) {
+        log(`[express] Error during shutdown: ${error.message}`);
+        process.exit(1);
+        return;
+      }
+
+      log('[express] Shutdown complete');
+      process.exit(exitCode);
+    });
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 })();

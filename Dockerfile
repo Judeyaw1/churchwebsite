@@ -33,5 +33,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD node healthcheck.js
 
-# Start the application
-CMD ["npm", "run", "start"]
+# Start the application directly so shutdown signals reach Node cleanly
+CMD ["node", "dist/index.js"]
