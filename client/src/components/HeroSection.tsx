@@ -182,8 +182,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
               <span className="font-semibold">Service Times</span>
             </div>
             <p className="text-white/90">
-              Sundays 10:00 AM
-              Monday - Thurday 8:00 PM
+              Sundays 10:00 AM <br /> Friday 10PM
               Friday 8:00 PM
             </p>
           </div>
@@ -191,10 +190,10 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
           <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 hover-elevate transition-all duration-300 border border-white/20">
             <div className="flex items-center mb-3">
               <MapPin className="h-6 w-6 text-white mr-2" />
-              <span className="font-semibold">Location</span>
+              <span className="font-semibold">Virtual Devotion</span>
             </div>
             <p className="text-white/90">
-              <a href="https://maps.google.com/?q=9045+Maier+Road,+Laurel,+MD+20723">9045 Maier Rd<br /> Suite D, Laurel, MD 20723</a>
+            Morning Devotion Monday - Friday 5:00 AM - 6:00 AM <br /> Evening Devotion Monday - Thursday 8:00 PM - 10:00 PM
             </p>
           </div>
           
@@ -215,7 +214,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
                     ))
                   : (
                       <>
-                        Wed Bible Study 7:00 PM<br />Fri Youth Group 6:30 PM
+                        Rhema Hour <br />Lunch With God
                       </>
                     )}
             </p>
