@@ -182,8 +182,9 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
               <span className="font-semibold">Service Times</span>
             </div>
             <p className="text-white/90">
-              Sundays 10:00 AM <br /> Friday 10PM
-              Friday 8:00 PM
+              Sundays 10:00 AM
+              <br />
+              Fridays 8:00 PM
             </p>
           </div>
           

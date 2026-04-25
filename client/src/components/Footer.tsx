@@ -65,10 +65,12 @@ export default function Footer({ className = '' }: FooterProps) {
     {
       title: 'Service Times',
       items: [
-        { icon: Clock, text: 'Sunday Worship' },
-        { text: '9:00 AM & 11:00 AM' },
-        { text: 'Wednesday Bible Study' },
-        { text: '7:00 PM' }
+        { icon: Clock, text: 'Sunday Services' },
+        { text: '10:00 AM' },
+        { text: 'Weekly Bible Study' },
+        { text: 'Mon - Thurs 8:00 PM' },
+        { text: 'Prayer Meeting' },
+        { text: 'Fridays 8:00 PM' }
       ]
     },
     {
