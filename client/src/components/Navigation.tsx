@@ -137,9 +137,9 @@ export default function Navigation({ className = '' }: NavigationProps) {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className={`fixed left-0 right-0 top-0 z-50 px-3 pt-3 transition-all duration-500 ease-out sm:px-4 ${className}`}
+      className={`fixed left-0 right-0 top-0 z-50 px-2 pt-2 transition-all duration-500 ease-out sm:px-4 sm:pt-3 ${className}`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div
           className={`flex h-16 items-center justify-between rounded-[1.75rem] border px-3 shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition-all duration-500 sm:px-4 ${
             isScrolled

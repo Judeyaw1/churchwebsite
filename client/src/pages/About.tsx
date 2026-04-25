@@ -202,7 +202,7 @@ export default function About() {
             <h2 className="text-2xl sm:text-3xl font-serif text-white">Moments of Community</h2>
           </motion.div>
 
-          <div className="relative h-[520px] w-full overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,#111,#050505)] shadow-[0_40px_120px_rgba(0,0,0,0.32)] sm:h-[600px]">
+          <div className="relative h-[460px] w-full overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,#111,#050505)] shadow-[0_40px_120px_rgba(0,0,0,0.32)] sm:h-[560px] lg:h-[600px]">
             <div
               className="absolute inset-0 flex items-center justify-center"
               style={{ perspective: '1200px' }}
@@ -229,7 +229,7 @@ export default function About() {
                       style={{ transformStyle: 'preserve-3d' }}
                       onClick={() => !isActive && goToSlide(index)}
                     >
-                      <div className="relative w-[320px] sm:w-[420px] h-[420px] sm:h-[520px] rounded-3xl overflow-hidden shadow-2xl">
+                      <div className="relative h-[360px] w-[min(76vw,320px)] rounded-3xl overflow-hidden shadow-2xl sm:h-[500px] sm:w-[min(62vw,420px)] lg:h-[520px] lg:w-[420px]">
                         <img
                           src={slide.image}
                           alt={slide.title}

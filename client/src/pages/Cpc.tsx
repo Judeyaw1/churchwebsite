@@ -519,7 +519,7 @@ export default function Cpc() {
             <h2 className="text-2xl sm:text-3xl font-serif text-white">See Photos</h2>
           </motion.div>
 
-          <div className="relative w-full h-[520px] sm:h-[600px] overflow-hidden rounded-3xl bg-gradient-to-br from-black/80 via-black/60 to-black/80 border border-white/10">
+          <div className="relative h-[460px] w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-black/80 via-black/60 to-black/80 sm:h-[560px] lg:h-[600px]">
             <div
               className="absolute inset-0 flex items-center justify-center"
               style={{ perspective: '1200px' }}

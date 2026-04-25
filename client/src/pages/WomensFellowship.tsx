@@ -176,7 +176,7 @@ export default function WomensFellowship() {
             <h2 className="text-2xl sm:text-3xl font-serif text-white">Moments of Fellowship</h2>
           </motion.div>
 
-          <div className="relative w-full h-[520px] sm:h-[600px] overflow-hidden rounded-3xl bg-gradient-to-br from-black/80 via-black/60 to-black/80 border border-white/10">
+          <div className="relative h-[460px] w-full overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-black/80 via-black/60 to-black/80 sm:h-[560px] lg:h-[600px]">
             <div
               className="absolute inset-0 flex items-center justify-center"
               style={{ perspective: '1200px' }}
@@ -203,7 +203,7 @@ export default function WomensFellowship() {
                       style={{ transformStyle: 'preserve-3d' }}
                       onClick={() => !isActive && goToSlide(index)}
                     >
-                      <div className="relative w-[320px] sm:w-[420px] h-[420px] sm:h-[520px] rounded-3xl overflow-hidden shadow-2xl">
+                      <div className="relative h-[360px] w-[min(76vw,320px)] rounded-3xl overflow-hidden shadow-2xl sm:h-[500px] sm:w-[min(62vw,420px)] lg:h-[520px] lg:w-[420px]">
                         <img
                           src={slide.image}
                           alt={slide.title}
