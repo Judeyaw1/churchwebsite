@@ -161,7 +161,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
           <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight text-left">
             Welcome to{' '}
             <span className="text-white">United Bethel 
-              <br className="hidden sm:block" /> Presbyterian</span>
+              <br className="hidden sm:block" /> Presbyterian Church</span>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-white/90 max-w-3xl leading-relaxed text-left">
             A place where faith meets community, and hearts find home. 
@@ -182,7 +182,9 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
               <span className="font-semibold">Service Times</span>
             </div>
             <p className="text-white/90">
-              Sundays 9:00 AM & 11:00 AM
+              Sundays 10:00 AM
+              Monday - Thurday 8:00 PM
+              Friday 8:00 PM
             </p>
           </div>
           
