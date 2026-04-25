@@ -105,7 +105,7 @@ export default function ServicesSection({ className = '' }: ServicesSectionProps
           initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
           transition={{ duration: 0.7 }}
-          className="mb-12 grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-end"
+          className="mb-12 grid gap-8 xl:grid-cols-[0.95fr_1.05fr] xl:items-end"
         >
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/65">Worship Life</p>
@@ -120,7 +120,7 @@ export default function ServicesSection({ className = '' }: ServicesSectionProps
           </p>
         </motion.div>
 
-        <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}

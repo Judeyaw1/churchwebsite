@@ -176,16 +176,16 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 >
                   Laurel, MD
                 </a>
-                <span className="font-serif text-base font-bold text-white transition-colors duration-300 sm:text-lg lg:text-xl">
-                  <span className="hidden lg:inline">United Bethel Presbyterian</span>
-                  <span className="lg:hidden">UBPC</span>
+                <span className="font-serif text-base font-bold text-white transition-colors duration-300 sm:text-lg xl:text-xl">
+                  <span className="hidden xl:inline">United Bethel Presbyterian</span>
+                  <span className="xl:hidden">UBPC</span>
                 </span>
               </div>
             </motion.div>
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden xl:flex items-center gap-3">
             <div className="flex items-center gap-1 rounded-full bg-white/[0.04] p-1.5">
             {navItems.map((item, index) => (
               <motion.div
@@ -321,7 +321,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
           </div>
 
           {/* Mobile menu button */}
-          <div className="lg:hidden">
+          <div className="xl:hidden">
             <Button
               variant="ghost"
               size="icon"
@@ -367,7 +367,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 onClick={() => setIsMenuOpen(false)}
-                className="lg:hidden fixed inset-0 top-16 bg-black/50 backdrop-blur-[2px]"
+                className="xl:hidden fixed inset-0 top-16 bg-black/50 backdrop-blur-[2px]"
                 aria-label="Close mobile navigation"
               />
               <motion.div
@@ -375,7 +375,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="lg:hidden fixed right-3 top-[5.25rem] h-[calc(100dvh-5.75rem)] w-[88vw] max-w-sm overflow-y-auto rounded-[2rem] border border-white/14 bg-black/92 shadow-[0_30px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl"
+                className="xl:hidden fixed right-3 top-[5.25rem] h-[calc(100dvh-5.75rem)] w-[88vw] max-w-sm overflow-y-auto rounded-[2rem] border border-white/14 bg-black/92 shadow-[0_30px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl"
               >
                 <div className="space-y-5 px-4 py-5">
                   <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4">

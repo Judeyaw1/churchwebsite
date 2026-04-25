@@ -154,7 +154,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
-        <div className="grid gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+        <div className="grid gap-10 xl:grid-cols-[1.25fr_0.75fr] xl:items-end">
           <div>
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -191,7 +191,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.85, delay: 0.35 }}
-              className="mt-8 flex flex-col gap-4 sm:flex-row"
+              className="mt-8 flex flex-col gap-4 md:flex-row"
             >
               <Button
                 size="lg"
@@ -217,7 +217,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.85, delay: 0.45 }}
-              className="mt-10 grid gap-4 md:grid-cols-3"
+              className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
             >
               {experienceCards.map((card) => (
                 <div
@@ -239,7 +239,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
             initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.4 }}
-            className="lg:justify-self-end"
+            className="xl:justify-self-end"
           >
             <div className="overflow-hidden rounded-[2rem] border border-white/12 bg-[#0e0e0e]/90 p-6 shadow-[0_40px_120px_rgba(0,0,0,0.45)] backdrop-blur-xl">
               <div className="flex items-center justify-between">
