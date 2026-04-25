@@ -55,25 +55,25 @@ export default function ServicesSection({ className = '' }: ServicesSectionProps
   const services = [
     {
       id: 'sunday-worship',
-      title: 'Sunday Worship',
-      time: '9:00 AM & 11:00 AM',
+      title: 'Sunday Services',
+      time: '10:00 AM',
       description: 'Join us for inspiring worship, biblical teaching, and community fellowship.',
       icon: Music,
       details: 'Our Sunday services include contemporary worship music, practical biblical teaching, and time for community connection. Childcare is available for all ages.'
     },
     {
       id: 'bible-study',
-      title: 'Midweek Bible Study',
-      time: 'Wednesdays 7:00 PM',
+      title: 'Weekly Bible Study',
+      time: 'Mon - Thurs 8:00 PM',
       description: 'Dive deeper into God\'s word with interactive study and discussion.',
       icon: GraduationCap,
       details: 'Interactive Bible study sessions where we explore Scripture together, ask questions, and grow in our understanding of God\'s word.'
     },
     {
-      id: 'youth-group',
-      title: 'Youth Ministry',
-      time: 'Fridays 6:30 PM',
-      description: 'Fun, faith-building activities for teens and young adults.',
+      id: 'Prayer Meeting',
+      title: 'Prayer Meeting',
+      time: 'Fridays 8:00 PM',
+      description: 'A time to seek God, grow in faith and pray together.',
       icon: Users,
       details: 'Age-appropriate programming for teens including games, worship, biblical teaching, and community service opportunities.'
     },

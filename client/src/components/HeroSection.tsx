@@ -214,7 +214,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
                     ))
                   : (
                       <>
-                        Rhema Hour <br />Lunch With God
+                        Rhema Hour Wednesday 10 AM<br />Lunch With God Friday 12 PM
                       </>
                     )}
             </p>
