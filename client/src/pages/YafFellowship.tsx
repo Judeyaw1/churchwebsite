@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
+import PublicPageLayout from '@/components/PublicPageLayout';
+import PublicPageHero from '@/components/PublicPageHero';
 import {
   Sparkles,
   HeartHandshake,
@@ -105,32 +105,13 @@ export default function YafFellowship() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <PublicPageLayout>
+      <PublicPageHero
+        title="YAF (Young Adult Fellowship)"
+        description="We are a community of young adults committed to faith, fellowship, and leadership in the church."
+      />
 
-      <section className="relative pt-24 pb-16 bg-gradient-to-b from-black/95 via-black/90 to-black/85">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="text-left"
-          >
-            <p className="text-white/70 uppercase tracking-[0.2em] text-xs sm:text-sm mb-4">
-              United Bethel Presbyterian Church
-            </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-white mb-6">
-              YAF (Young Adult Fellowship)
-            </h1>
-            <p className="text-lg sm:text-xl text-white/85 max-w-3xl leading-relaxed">
-              YAF stands for Young Adult Fellowship. We are a community of young adults committed
-              to faith, fellowship, and leadership in the church.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="py-16 sm:py-20 bg-black/95">
+      <section className="py-8 sm:py-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-10 lg:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -172,7 +153,7 @@ export default function YafFellowship() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 bg-black/90">
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -215,7 +196,7 @@ export default function YafFellowship() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 bg-black/95">
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -448,7 +429,6 @@ export default function YafFellowship() {
         </div>
       </section>
 
-      <Footer />
-    </div>
+    </PublicPageLayout>
   );
 }

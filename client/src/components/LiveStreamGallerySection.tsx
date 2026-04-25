@@ -121,21 +121,23 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
   }, [currentImageIndex]);
 
   return (
-    <section ref={ref} className={`py-20 bg-black/95 ${className}`} id="gallery">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+    <section ref={ref} className={`relative overflow-hidden py-20 sm:py-24 ${className}`} id="gallery">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="mb-14 grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-end"
         >
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-white mb-4 sm:mb-6">
-            Live Stream & <span className="text-white">Gallery</span>
-          </h2>
-          <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
-            Join our live worship services online and explore our photo gallery showcasing 
-            the life and community of our church family.
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-white/65">Online + In Motion</p>
+            <h2 className="mt-4 font-serif text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
+              Worship with us live, then see the life of the church up close.
+            </h2>
+          </div>
+          <p className="max-w-2xl text-base leading-8 text-white/72 sm:text-lg">
+            The homepage now treats streaming and photography as part of the same story: gathered
+            worship, shared moments, and a church community that is visibly active.
           </p>
         </motion.div>
 
@@ -146,10 +148,10 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <Card className="bg-white/5 border-white/20 overflow-hidden">
+            <Card className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-[0_40px_120px_rgba(0,0,0,0.32)]">
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="relative aspect-video bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
+                  <div className="relative aspect-video flex items-center justify-center bg-[linear-gradient(135deg,#1a1a1a,#0f0f0f)]">
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
                       <p className="text-white/70">Loading live stream...</p>
@@ -158,10 +160,10 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                 ) : currentLiveStream ? (
                   <div className="relative aspect-video bg-black">
                     {isCurrentStreamZoom ? (
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/35 to-primary/55">
+                      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(20,20,20,0.92),rgba(255,255,255,0.14))]">
                         <div className="absolute inset-0 flex items-center justify-center p-6">
                           <div className="text-center">
-                            <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-4 inline-block animate-pulse">
+                            <div className="mb-4 inline-block rounded-full bg-red-600 px-3 py-1 text-sm font-medium text-white animate-pulse">
                               LIVE
                             </div>
                             <Play className="h-14 w-14 text-white/85 mx-auto mb-4" />
@@ -193,7 +195,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                         frameBorder="0"
                       />
                     ) : (
-                      <div className="relative aspect-video bg-gradient-to-br from-primary/30 to-primary/50">
+                      <div className="relative aspect-video bg-[linear-gradient(135deg,#1a1a1a,#0f0f0f)]">
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="text-center">
                             <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-4 inline-block animate-pulse">
@@ -208,7 +210,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                     )}
                   </div>
                 ) : (
-                  <div className="relative aspect-video bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
+                  <div className="relative aspect-video flex items-center justify-center bg-[linear-gradient(135deg,#1a1a1a,#0f0f0f)]">
                     <div className="text-center">
                       <Play className="h-16 w-16 text-white/80 mx-auto mb-4" />
                       <h3 className="text-xl font-semibold text-white mb-2">No Live Stream</h3>
@@ -218,14 +220,17 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                 )}
 
                 {!isLoading && currentLiveStream && (
-                  <div className="p-6">
+                  <div className="p-6 sm:p-7">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl font-semibold text-white">{currentLiveStream.title}</h3>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.22em] text-white">Streaming Now</p>
+                        <h3 className="mt-2 text-2xl font-semibold text-white">{currentLiveStream.title}</h3>
+                      </div>
                       {joinUrl && (
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-white/30 text-white hover:bg-white/10"
+                          className="rounded-full border-white/20 text-white hover:bg-white/10"
                           onClick={() => window.open(joinUrl, '_blank')}
                         >
                           <ExternalLink className="h-4 w-4 mr-2" />
@@ -246,11 +251,11 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
             </Card>
             
             {/* Visit Our Channel Button */}
-            <div className="text-left mt-6">
+            <div className="mt-6 text-left">
               <Button
                 variant="outline"
                 size="lg"
-                className="border-white/70 text-white hover:bg-white/10 hover:text-white px-8 py-3"
+                className="rounded-full border-white/20 bg-white/5 px-8 py-3 text-white hover:bg-white/10 hover:text-white"
                 onClick={() => window.open(zoomUrl, '_blank')}
               >
                 <ExternalLink className="h-5 w-5 mr-2" />
@@ -265,18 +270,20 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <Card className="bg-white/5 border-white/20 overflow-hidden">
+            <Card className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-[0_40px_120px_rgba(0,0,0,0.32)]">
               <CardContent className="p-0">
-                {/* Gallery Header */}
-                <div className="p-6 border-b border-white/10">
+                <div className="border-b border-white/10 p-6 sm:p-7">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <Camera className="h-5 w-5 text-white mr-2" />
-                      <h3 className="text-xl font-semibold text-white">Photo Gallery</h3>
+                      <Camera className="mr-2 h-5 w-5 text-white" />
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.22em] text-white">Moments</p>
+                        <h3 className="mt-2 text-2xl font-semibold text-white">Photo Gallery</h3>
+                      </div>
                     </div>
                     <a
                       href="/gallery"
-                      className="inline-flex items-center px-3 py-2 border border-white/30 text-white rounded-md hover:bg-white/10 text-sm"
+                      className="inline-flex items-center rounded-full border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/10"
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
                       View All
@@ -287,7 +294,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                 {/* Gallery Carousel */}
                 <div className="relative">
                   {isLoading ? (
-                    <div className="aspect-[4/3] bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
+                    <div className="aspect-[4/3] flex items-center justify-center bg-[linear-gradient(135deg,#1a1a1a,#0f0f0f)]">
                       <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
                         <p className="text-white/70">Loading gallery...</p>
@@ -295,7 +302,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                     </div>
                   ) : galleryImages.length > 0 ? (
                     <>
-                      <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-3 relative transition-all duration-300 overflow-hidden">
+                      <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-black/30 p-3 transition-all duration-300">
                         <img
                           src={galleryImages[currentImageIndex].url}
                           alt={galleryImages[currentImageIndex].title}
@@ -313,27 +320,27 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                         
                         {/* Image Info Overlay */}
                         <div className="absolute bottom-4 left-4 text-white">
-                          <h4 className="font-semibold text-lg">{galleryImages[currentImageIndex].title}</h4>
+                          <h4 className="text-lg font-semibold">{galleryImages[currentImageIndex].title}</h4>
                           <p className="text-sm opacity-90">{galleryImages[currentImageIndex].date}</p>
                         </div>
 
                         {/* Navigation Arrows */}
                         <button
                           onClick={prevImage}
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 transition-all duration-300"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 transition-all duration-300 hover:bg-white"
                         >
                           <ChevronLeft className="h-5 w-5 text-black" />
                         </button>
                         <button
                           onClick={nextImage}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 transition-all duration-300"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 transition-all duration-300 hover:bg-white"
                         >
                           <ChevronRight className="h-5 w-5 text-black" />
                         </button>
                       </div>
 
                       {/* Gallery Thumbnails */}
-                      <div className="p-4">
+                      <div className="p-4 sm:p-5">
                         <div className="flex gap-2 overflow-x-auto pb-2">
                           {galleryImages.map((image, index) => (
                             <button
@@ -365,7 +372,7 @@ export default function LiveStreamGallerySection({ className = '' }: LiveStreamG
                       </div>
                     </>
                   ) : (
-                    <div className="aspect-[4/3] bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
+                    <div className="aspect-[4/3] flex items-center justify-center bg-[linear-gradient(135deg,#1a1a1a,#0f0f0f)]">
                       <div className="text-center">
                         <Camera className="h-16 w-16 text-white/80 mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-white mb-2">No Gallery Images</h3>

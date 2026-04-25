@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Megaphone } from 'lucide-react';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
+import PublicPageLayout from '@/components/PublicPageLayout';
+import PublicPageHero from '@/components/PublicPageHero';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -17,13 +17,13 @@ interface Announcement {
 const getPriorityColor = (priority: Announcement['priority']) => {
   switch (priority) {
     case 'high':
-      return 'bg-red-100 text-red-800';
+      return 'border border-white/20 bg-white text-black';
     case 'medium':
-      return 'bg-yellow-100 text-yellow-800';
+      return 'border border-white/20 bg-white/15 text-white';
     case 'low':
-      return 'bg-green-100 text-green-800';
+      return 'border border-white/20 bg-black/30 text-white';
     default:
-      return 'bg-gray-100 text-gray-800';
+      return 'border border-white/20 bg-white/10 text-white';
   }
 };
 
@@ -55,28 +55,14 @@ export default function Announcements() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
-      <Navigation />
+    <PublicPageLayout>
+      <PublicPageHero
+        title="Church Announcements"
+        description="Stay up to date with important news, events, and ministry updates."
+        align="center"
+      />
 
-      <main className="flex-1">
-        <section className="pt-20 pb-16 bg-gradient-to-br from-black/80 to-black/60">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-white mb-4">
-                Church <span className="text-white">Announcements</span>
-              </h1>
-              <p className="text-white/80 max-w-3xl mx-auto">
-                Stay up to date with important news, events, and ministry updates.
-              </p>
-            </motion.div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-black/95">
+        <section className="py-8 sm:py-12">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {isLoading ? (
               <div className="text-center py-12">
@@ -92,7 +78,7 @@ export default function Announcements() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                   >
-                    <Card className="bg-white/5 border-white/20">
+                    <Card className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] shadow-[0_30px_80px_rgba(0,0,0,0.22)]">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-white text-lg flex items-center gap-2">
@@ -124,9 +110,6 @@ export default function Announcements() {
             )}
           </div>
         </section>
-      </main>
-
-      <Footer />
-    </div>
+    </PublicPageLayout>
   );
 }

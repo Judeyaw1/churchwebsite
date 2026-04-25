@@ -18,13 +18,16 @@ const SectionFallback = ({ label }: { label: string }) => (
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background relative">
-      {/* Navigation with Theme Toggle */}
-      <Navigation />
-      
+    <div className="relative min-h-screen overflow-hidden bg-[#050505] text-white">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-[-12rem] top-[-10rem] h-[30rem] w-[30rem] rounded-full bg-white/8 blur-3xl" />
+        <div className="absolute right-[-10rem] top-[22rem] h-[28rem] w-[28rem] rounded-full bg-white/6 blur-3xl" />
+        <div className="absolute bottom-[-12rem] left-1/3 h-[32rem] w-[32rem] rounded-full bg-white/5 blur-3xl" />
+      </div>
 
-      {/* Page Sections */}
-      <main>
+      <Navigation />
+
+      <main className="relative z-10">
         <HeroSection />
         <Suspense fallback={<SectionFallback label="Countdown" />}>
           <CountdownSection />
@@ -46,7 +49,6 @@ export default function Home() {
         </Suspense>
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
+import PublicPageLayout from '@/components/PublicPageLayout';
+import PublicPageHero from '@/components/PublicPageHero';
 import { Sparkles, HeartHandshake, BookOpen, ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
 import photo1 from '@assets/womensfelloship/DSC_5232.JPG';
 import photo2 from '@assets/womensfelloship/DSC_5249.JPG';
@@ -74,31 +74,13 @@ export default function WomensFellowship() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <PublicPageLayout>
+      <PublicPageHero
+        title="Women's Fellowship"
+        description="A sisterhood dedicated to love, unity, and lives that reflect Christ wherever we are."
+      />
 
-      <section className="relative pt-24 pb-16 bg-gradient-to-b from-black/95 via-black/90 to-black/85">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="text-left"
-          >
-            <p className="text-white/70 uppercase tracking-[0.2em] text-xs sm:text-sm mb-4">
-              United Bethel Presbyterian Church
-            </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-white mb-6">
-              Women&apos;s Fellowship
-            </h1>
-            <p className="text-lg sm:text-xl text-white/85 max-w-3xl leading-relaxed">
-              A sisterhood dedicated to love, unity, and lives that reflect Christ wherever we are.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="py-16 sm:py-20 bg-black/95">
+      <section className="py-8 sm:py-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-10 lg:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -142,7 +124,7 @@ export default function WomensFellowship() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 bg-black/90">
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -182,7 +164,7 @@ export default function WomensFellowship() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 bg-black/95">
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -336,7 +318,6 @@ export default function WomensFellowship() {
         </div>
       </section>
 
-      <Footer />
-    </div>
+    </PublicPageLayout>
   );
 }

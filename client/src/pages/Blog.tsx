@@ -7,8 +7,8 @@ import { Calendar, User, ArrowLeft, Clock } from 'lucide-react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
+import PublicPageLayout from '@/components/PublicPageLayout';
+import PublicPageHero from '@/components/PublicPageHero';
 
 interface BlogPost {
   id: string;
@@ -69,32 +69,14 @@ export default function Blog() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
-      <Navigation />
-      
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="pt-20 pb-16 bg-gradient-to-br from-black/80 to-black/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-center"
-            >
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-white mb-4 sm:mb-6">
-                Church <span className="text-white">Blog</span>
-              </h1>
-              <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
-                Stay connected with our community through inspiring stories, 
-                updates, and reflections from our church family.
-              </p>
-            </motion.div>
-          </div>
-        </section>
+    <PublicPageLayout>
+      <PublicPageHero
+        title="Church Blog"
+        description="Stay connected with our community through inspiring stories, updates, and reflections from our church family."
+        align="center"
+      />
 
-        {/* Blog Posts Section */}
-        <section ref={ref} className="py-20 bg-black/95">
+        <section ref={ref} className="py-8 sm:py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Loading State */}
             {isLoading && (
@@ -115,7 +97,7 @@ export default function Blog() {
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                   >
                     <Card 
-                      className="hover-elevate transition-all duration-300 overflow-hidden bg-white/5 border-white/20 cursor-pointer"
+                      className="cursor-pointer overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.04] transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.06]"
                       onClick={() => setSelectedPost(post)}
                     >
                       {/* Blog Image */}
@@ -179,7 +161,7 @@ export default function Blog() {
                   Back to Blog
                 </Button>
 
-                <Card className="bg-white/5 border-white/20">
+                <Card className="rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-[0_40px_120px_rgba(0,0,0,0.32)]">
                   {selectedPost.image && (
                     <div className="aspect-video overflow-hidden rounded-t-lg">
                       <img
@@ -232,9 +214,6 @@ export default function Blog() {
             )}
           </div>
         </section>
-      </main>
-
-      <Footer />
-    </div>
+    </PublicPageLayout>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+import PublicPageLayout from "@/components/PublicPageLayout";
+import PublicPageHero from "@/components/PublicPageHero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Camera, ExternalLink, Play, ChevronDown } from "lucide-react";
@@ -72,25 +72,14 @@ export default function Media() {
   }, [orderedGalleryCategories, openGalleryCategory]);
 
   return (
-    <div className="min-h-screen bg-black">
-      <Navigation />
+    <PublicPageLayout>
+      <PublicPageHero
+        title="Gallery & Live Stream"
+        description="Browse church photos and watch our live or past streams in a layout that matches the new homepage."
+        align="center"
+      />
 
-      <main className="pt-24 pb-16">
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-4xl sm:text-5xl font-serif font-bold text-white mb-4">
-              Gallery & Live Stream
-            </h1>
-            <p className="text-white/70 max-w-3xl mx-auto">
-              Browse all photos and watch our live or past streams.
-            </p>
-          </motion.div>
-
+        <section className="max-w-7xl mx-auto px-4 pb-16 sm:px-6 lg:px-8">
           {/* Live Stream Section */}
           <div className="mb-16">
             <div className="flex items-center justify-between mb-4">
@@ -111,7 +100,7 @@ export default function Media() {
               )}
             </div>
 
-            <Card className="bg-white/5 border-white/10">
+            <Card className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-[0_40px_120px_rgba(0,0,0,0.32)]">
               <CardContent className="p-0">
                 {currentLive ? (
                   <div className="aspect-video bg-black flex items-center justify-center p-4">
@@ -126,7 +115,7 @@ export default function Media() {
                     </div>
                   </div>
                 ) : (
-                  <div className="aspect-video bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
+                  <div className="aspect-video bg-[linear-gradient(135deg,#1a1a1a,#0f0f0f)] flex items-center justify-center">
                     <p className="text-white/70">No live stream available</p>
                   </div>
                 )}
@@ -147,7 +136,7 @@ export default function Media() {
             </div>
 
             {isLoading ? (
-              <div className="aspect-[4/3] bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center mb-6">
+              <div className="mb-6 aspect-[4/3] bg-[linear-gradient(135deg,#1a1a1a,#0f0f0f)] flex items-center justify-center rounded-[2rem] border border-white/10">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
               </div>
             ) : galleryImages.length > 0 ? (
@@ -155,7 +144,7 @@ export default function Media() {
                 {orderedGalleryCategories.map((category) => {
                   const isOpen = openGalleryCategory === category;
                   return (
-                    <div key={category} className="border border-white/10 rounded-xl bg-white/5">
+                    <div key={category} className="rounded-[1.5rem] border border-white/10 bg-white/[0.04]">
                       <button
                         type="button"
                         onClick={() => setOpenGalleryCategory(isOpen ? null : category)}
@@ -176,7 +165,7 @@ export default function Media() {
                       {isOpen && (
                         <div className="px-4 sm:px-6 pb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                           {groupedGalleryImages[category].map((image) => (
-                            <Card key={image.id} className="bg-white/5 border-white/10 overflow-hidden">
+                            <Card key={image.id} className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.04]">
                               <div className="aspect-[4/3] bg-black/30 flex items-center justify-center p-2 overflow-hidden">
                                 <img
                                   src={image.url}
@@ -218,7 +207,7 @@ export default function Media() {
                 })}
               </div>
             ) : (
-              <div className="aspect-[4/3] bg-gradient-to-br from-primary/30 to-primary/50 flex items-center justify-center">
+              <div className="aspect-[4/3] bg-[linear-gradient(135deg,#1a1a1a,#0f0f0f)] flex items-center justify-center rounded-[2rem] border border-white/10">
                 <div className="text-center">
                   <Camera className="h-12 w-12 text-white/70 mx-auto mb-3" />
                   <p className="text-white/70">No gallery images yet</p>
@@ -227,9 +216,6 @@ export default function Media() {
             )}
           </div>
         </section>
-      </main>
-
-      <Footer />
-    </div>
+    </PublicPageLayout>
   );
 }

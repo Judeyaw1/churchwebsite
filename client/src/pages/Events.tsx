@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
+import PublicPageLayout from '@/components/PublicPageLayout';
+import PublicPageHero from '@/components/PublicPageHero';
 import CountdownClock from '@/components/CountdownClock';
 import CompactCountdown from '@/components/CompactCountdown';
 
@@ -169,47 +169,27 @@ export default function Events() {
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
-      'Special Event': 'bg-purple-100 text-purple-800',
-      'Worship Service': 'bg-blue-100 text-blue-800',
-      'Special Service': 'bg-red-100 text-red-800',
-      'Membership': 'bg-green-100 text-green-800',
-      'Youth': 'bg-orange-100 text-orange-800',
-      'Community Service': 'bg-yellow-100 text-yellow-800',
-      'Adult Ministry': 'bg-indigo-100 text-indigo-800',
-      'Children\'s Ministry': 'bg-pink-100 text-pink-800'
+      'Special Event': 'border border-white/20 bg-white text-black',
+      'Worship Service': 'border border-white/20 bg-white/15 text-white',
+      'Special Service': 'border border-white/20 bg-black/40 text-white',
+      'Membership': 'border border-white/20 bg-white/10 text-white',
+      'Youth': 'border border-white/20 bg-white/15 text-white',
+      'Community Service': 'border border-white/20 bg-black/30 text-white',
+      'Adult Ministry': 'border border-white/20 bg-white/10 text-white',
+      'Children\'s Ministry': 'border border-white/20 bg-black/40 text-white'
     };
-    return colors[category] || 'bg-gray-100 text-gray-800';
+    return colors[category] || 'border border-white/20 bg-white/10 text-white';
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
-      {/* Navigation */}
-      <Navigation />
-      
+    <PublicPageLayout>
+      <PublicPageHero
+        title="Church Events"
+        description="Join us for worship, fellowship, and community events throughout the year. Find meaningful ways to connect with God and your church family."
+        align="center"
+      />
 
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="pt-20 pb-16 bg-gradient-to-br from-black/80 to-black/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-center"
-            >
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-white mb-4 sm:mb-6">
-                Church <span className="text-white">Events</span>
-              </h1>
-              <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
-                Join us for worship, fellowship, and community events throughout the year. 
-                Find meaningful ways to connect with God and your church family.
-              </p>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Events Section */}
-        <section ref={ref} className="py-20 bg-black/95">
+      <section ref={ref} className="py-8 sm:py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Filters */}
             <motion.div
@@ -454,10 +434,7 @@ export default function Events() {
             )}
           </div>
         </section>
-      </main>
-
-      {/* Footer */}
-      <Footer />
+      
 
       {/* Event Details Modal */}
       <AnimatePresence>
@@ -837,6 +814,6 @@ export default function Events() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </PublicPageLayout>
   );
 }

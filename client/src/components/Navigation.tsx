@@ -125,52 +125,68 @@ export default function Navigation({ className = '' }: NavigationProps) {
     event.preventDefault();
     window.location.href = '/';
   };
-  
-  
+
+  const desktopLinkClass =
+    'flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-white/85 transition-all duration-300 hover:bg-white/10 hover:text-white';
+
+  const mobileLinkClass =
+    'flex items-center gap-3 rounded-2xl px-4 py-3 text-base font-medium text-white/85 transition-all duration-300 hover:bg-white/10 hover:text-white';
 
   return (
     <motion.nav
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
-        isScrolled 
-          ? 'bg-white/10 backdrop-blur-xl shadow-2xl border-b border-white/20' 
-          : 'bg-black/5 backdrop-blur-sm border-b border-white/10'
-      } ${className}`}
+      className={`fixed left-0 right-0 top-0 z-50 px-3 pt-3 transition-all duration-500 ease-out sm:px-4 ${className}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div
+          className={`flex h-16 items-center justify-between rounded-[1.75rem] border px-3 shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition-all duration-500 sm:px-4 ${
+            isScrolled
+              ? 'border-white/5 bg-black/72 backdrop-blur-2xl'
+              : 'border-white/4 bg-black/42 backdrop-blur-xl'
+          }`}
+        >
           {/* Logo */}
           <a
             href="/"
             onClick={handleHomeClick}
-            className="flex items-center cursor-pointer hover:opacity-80 transition-opacity duration-300"
+            className="group flex items-center"
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="flex items-center"
+              className="flex items-center gap-3 rounded-full bg-white/[0.04] px-2.5 py-2"
             >
               <img
                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRslI3U8-lsDRRpnOt-lxkEMYZvV6Wtdzv3TQ&s"
                 alt="United Bethel Presbyterian logo"
-                className="h-8 w-8 rounded-full object-contain bg-transparent mr-2"
+                className="h-8 w-8 rounded-full object-contain bg-transparent"
                 loading="eager"
                 decoding="async"
               />
-              <span className={`font-serif text-base sm:text-lg lg:text-xl font-bold transition-colors duration-300 ${
-                isScrolled ? 'text-white' : 'text-white'
-              }`}>
-                <span className="hidden lg:inline">United Bethel Presbyterian</span>
-                <span className="lg:hidden">UBPC</span>
-              </span>
+              <div className="leading-tight">
+                <a
+                  href="https://maps.google.com/?q=9045+Maier+Road+Suite+D,+Laurel,+MD+20723"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-[0.6rem] uppercase tracking-[0.28em] text-white/45 transition hover:text-white/80"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  Laurel, MD
+                </a>
+                <span className="font-serif text-base font-bold text-white transition-colors duration-300 sm:text-lg lg:text-xl">
+                  <span className="hidden lg:inline">United Bethel Presbyterian</span>
+                  <span className="lg:hidden">UBPC</span>
+                </span>
+              </div>
             </motion.div>
           </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center gap-3">
+            <div className="flex items-center gap-1 rounded-full bg-white/[0.04] p-1.5">
             {navItems.map((item, index) => (
               <motion.div
                 key={item.label}
@@ -214,11 +230,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                       data-groups-button={item.dropdownKey === 'groups' ? true : undefined}
                       data-ministry-button={item.dropdownKey === 'ministry' ? true : undefined}
                       data-blog-button={item.dropdownKey === 'blog' ? true : undefined}
-                      className={`transition-all duration-300 font-medium text-sm flex items-center gap-2 px-3 py-2 rounded-lg ${
-                        isScrolled 
-                          ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
-                          : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
-                      }`}
+                      className={desktopLinkClass}
                       data-testid={`link-nav-${item.label.toLowerCase()}`}
                     >
                       {item.label}
@@ -241,7 +253,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute top-full left-0 mt-2 w-48 bg-black/80 backdrop-blur-xl rounded-lg shadow-xl border border-white/20 py-2 z-50"
+                          className="absolute left-0 top-full z-50 mt-3 w-56 rounded-2xl border border-white/12 bg-black/95 py-2 shadow-[0_24px_80px_rgba(0,0,0,0.46)] backdrop-blur-2xl"
                           data-groups-dropdown={item.dropdownKey === 'groups' ? true : undefined}
                           data-ministry-dropdown={item.dropdownKey === 'ministry' ? true : undefined}
                           data-blog-dropdown={item.dropdownKey === 'blog' ? true : undefined}
@@ -249,7 +261,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                           {(item.dropdownKey === 'groups' ? groupsItems : item.dropdownKey === 'ministry' ? ministryItems : blogItems).map((groupItem) => (
                             <Link key={groupItem.label} href={groupItem.href}>
                               <a
-                                className="block px-4 py-2 text-white hover:bg-white/10 transition-colors duration-200"
+                                className="mx-2 block rounded-xl px-4 py-2.5 text-sm text-white/82 transition-colors duration-200 hover:bg-white/10 hover:text-white"
                                 onClick={() => {
                                   if (item.dropdownKey === 'groups') {
                                     setIsGroupsOpen(false);
@@ -272,11 +284,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                   <a
                     href="/"
                     onClick={handleHomeClick}
-                    className={`transition-all duration-300 font-medium text-sm flex items-center gap-2 px-3 py-2 rounded-lg ${
-                      isScrolled 
-                        ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
-                        : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
-                    }`}
+                    className={desktopLinkClass}
                     data-testid={`link-nav-${item.label.toLowerCase()}`}
                     title={item.label}
                   >
@@ -285,11 +293,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 ) : (
                   <Link href={item.href}>
                     <a
-                      className={`transition-all duration-300 font-medium text-sm flex items-center gap-2 px-3 py-2 rounded-lg ${
-                        isScrolled 
-                          ? 'text-white hover:text-white/80 hover:bg-white/20 hover:backdrop-blur-sm' 
-                          : 'text-white hover:text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
-                      }`}
+                      className={desktopLinkClass}
                       data-testid={`link-nav-${item.label.toLowerCase()}`}
                       title={item.label}
                     >
@@ -299,6 +303,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 )}
               </motion.div>
             ))}
+            </div>
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -306,7 +311,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
             >
               <Button 
                 variant="default" 
-                className="bg-black hover:bg-black/90 text-white border border-white/20"
+                className="rounded-full bg-white px-5 text-black hover:bg-white/90"
                 data-testid="button-visit-us"
                 onClick={handleVisitUs}
               >
@@ -322,9 +327,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
               size="icon"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               data-testid="button-mobile-menu"
-              className={`transition-colors duration-300 ${
-                isScrolled ? 'text-white' : 'text-white'
-              }`}
+              className="rounded-full border border-white/10 bg-white/[0.04] text-white transition-colors duration-300 hover:bg-white/10"
             >
               <AnimatePresence mode="wait">
                 {isMenuOpen ? (
@@ -372,9 +375,17 @@ export default function Navigation({ className = '' }: NavigationProps) {
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="lg:hidden fixed right-0 top-16 h-[calc(100dvh-4rem)] w-[85vw] max-w-sm bg-black/85 backdrop-blur-xl border-l border-white/20 shadow-2xl overflow-y-auto"
+                className="lg:hidden fixed right-3 top-[5.25rem] h-[calc(100dvh-5.75rem)] w-[88vw] max-w-sm overflow-y-auto rounded-[2rem] border border-white/14 bg-black/92 shadow-[0_30px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl"
               >
-                <div className="px-4 py-6 space-y-4">
+                <div className="space-y-5 px-4 py-5">
+                  <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-4">
+                    <p className="text-[0.65rem] uppercase tracking-[0.28em] text-white/45">
+                      United Bethel Presbyterian Church
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-white/74">
+                      Explore worship, events, fellowship groups, and ministry life from one place.
+                    </p>
+                  </div>
                   {navItems.map((item, index) => (
                     <motion.div
                       key={item.label}
@@ -385,11 +396,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                       {item.hasDropdown ? (
                         <div>
                           <button
-                            className={`w-full text-left transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center justify-between hover:bg-white/10 ${
-                              isScrolled 
-                                ? 'text-white hover:text-white/80' 
-                                : 'text-white hover:text-white/80'
-                            }`}
+                            className={`w-full ${mobileLinkClass} justify-between text-left`}
                             onClick={() => {
                               if (item.dropdownKey === 'groups') {
                                 setIsGroupsOpen(!isGroupsOpen);
@@ -425,13 +432,13 @@ export default function Navigation({ className = '' }: NavigationProps) {
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="ml-4 mt-2 space-y-2 bg-black/60 backdrop-blur-sm rounded-lg p-2"
+                              transition={{ duration: 0.2 }}
+                                className="ml-3 mt-2 space-y-2 rounded-2xl border border-white/8 bg-black/85 p-2 backdrop-blur-xl"
                               >
                                 {(item.dropdownKey === 'groups' ? groupsItems : item.dropdownKey === 'ministry' ? ministryItems : blogItems).map((groupItem) => (
                                   <Link key={groupItem.label} href={groupItem.href}>
                                     <a
-                                      className="block py-2 px-3 text-white hover:text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
+                                      className="block rounded-xl px-3 py-2.5 text-white/82 transition-colors duration-200 hover:bg-white/10 hover:text-white"
                                       onClick={() => {
                                         setIsMenuOpen(false);
                                         if (item.dropdownKey === 'groups') {
@@ -458,11 +465,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                             setIsMenuOpen(false);
                             handleHomeClick(event);
                           }}
-                          className={`transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
-                            isScrolled 
-                              ? 'text-white hover:text-white/80' 
-                              : 'text-white hover:text-white/80'
-                          }`}
+                          className={mobileLinkClass}
                           data-testid={`link-mobile-${item.label.toLowerCase()}`}
                         >
                           {item.icon && <item.icon className="h-5 w-5 flex-shrink-0" />}
@@ -471,11 +474,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                       ) : (
                         <Link href={item.href}>
                           <a
-                            className={`transition-colors duration-300 font-medium text-sm py-3 px-3 rounded-lg flex items-center gap-3 hover:bg-white/10 ${
-                              isScrolled 
-                                ? 'text-white hover:text-white/80' 
-                                : 'text-white hover:text-white/80'
-                            }`}
+                            className={mobileLinkClass}
                             data-testid={`link-mobile-${item.label.toLowerCase()}`}
                             onClick={() => setIsMenuOpen(false)}
                           >
@@ -494,7 +493,7 @@ export default function Navigation({ className = '' }: NavigationProps) {
                   >
                     <Button 
                       variant="default" 
-                      className="w-full bg-black hover:bg-black/90 text-white border border-white/20 py-3 text-base font-semibold"
+                      className="w-full rounded-full bg-white py-3 text-base font-semibold text-black hover:bg-white/90"
                       data-testid="button-mobile-visit-us"
                       onClick={() => {
                         setIsMenuOpen(false);

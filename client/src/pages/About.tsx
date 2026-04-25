@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
+import PublicPageLayout from '@/components/PublicPageLayout';
+import PublicPageHero from '@/components/PublicPageHero';
 import {
   Sparkles,
   Target,
@@ -90,38 +90,20 @@ export default function About() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <PublicPageLayout>
+      <PublicPageHero
+        title="About Our Church"
+        description="Discover the story, mission, and community behind United Bethel Presbyterian."
+      />
 
-      <section className="relative pt-24 pb-16 bg-gradient-to-b from-black/95 via-black/90 to-black/85">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="text-left"
-          >
-            <p className="text-white/70 uppercase tracking-[0.2em] text-xs sm:text-sm mb-4">
-              United Bethel Presbyterian Church
-            </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-white mb-6">
-              About Our Church
-            </h1>
-            <p className="text-lg sm:text-xl text-white/85 max-w-3xl leading-relaxed">
-              Discover the story, mission, and community behind United Bethel Presbyterian.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="py-16 sm:py-20 bg-black/95">
+      <section className="py-8 sm:py-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-10 lg:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6 }}
-            className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8"
+            className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-6 sm:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.22)]"
           >
             <div className="flex items-center gap-3 mb-4">
               <Target className="h-6 w-6 text-white" />
@@ -139,7 +121,7 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8"
+            className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-6 sm:p-8 shadow-[0_30px_80px_rgba(0,0,0,0.22)]"
           >
             <div className="flex items-center gap-3 mb-4">
               <Lightbulb className="h-6 w-6 text-white" />
@@ -153,21 +135,21 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 bg-black/90">
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6 }}
-            className="bg-gradient-to-r from-white/10 via-white/5 to-white/10 border border-white/10 rounded-2xl p-6 sm:p-10"
+            className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-[0_40px_120px_rgba(0,0,0,0.3)] sm:p-10"
           >
             <div className="flex items-center gap-3 mb-6">
               <Sparkles className="h-6 w-6 text-white" />
               <h2 className="text-2xl sm:text-3xl font-serif text-white">Our Core Values</h2>
             </div>
             <div className="grid gap-6 md:grid-cols-4">
-              <div className="bg-black/40 rounded-xl p-5 border border-white/10">
+              <div className="rounded-[1.25rem] border border-white/10 bg-black/35 p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <Heart className="h-5 w-5 text-white" />
                   <h3 className="text-white font-semibold">Faith & Worship</h3>
@@ -176,7 +158,7 @@ export default function About() {
                   We gather to worship God with reverence, prayer, and gratitude.
                 </p>
               </div>
-              <div className="bg-black/40 rounded-xl p-5 border border-white/10">
+              <div className="rounded-[1.25rem] border border-white/10 bg-black/35 p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="h-5 w-5 text-white" />
                   <h3 className="text-white font-semibold">Fellowship</h3>
@@ -185,7 +167,7 @@ export default function About() {
                   We build relationships that strengthen our church family.
                 </p>
               </div>
-              <div className="bg-black/40 rounded-xl p-5 border border-white/10">
+              <div className="rounded-[1.25rem] border border-white/10 bg-black/35 p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <Book className="h-5 w-5 text-white" />
                   <h3 className="text-white font-semibold">Scripture</h3>
@@ -194,7 +176,7 @@ export default function About() {
                   We are grounded in the Word to guide our daily lives.
                 </p>
               </div>
-              <div className="bg-black/40 rounded-xl p-5 border border-white/10">
+              <div className="rounded-[1.25rem] border border-white/10 bg-black/35 p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <Globe className="h-5 w-5 text-white" />
                   <h3 className="text-white font-semibold">Service</h3>
@@ -208,7 +190,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-20 bg-black/95">
+      <section className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -220,7 +202,7 @@ export default function About() {
             <h2 className="text-2xl sm:text-3xl font-serif text-white">Moments of Community</h2>
           </motion.div>
 
-          <div className="relative w-full h-[520px] sm:h-[600px] overflow-hidden rounded-3xl bg-gradient-to-br from-black/80 via-black/60 to-black/80 border border-white/10">
+          <div className="relative h-[520px] w-full overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,#111,#050505)] shadow-[0_40px_120px_rgba(0,0,0,0.32)] sm:h-[600px]">
             <div
               className="absolute inset-0 flex items-center justify-center"
               style={{ perspective: '1200px' }}
@@ -362,7 +344,6 @@ export default function About() {
         </div>
       </section>
 
-      <Footer />
-    </div>
+    </PublicPageLayout>
   );
 }
