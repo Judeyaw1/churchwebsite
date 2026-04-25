@@ -29,7 +29,7 @@ interface WeeklyEvent {
 const experienceCards = [
   {
     icon: Clock,
-    eyebrow: 'Gather',
+    eyebrow: 'Gathering',
     title: 'Sunday Services',
     detail: 'Sundays 10:00 AM',
   },
@@ -37,7 +37,7 @@ const experienceCards = [
     icon: MapPin,
     eyebrow: 'Devotion',
     title: 'Virtual Prayer Rhythm',
-    detail: 'Morning devotion Mon - Fri 5:00 AM and evening devotion Mon - Thurs 8:00 PM',
+    detail: 'Morning devotion Mon - Fri 5:00 AM & Evening devotion Mon - Thurs 8:00 PM',
   },
   {
     icon: Calendar,
@@ -268,7 +268,7 @@ export default function HeroSection({ className = '' }: HeroSectionProps) {
               <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
                 <div className="flex items-center gap-3 text-white">
                   <Calendar className="h-5 w-5" />
-                  <span className="text-sm font-medium uppercase tracking-[0.22em]">Upcoming Gatherings</span>
+                  <span className="text-sm font-medium uppercase tracking-[0.22em]">Weekly Gatherings</span>
                 </div>
                 <div className="mt-4 space-y-3">
                   {weeklyEventsLoading ? (
